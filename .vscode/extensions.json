@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "astro-build.astro-vscode",
+    "bradlc.vscode-tailwindcss",
+    "vitest.explorer",
+    "github.vscode-github-actions",
+    "ms-vscode.vscode-typescript-next"
+  ]
+}

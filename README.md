@@ -1,2 +1,145 @@
-# astro-components
-Astro Components
+# Astro Components
+
+A collection of modern, well-tested Astro components built with TypeScript, designed for Astro 5+ projects.
+
+[![CI](https://github.com/sjohansson/astro-components/workflows/CI/badge.svg)](https://github.com/sjohansson/astro-components/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 📦 Packages
+
+This monorepo contains the following Astro components:
+
+- **[@sjohansson/astro-reactflow](./packages/astro-reactflow)** - React Flow integration for Astro
+- **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
+- **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for documentation sites
+
+## 🚀 Quick Start
+
+Install the component you need:
+
+```bash
+pnpm add @sjohansson/astro-theme-toggle
+```
+
+Use it in your Astro project:
+
+```astro
+---
+import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
+---
+
+<ThemeToggle />
+```
+
+## 🛠️ Development
+
+This monorepo uses modern tooling for 2026:
+
+- **Node.js 24** - Latest LTS with enhanced performance
+- **pnpm** - Fast, disk space efficient package manager with workspaces
+- **TypeScript 5.7** - Strict type checking for reliability
+- **Biome** - Lightning-fast linter and formatter (replaces ESLint + Prettier)
+- **Vitest** - Modern test framework with native ESM support
+- **Changesets** - Automated versioning and changelog generation
+- **GitHub Actions** - CI/CD for testing, linting, and publishing
+
+### Prerequisites
+
+- Node.js >= 24.0.0
+- pnpm >= 9.0.0
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/sjohansson/astro-components.git
+cd astro-components
+
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Lint and format
+pnpm lint:fix
+```
+
+### Available Scripts
+
+```bash
+pnpm build          # Build all packages
+pnpm test           # Run tests
+pnpm test:ui        # Run tests with UI
+pnpm test:coverage  # Generate coverage report
+pnpm lint           # Lint code with Biome
+pnpm lint:fix       # Lint and auto-fix issues
+pnpm format         # Format code with Biome
+pnpm typecheck      # Type check with TypeScript
+pnpm check          # Run all checks (lint + typecheck + test)
+pnpm changeset      # Create a changeset for versioning
+pnpm dev            # Run dev mode for all packages
+```
+
+### Project Structure
+
+```
+astro-components/
+├── .changeset/              # Changesets configuration
+├── .github/
+│   └── workflows/           # GitHub Actions workflows
+├── packages/
+│   ├── astro-reactflow/     # React Flow integration
+│   ├── astro-theme-toggle/  # Theme toggle component
+│   └── astro-version-note/  # Version note component
+├── biome.json               # Biome configuration
+├── tsconfig.json            # TypeScript configuration
+├── vitest.config.ts         # Vitest configuration
+└── pnpm-workspace.yaml      # pnpm workspace configuration
+```
+
+## 🧪 Testing
+
+Tests are written using Vitest with happy-dom for DOM testing:
+
+```bash
+# Run tests in watch mode
+pnpm test
+
+# Run tests with UI
+pnpm test:ui
+
+# Generate coverage report
+pnpm test:coverage
+```
+
+## 📝 Creating a Changeset
+
+When making changes, create a changeset to document your changes:
+
+```bash
+pnpm changeset
+```
+
+This will:
+1. Prompt you to select affected packages
+2. Ask for the version bump type (major/minor/patch)
+3. Request a description of your changes
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 📄 License
+
+MIT © [sjohansson](https://github.com/sjohansson)
+
+## 🔗 Links
+
+- [Astro Documentation](https://docs.astro.build)
+- [Biome Documentation](https://biomejs.dev)
+- [Vitest Documentation](https://vitest.dev)
+- [Changesets Documentation](https://github.com/changesets/changesets)
