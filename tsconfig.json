@@ -10,6 +10,7 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "types": ["astro/client", "node"],
     
     // Type Checking
     "strict": true,
@@ -39,6 +40,6 @@
     // Skip Lib Check
     "skipLibCheck": true
   },
-  "include": ["packages/*/src/**/*"],
+  "include": ["packages/*/src/**/*", "types/**/*.d.ts"],
   "exclude": ["node_modules", "**/dist", "**/node_modules"]
 }

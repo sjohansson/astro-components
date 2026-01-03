@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../src/VersionNote.astro', () => ({
+  default: () => null,
+}));
 
 describe('VersionNote', () => {
   it('should export VersionNote component', async () => {

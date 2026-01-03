@@ -35,7 +35,14 @@
     "url": "https://github.com/sjohansson/astro-components.git",
     "directory": "packages/astro-version-note"
   },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "astro": "^5.0.0"
-  }
+  },
+  "sideEffects": ["./dist/**/*.css", "./src/**/*.astro"]
 }
