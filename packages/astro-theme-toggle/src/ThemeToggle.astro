@@ -46,21 +46,20 @@ const { class: className } = Astro.props;
   </svg>
 </button>
 
-<script>
+<script lang="ts">
   function initThemeToggle() {
     const button = document.querySelector("[data-theme-toggle]");
     if (!button) return;
 
     const sunIcon = button.querySelector(".sun-icon");
     const moonIcon = button.querySelector(".moon-icon");
+    const root = document.documentElement;
 
     // Get theme from localStorage or system preference
     const getTheme = (): string => {
-      if (
-        typeof localStorage !== "undefined" &&
-        localStorage.getItem("theme")
-      ) {
-        return localStorage.getItem("theme") || "light";
+      if (typeof localStorage !== "undefined") {
+        const storedTheme = localStorage.getItem("theme");
+        if (storedTheme) return storedTheme;
       }
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         return "dark";
@@ -71,26 +70,32 @@ const { class: className } = Astro.props;
     // Set theme
     const setTheme = (theme: string) => {
       if (theme === "dark") {
-        document.documentElement.classList.add("dark");
+        root.classList.add("dark");
         sunIcon?.classList.add("hidden");
         moonIcon?.classList.remove("hidden");
       } else {
-        document.documentElement.classList.remove("dark");
+        root.classList.remove("dark");
         sunIcon?.classList.remove("hidden");
         moonIcon?.classList.add("hidden");
       }
-      localStorage.setItem("theme", theme);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("theme", theme);
+      }
     };
 
     // Initialize theme
     setTheme(getTheme());
 
     // Toggle theme on button click
-    button.addEventListener("click", () => {
-      const currentTheme = getTheme();
-      const newTheme = currentTheme === "dark" ? "light" : "dark";
-      setTheme(newTheme);
-    });
+    button.addEventListener(
+      "click",
+      () => {
+        const currentTheme = getTheme();
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        setTheme(newTheme);
+      },
+      { passive: true },
+    );
   }
 
   // Initialize on page load

@@ -5,7 +5,7 @@
   "description": "A collection of modern Astro components",
   "type": "module",
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=20.11.0",
     "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@9.15.0",
@@ -18,7 +18,7 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm run lint && pnpm run typecheck && pnpm run test run",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "pnpm run build && changeset publish",
