@@ -10,26 +10,20 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "import": "./dist/integration.js"
+    },
     "./styles": "./dist/styles.css"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
+  "files": ["dist", "src"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest"
   },
-  "keywords": [
-    "astro",
-    "astro-component",
-    "theme",
-    "dark-mode",
-    "light-mode",
-    "tailwindcss"
-  ],
+  "keywords": ["astro", "astro-component", "theme", "dark-mode", "light-mode", "tailwindcss"],
   "author": "sjohansson",
   "license": "MIT",
   "repository": {

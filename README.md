@@ -13,6 +13,8 @@ This monorepo contains the following Astro components:
 - **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
 - **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for documentation sites
 
+Each component can be used as either a standalone component or as an Astro integration for enhanced functionality and automatic configuration.
+
 ## 🚀 Quick Start
 
 Install the component you need:
@@ -21,7 +23,19 @@ Install the component you need:
 pnpm add @sjohansson/astro-theme-toggle
 ```
 
-Use it in your Astro project:
+### Option 1: Use as an Integration (Recommended)
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+
+export default defineConfig({
+  integrations: [themeToggle()],
+});
+```
+
+### Option 2: Use as a Component
 
 ```astro
 ---
@@ -30,6 +44,8 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 
 <ThemeToggle />
 ```
+
+**See the [Integration Guide](./INTEGRATION_GUIDE.md) for detailed usage instructions and best practices.**
 
 ## 🛠️ Development
 
@@ -147,6 +163,13 @@ This will:
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 📚 Documentation
+
+- **[Integration Guide](./INTEGRATION_GUIDE.md)** - Learn how to use components as integrations vs standalone
+- **[Packaging Guide](./PACKAGING_GUIDE.md)** - Architecture and best practices for the monorepo
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute to this project
+- **[Getting Started](./GETTING_STARTED.md)** - Detailed setup and workflow guide
 
 ## 📄 License
 
