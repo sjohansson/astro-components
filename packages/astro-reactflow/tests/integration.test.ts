@@ -18,7 +18,7 @@ describe('ReactFlow Integration', () => {
   });
 
   it('should accept options', () => {
-    const result = reactFlowIntegration({ injectStyles: false });
+    const result = reactFlowIntegration({ configureSsr: false });
 
     expect(result).toBeDefined();
     expect(result.name).toBe('@sjohansson/astro-reactflow');
@@ -31,7 +31,7 @@ describe('ReactFlow Integration', () => {
     expect(result.name).toBe('@sjohansson/astro-reactflow');
   });
 
-  it('should default injectStyles to true', () => {
+  it('should default configureSsr to true', () => {
     const result = reactFlowIntegration();
 
     expect(result).toBeDefined();

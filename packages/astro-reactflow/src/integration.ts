@@ -2,17 +2,19 @@ import type { AstroIntegration } from 'astro';
 
 export interface ReactFlowOptions {
   /**
-   * Whether to automatically inject React Flow styles globally
+   * Whether to configure React Flow for proper SSR handling
    * @default true
    */
-  injectStyles?: boolean;
+  configureSsr?: boolean;
 }
 
 /**
  * Astro integration for React Flow components.
  *
  * This integration provides React Flow diagram support for Astro sites,
- * with automatic React renderer setup and optional style injection.
+ * with automatic React renderer setup and SSR configuration.
+ *
+ * Note: React Flow styles are imported automatically by the ReactFlowWrapper component.
  *
  * @example
  * ```js
@@ -23,13 +25,13 @@ export interface ReactFlowOptions {
  * export default defineConfig({
  *   integrations: [
  *     react(),
- *     reactFlow({ injectStyles: true })
+ *     reactFlow({ configureSsr: true })
  *   ],
  * });
  * ```
  */
 export default function reactFlowIntegration(options: ReactFlowOptions = {}): AstroIntegration {
-  const { injectStyles = true } = options;
+  const { configureSsr = true } = options;
 
   return {
     name: '@sjohansson/astro-reactflow',
@@ -37,18 +39,18 @@ export default function reactFlowIntegration(options: ReactFlowOptions = {}): As
       'astro:config:setup': ({ logger, updateConfig }) => {
         logger.info('Setting up React Flow integration');
 
-        // Inject React Flow styles if requested
-        if (injectStyles) {
+        // Configure SSR handling for React Flow if requested
+        if (configureSsr) {
           updateConfig({
             vite: {
               ssr: {
-                // Ensure React Flow is not SSR'd since it requires client-side rendering
+                // Ensure React Flow is bundled for SSR compatibility
                 noExternal: ['@xyflow/react'],
               },
             },
           });
 
-          logger.debug('React Flow styles will be automatically injected');
+          logger.debug('React Flow SSR configuration applied');
         }
       },
       'astro:config:done': ({ config, logger }) => {

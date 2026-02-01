@@ -13,12 +13,12 @@ export default defineConfig({
       injectScript: true,
     }),
     versionNote({
-      // Set default type for version notes
+      // Document version note conventions (informational)
       defaultType: 'info',
     }),
     reactFlow({
-      // Automatically handle React Flow styles
-      injectStyles: true,
+      // Configure SSR handling for React Flow
+      configureSsr: true,
     }),
   ],
 });

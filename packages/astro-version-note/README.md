@@ -12,7 +12,7 @@ pnpm add @sjohansson/astro-version-note
 
 ### As an Astro Integration (Recommended)
 
-Use the integration for consistent configuration across your site:
+Use the integration to document your configuration and ensure proper setup:
 
 ```js
 // astro.config.mjs
@@ -22,7 +22,7 @@ import versionNote from '@sjohansson/astro-version-note/integration';
 export default defineConfig({
   integrations: [
     versionNote({
-      // Optional: set defaults for all version notes
+      // Document your version note conventions (informational only)
       defaultVersion: 'v1.0.0',
       defaultType: 'info',
     })
@@ -43,9 +43,11 @@ import { VersionNote } from '@sjohansson/astro-version-note';
 ```
 
 **Benefits of using the integration:**
-- Global defaults for consistent styling
-- Configuration validation
-- Runtime configuration access
+- Documents your version note conventions
+- Validates integration setup
+- Logs configuration during build
+
+**Note:** The integration options are informational only. You must explicitly provide `version` and `type` props when using the component.
 
 ### As a Standalone Component
 
@@ -65,10 +67,12 @@ import { VersionNote } from '@sjohansson/astro-version-note';
 
 ### Integration Options
 
-| Option          | Type                                           | Description                      | Default  |
-| --------------- | ---------------------------------------------- | -------------------------------- | -------- |
-| `defaultVersion`| `string`                                       | Default version for all notes    | —        |
-| `defaultType`   | `"info"` \| `"warning"` \| `"success"` \| `"error"` | Default visual variant           | `"info"` |
+| Option          | Type                                           | Description                                      | Default  |
+| --------------- | ---------------------------------------------- | ------------------------------------------------ | -------- |
+| `defaultVersion`| `string`                                       | Documents your version convention (info only)    | —        |
+| `defaultType`   | `"info"` \| `"warning"` \| `"success"` \| `"error"` | Documents your default type (info only)          | `"info"` |
+
+**Note:** These options are for documentation purposes only and do not affect component behavior. Always provide explicit props when using the component.
 
 ### Component Props
 

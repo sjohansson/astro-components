@@ -24,8 +24,8 @@ export default defineConfig({
   integrations: [
     react(), // Required
     reactFlow({
-      // Optional: inject React Flow styles automatically
-      injectStyles: true,
+      // Optional: configure SSR handling for React Flow
+      configureSsr: true,
     })
   ],
 });
@@ -51,8 +51,8 @@ const edges = [];
 
 **Benefits of using the integration:**
 - Automatic detection of missing React integration
-- Optimized Vite configuration for React Flow
-- Proper SSR handling
+- Optimized Vite configuration for React Flow SSR compatibility
+- Proper dependency validation
 
 ### As a Standalone Component
 
@@ -78,9 +78,11 @@ const edges = [];
 
 ### Integration Options
 
-| Option         | Type      | Description                            | Default |
-| -------------- | --------- | -------------------------------------- | ------- |
-| `injectStyles` | `boolean` | Automatically inject React Flow styles | `true`  |
+| Option          | Type      | Description                                   | Default |
+| --------------- | --------- | --------------------------------------------- | ------- |
+| `configureSsr`  | `boolean` | Configure React Flow for SSR compatibility    | `true`  |
+
+**Note:** React Flow styles are automatically imported by the ReactFlowWrapper component and cannot be disabled via integration options.
 
 ### Component Props
 

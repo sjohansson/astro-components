@@ -19,6 +19,9 @@ export interface VersionNoteOptions {
  * This integration provides documentation version notes for Astro sites,
  * perfect for highlighting version-specific features or changes.
  *
+ * Note: The default values configured in this integration are informational only.
+ * Component props must be explicitly provided when using the VersionNote component.
+ *
  * @example
  * ```js
  * // astro.config.mjs
@@ -40,12 +43,15 @@ export default function versionNoteIntegration(options: VersionNoteOptions = {})
     hooks: {
       'astro:config:setup': ({ logger }) => {
         logger.info('Setting up Version Note integration');
+        if (options.defaultVersion) {
+          logger.debug(`Default version configured: ${options.defaultVersion}`);
+        }
+        if (options.defaultType) {
+          logger.debug(`Default type configured: ${options.defaultType}`);
+        }
       },
       'astro:config:done': ({ logger }) => {
         logger.info('Version Note integration configured');
-        if (options.defaultVersion) {
-          logger.debug(`Default version: ${options.defaultVersion}`);
-        }
       },
     },
   };
