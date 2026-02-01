@@ -1,8 +1,8 @@
-import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
+import reactFlow from '@sjohansson/astro-reactflow/integration';
 import themeToggle from '@sjohansson/astro-theme-toggle/integration';
 import versionNote from '@sjohansson/astro-version-note/integration';
-import reactFlow from '@sjohansson/astro-reactflow/integration';
+import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
