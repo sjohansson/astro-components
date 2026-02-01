@@ -47,6 +47,14 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 
 **See the [Integration Guide](./INTEGRATION_GUIDE.md) for detailed usage instructions and best practices.**
 
+## 📁 Examples
+
+Check out the [examples directory](./examples) for complete working examples:
+
+- **[Basic Usage](./examples/basic-usage)** - All three integrations working together
+
+Each example is a fully functional Astro project you can run and explore.
+
 ## 🛠️ Development
 
 This monorepo uses modern tooling for 2026:

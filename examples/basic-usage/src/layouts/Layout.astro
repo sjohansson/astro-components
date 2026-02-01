@@ -1,0 +1,89 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = 'Astro Components Example' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: #fff;
+        padding: 2rem;
+      }
+
+      body.dark {
+        color: #ddd;
+        background: #1a1a1a;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      body.dark header {
+        border-bottom-color: #333;
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        margin: 2rem 0 1rem;
+      }
+
+      section {
+        margin: 2rem 0;
+      }
+
+      .border {
+        border: 1px solid #e0e0e0;
+      }
+
+      body.dark .border {
+        border-color: #333;
+      }
+
+      .rounded {
+        border-radius: 0.5rem;
+      }
+
+      .h-96 {
+        height: 24rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <slot />
+    </div>
+  </body>
+</html>
