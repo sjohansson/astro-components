@@ -1,23 +1,18 @@
 ---
-import type { ThemeConfig } from "./types";
-import { defaultThemes } from "./theme-config";
+import { defaultThemes } from './theme-config';
+import type { ThemeConfig } from './types';
 
 interface Props {
   class?: string;
   /** Show all themes or a specific theme */
-  theme?: "all" | ThemeConfig["mode"];
+  theme?: 'all' | ThemeConfig['mode'];
   /** Custom themes to preview */
   themes?: ThemeConfig[];
 }
 
-const {
-  class: className,
-  theme = "all",
-  themes = defaultThemes,
-} = Astro.props;
+const { class: className, theme = 'all', themes = defaultThemes } = Astro.props;
 
-const themesToShow =
-  theme === "all" ? themes : themes.filter((t) => t.mode === theme);
+const themesToShow = theme === 'all' ? themes : themes.filter((t) => t.mode === theme);
 ---
 
 <div class={`theme-preview ${className || ""}`}>

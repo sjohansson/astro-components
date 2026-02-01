@@ -1,12 +1,7 @@
 /**
  * Theme mode options supported by the theme controller
  */
-export type ThemeMode =
-  | "system"
-  | "light"
-  | "dark"
-  | "high-contrast-light"
-  | "high-contrast-dark";
+export type ThemeMode = 'system' | 'light' | 'dark' | 'high-contrast-light' | 'high-contrast-dark';
 
 /**
  * Color token definition for a specific theme color
@@ -25,7 +20,7 @@ export interface ColorToken {
  */
 export interface ThemeConfig {
   /** Theme identifier */
-  mode: Exclude<ThemeMode, "system">;
+  mode: Exclude<ThemeMode, 'system'>;
   /** Display name for the theme */
   label: string;
   /** Theme description */
@@ -74,7 +69,7 @@ export interface ThemeControllerProps {
   /** Optional CSS class for styling */
   class?: string;
   /** Position of the theme selector */
-  position?: "inline" | "dropdown";
+  position?: 'inline' | 'dropdown';
   /** Show labels next to icons */
   showLabels?: boolean;
   /** Custom theme configurations (overrides defaults) */

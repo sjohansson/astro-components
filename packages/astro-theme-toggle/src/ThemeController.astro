@@ -1,12 +1,12 @@
 ---
-import type { ThemeControllerProps } from "./types";
-import { defaultThemes } from "./theme-config";
+import { defaultThemes } from './theme-config';
+import type { ThemeControllerProps } from './types';
 
 interface Props extends ThemeControllerProps {}
 
 const {
   class: className,
-  position = "dropdown",
+  position = 'dropdown',
   showLabels = false,
   themes = defaultThemes,
 } = Astro.props;

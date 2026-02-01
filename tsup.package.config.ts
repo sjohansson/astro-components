@@ -1,4 +1,4 @@
-import { defineConfig, type Options } from 'tsup';
+import { type Options, defineConfig } from 'tsup';
 
 type PackageConfigOptions = {
   entry?: string;
@@ -10,9 +10,10 @@ const assetLoaders: NonNullable<Options['esbuildOptions']>['loader'] = {
   '.css': 'copy',
 };
 
-export function createPackageConfig(
-  { entry = 'src/index.ts', external = [] }: PackageConfigOptions = {},
-) {
+export function createPackageConfig({
+  entry = 'src/index.ts',
+  external = [],
+}: PackageConfigOptions = {}) {
   return defineConfig({
     entry: [entry],
     format: ['esm'],

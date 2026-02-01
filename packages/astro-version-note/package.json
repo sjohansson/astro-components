@@ -11,23 +11,14 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "src"
-  ],
+  "files": ["dist", "src"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest"
   },
-  "keywords": [
-    "astro",
-    "astro-component",
-    "version",
-    "documentation",
-    "notes"
-  ],
+  "keywords": ["astro", "astro-component", "version", "documentation", "notes"],
   "author": "sjohansson",
   "license": "MIT",
   "repository": {
