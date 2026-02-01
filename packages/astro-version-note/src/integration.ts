@@ -38,20 +38,8 @@ export default function versionNoteIntegration(options: VersionNoteOptions = {})
   return {
     name: '@sjohansson/astro-version-note',
     hooks: {
-      'astro:config:setup': ({ logger, updateConfig }) => {
+      'astro:config:setup': ({ logger }) => {
         logger.info('Setting up Version Note integration');
-
-        // Store integration options in Astro's public config for runtime access
-        updateConfig({
-          vite: {
-            define: {
-              __ASTRO_VERSION_NOTE_CONFIG__: JSON.stringify({
-                defaultVersion: options.defaultVersion,
-                defaultType: options.defaultType || 'info',
-              }),
-            },
-          },
-        });
       },
       'astro:config:done': ({ logger }) => {
         logger.info('Version Note integration configured');
