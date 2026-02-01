@@ -1,4 +1,37 @@
 .reactflow-wrapper {
   width: 100%;
   height: 500px;
+  position: relative;
+}
+
+.export-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+
+.export-button {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.export-button:hover {
+  background: #f5f5f5;
+  border-color: #999;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.export-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }

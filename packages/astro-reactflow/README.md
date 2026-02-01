@@ -26,6 +26,32 @@ const edges = [];
 />
 ```
 
+### With Export Feature
+
+To enable diagram export, set the `enableExport` prop to `true`:
+
+```astro
+---
+import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
+
+const nodes = [
+  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Start' } },
+  { id: '2', position: { x: 100, y: 100 }, data: { label: 'End' } }
+];
+const edges = [{ id: 'e1-2', source: '1', target: '2' }];
+---
+
+<ReactFlowWrapper
+  client:only="react"
+  nodes={nodes}
+  edges={edges}
+  enableExport={true}
+  className="h-96 rounded-xl bg-surface-1"
+/>
+```
+
+When enabled, two export buttons (PNG and SVG) will appear in the top-right corner of the diagram, allowing users to download the diagram.
+
 ### Props
 
 | Prop       | Type                    | Description                                     |
@@ -33,6 +59,7 @@ const edges = [];
 | `nodes`    | `Node[]`                | Nodes to render.                                |
 | `edges`    | `Edge[]`                | Edges to render.                                |
 | `className`| `string` (optional)     | Additional classes applied to the outer wrapper |
+| `enableExport` | `boolean` (optional) | Enable export buttons for PNG/SVG download (default: `false`) |
 
 ### Styling
 
