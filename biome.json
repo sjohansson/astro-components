@@ -8,15 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      "coverage",
-      ".astro",
-      "*.min.js",
-      "pnpm-lock.yaml"
-    ]
+    "ignore": ["node_modules", "dist", "build", "coverage", ".astro", "*.min.js", "pnpm-lock.yaml"]
   },
   "formatter": {
     "enabled": true,

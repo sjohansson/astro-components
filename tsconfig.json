@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "types": ["astro/client", "node"],
-    
+
     // Type Checking
     "strict": true,
     "noUnusedLocals": true,
@@ -24,19 +24,19 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
-    
+
     // Emit
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "noEmit": true,
-    
+
     // Interop
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
-    
+
     // Skip Lib Check
     "skipLibCheck": true
   },
