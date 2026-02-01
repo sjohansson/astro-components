@@ -1,0 +1,346 @@
+---
+import type { ThemeConfig } from "./types";
+import { defaultThemes } from "./theme-config";
+
+interface Props {
+  class?: string;
+  /** Show all themes or a specific theme */
+  theme?: "all" | ThemeConfig["mode"];
+  /** Custom themes to preview */
+  themes?: ThemeConfig[];
+}
+
+const {
+  class: className,
+  theme = "all",
+  themes = defaultThemes,
+} = Astro.props;
+
+const themesToShow =
+  theme === "all" ? themes : themes.filter((t) => t.mode === theme);
+---
+
+<div class={`theme-preview ${className || ""}`}>
+  <h2 class="preview-title">Theme Color Palette</h2>
+  <p class="preview-description">
+    Preview of color tokens across different theme modes. These colors are
+    available as CSS custom properties in your application.
+  </p>
+
+  <div class="theme-grid">
+    {
+      themesToShow.map((themeConfig) => (
+        <div class="theme-card">
+          <div class="theme-header">
+            <h3 class="theme-name">{themeConfig.label}</h3>
+            {themeConfig.description && (
+              <p class="theme-desc">{themeConfig.description}</p>
+            )}
+          </div>
+
+          <div class="color-section">
+            <h4 class="section-title">Background</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.background.primary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Primary</span>
+                  <code class="color-var">--theme-bg-primary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.background.primary}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.background.secondary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Secondary</span>
+                  <code class="color-var">--theme-bg-secondary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.background.secondary}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.background.tertiary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Tertiary</span>
+                  <code class="color-var">--theme-bg-tertiary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.background.tertiary}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <h4 class="section-title">Foreground</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.foreground.primary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Primary</span>
+                  <code class="color-var">--theme-fg-primary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.foreground.primary}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.foreground.secondary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Secondary</span>
+                  <code class="color-var">--theme-fg-secondary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.foreground.secondary}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.foreground.tertiary}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Tertiary</span>
+                  <code class="color-var">--theme-fg-tertiary</code>
+                  <span class="color-value">
+                    {themeConfig.colors.foreground.tertiary}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <h4 class="section-title">Interactive</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.interactive.default}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Default</span>
+                  <code class="color-var">--theme-interactive-default</code>
+                  <span class="color-value">
+                    {themeConfig.colors.interactive.default}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.interactive.hover}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Hover</span>
+                  <code class="color-var">--theme-interactive-hover</code>
+                  <span class="color-value">
+                    {themeConfig.colors.interactive.hover}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <h4 class="section-title">Semantic</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.semantic.success}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Success</span>
+                  <code class="color-var">--theme-success</code>
+                  <span class="color-value">
+                    {themeConfig.colors.semantic.success}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.semantic.warning}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Warning</span>
+                  <code class="color-var">--theme-warning</code>
+                  <span class="color-value">
+                    {themeConfig.colors.semantic.warning}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.semantic.error}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Error</span>
+                  <code class="color-var">--theme-error</code>
+                  <span class="color-value">
+                    {themeConfig.colors.semantic.error}
+                  </span>
+                </div>
+              </div>
+              <div class="color-item">
+                <div
+                  class="color-swatch"
+                  style={`background-color: ${themeConfig.colors.semantic.info}`}
+                />
+                <div class="color-info">
+                  <span class="color-name">Info</span>
+                  <code class="color-var">--theme-info</code>
+                  <span class="color-value">
+                    {themeConfig.colors.semantic.info}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .theme-preview {
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 0.5rem;
+  }
+
+  .preview-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #212529;
+  }
+
+  .preview-description {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+
+  .theme-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+  }
+
+  .theme-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .theme-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #212529;
+  }
+
+  .theme-desc {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0;
+  }
+
+  .color-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .color-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #495057;
+    margin-bottom: 0.75rem;
+  }
+
+  .color-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .color-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+  }
+
+  .color-swatch {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+
+  .color-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .color-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #212529;
+  }
+
+  .color-var {
+    font-size: 0.75rem;
+    font-family: "Courier New", monospace;
+    color: #0d6efd;
+    background: #e7f3ff;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    align-self: flex-start;
+  }
+
+  .color-value {
+    font-size: 0.75rem;
+    font-family: "Courier New", monospace;
+    color: #6c757d;
+  }
+</style>

@@ -1,0 +1,612 @@
+---
+import type { ThemeControllerProps } from "./types";
+import { defaultThemes } from "./theme-config";
+
+interface Props extends ThemeControllerProps {}
+
+const {
+  class: className,
+  position = "dropdown",
+  showLabels = false,
+  themes = defaultThemes,
+} = Astro.props;
+---
+
+<div class={`theme-controller ${className || ""}`} data-theme-controller>
+  {
+    position === "dropdown" ? (
+      <div class="theme-dropdown">
+        <button
+          type="button"
+          class="theme-button"
+          aria-label="Select theme"
+          aria-haspopup="true"
+          aria-expanded="false"
+          data-theme-dropdown-button
+        >
+          <svg
+            class="theme-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="10"
+              cy="10"
+              r="4"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M10 2V4M10 16V18M18 10H16M4 10H2M15.657 4.343L14.243 5.757M5.757 14.243L4.343 15.657M15.657 15.657L14.243 14.243M5.757 5.757L4.343 4.343"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="current-theme-label" data-current-theme-label>
+            Theme
+          </span>
+          <svg
+            class="dropdown-arrow"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 6L8 10L12 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <div
+          class="theme-menu"
+          role="menu"
+          aria-label="Theme selection"
+          data-theme-menu
+        >
+          <button
+            type="button"
+            class="theme-option"
+            role="menuitem"
+            data-theme-option="system"
+          >
+            <svg
+              class="option-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="2"
+                y="3"
+                width="12"
+                height="10"
+                rx="1"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path d="M2 6h12" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <span class="option-label">System</span>
+            <svg
+              class="check-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 8L6.5 11.5L13 5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          {themes.map((theme) => (
+            <button
+              type="button"
+              class="theme-option"
+              role="menuitem"
+              data-theme-option={theme.mode}
+            >
+              <svg
+                class="option-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {theme.mode.includes("light") ? (
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="3"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                ) : (
+                  <path
+                    d="M13 9.5A5.5 5.5 0 1 1 6.5 3a4.5 4.5 0 0 0 6.5 6.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                )}
+                {theme.mode.includes("high-contrast") && (
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-dasharray="2 2"
+                  />
+                )}
+              </svg>
+              <span class="option-label">{theme.label}</span>
+              {theme.description && (
+                <span class="option-description">{theme.description}</span>
+              )}
+              <svg
+                class="check-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 8L6.5 11.5L13 5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="theme-inline">
+        {themes.map((theme) => (
+          <button
+            type="button"
+            class={`theme-inline-button ${showLabels ? "with-label" : ""}`}
+            data-theme-option={theme.mode}
+            aria-label={theme.label}
+            title={theme.description || theme.label}
+          >
+            <svg
+              class="option-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {theme.mode.includes("light") ? (
+                <>
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="4"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M10 2V4M10 16V18M18 10H16M4 10H2"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                </>
+              ) : (
+                <path
+                  d="M17 12.5A7.5 7.5 0 1 1 7.5 3a6 6 0 0 0 9.5 9.5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              )}
+            </svg>
+            {showLabels && <span class="option-label">{theme.label}</span>}
+          </button>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<script lang="ts" define:vars={{ themes }}>
+  function initThemeController() {
+    const controller = document.querySelector("[data-theme-controller]");
+    if (!controller) return;
+
+    const dropdownButton = controller.querySelector(
+      "[data-theme-dropdown-button]",
+    );
+    const menu = controller.querySelector("[data-theme-menu]");
+    const currentLabel = controller.querySelector("[data-current-theme-label]");
+    const options = controller.querySelectorAll("[data-theme-option]");
+
+    const root = document.documentElement;
+
+    // Get current theme from localStorage or system preference
+    const getCurrentTheme = (): string => {
+      if (typeof localStorage !== "undefined") {
+        const stored = localStorage.getItem("theme-mode");
+        if (stored) return stored;
+      }
+      return "system";
+    };
+
+    // Get effective theme (resolve system to actual theme)
+    const getEffectiveTheme = (
+      themeMode: string,
+    ): "light" | "dark" | "high-contrast-light" | "high-contrast-dark" => {
+      if (themeMode === "system") {
+        // Check for high contrast preference
+        const prefersHighContrast =
+          window.matchMedia &&
+          window.matchMedia("(prefers-contrast: more)").matches;
+
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        if (prefersHighContrast) {
+          return prefersDark ? "high-contrast-dark" : "high-contrast-light";
+        }
+        return prefersDark ? "dark" : "light";
+      }
+      return themeMode as
+        | "light"
+        | "dark"
+        | "high-contrast-light"
+        | "high-contrast-dark";
+    };
+
+    // Apply theme to document
+    const applyTheme = (themeMode: string) => {
+      const effectiveTheme = getEffectiveTheme(themeMode);
+
+      // Remove all theme classes
+      root.classList.remove(
+        "theme-light",
+        "theme-dark",
+        "theme-high-contrast-light",
+        "theme-high-contrast-dark",
+      );
+
+      // Add new theme class
+      root.classList.add(`theme-${effectiveTheme}`);
+
+      // Apply CSS custom properties
+      const themeConfig = themes.find((t) => t.mode === effectiveTheme);
+      if (themeConfig) {
+        const colors = themeConfig.colors;
+
+        // Background
+        root.style.setProperty("--theme-bg-primary", colors.background.primary);
+        root.style.setProperty(
+          "--theme-bg-secondary",
+          colors.background.secondary,
+        );
+        root.style.setProperty(
+          "--theme-bg-tertiary",
+          colors.background.tertiary,
+        );
+
+        // Foreground
+        root.style.setProperty("--theme-fg-primary", colors.foreground.primary);
+        root.style.setProperty(
+          "--theme-fg-secondary",
+          colors.foreground.secondary,
+        );
+        root.style.setProperty(
+          "--theme-fg-tertiary",
+          colors.foreground.tertiary,
+        );
+
+        // Borders
+        root.style.setProperty("--theme-border-default", colors.border.default);
+        root.style.setProperty("--theme-border-hover", colors.border.hover);
+        root.style.setProperty("--theme-border-focus", colors.border.focus);
+
+        // Interactive
+        root.style.setProperty(
+          "--theme-interactive-default",
+          colors.interactive.default,
+        );
+        root.style.setProperty(
+          "--theme-interactive-hover",
+          colors.interactive.hover,
+        );
+        root.style.setProperty(
+          "--theme-interactive-active",
+          colors.interactive.active,
+        );
+        root.style.setProperty(
+          "--theme-interactive-disabled",
+          colors.interactive.disabled,
+        );
+
+        // Semantic
+        root.style.setProperty("--theme-success", colors.semantic.success);
+        root.style.setProperty("--theme-warning", colors.semantic.warning);
+        root.style.setProperty("--theme-error", colors.semantic.error);
+        root.style.setProperty("--theme-info", colors.semantic.info);
+      }
+
+      // Update UI
+      options.forEach((opt) => {
+        const optTheme = opt.getAttribute("data-theme-option");
+        if (optTheme === themeMode) {
+          opt.classList.add("active");
+        } else {
+          opt.classList.remove("active");
+        }
+      });
+
+      // Update current label
+      if (currentLabel) {
+        const activeTheme = themes.find((t) => t.mode === effectiveTheme);
+        if (themeMode === "system") {
+          currentLabel.textContent = "System";
+        } else if (activeTheme) {
+          currentLabel.textContent = activeTheme.label;
+        }
+      }
+
+      // Store preference
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("theme-mode", themeMode);
+      }
+    };
+
+    // Initialize theme
+    applyTheme(getCurrentTheme());
+
+    // Dropdown toggle
+    if (dropdownButton && menu) {
+      dropdownButton.addEventListener(
+        "click",
+        () => {
+          const isOpen = menu.classList.contains("open");
+          if (isOpen) {
+            menu.classList.remove("open");
+            dropdownButton.setAttribute("aria-expanded", "false");
+          } else {
+            menu.classList.add("open");
+            dropdownButton.setAttribute("aria-expanded", "true");
+          }
+        },
+        { passive: true },
+      );
+
+      // Close dropdown on outside click
+      document.addEventListener("click", (e) => {
+        if (!controller.contains(e.target as Node)) {
+          menu.classList.remove("open");
+          dropdownButton.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+
+    // Theme option clicks
+    options.forEach((option) => {
+      option.addEventListener(
+        "click",
+        () => {
+          const theme = option.getAttribute("data-theme-option");
+          if (theme) {
+            applyTheme(theme);
+            if (menu) {
+              menu.classList.remove("open");
+              if (dropdownButton) {
+                dropdownButton.setAttribute("aria-expanded", "false");
+              }
+            }
+          }
+        },
+        { passive: true },
+      );
+    });
+
+    // Listen to system theme changes
+    if (window.matchMedia) {
+      const colorSchemeQuery = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      );
+      const contrastQuery = window.matchMedia("(prefers-contrast: more)");
+
+      const updateSystemTheme = () => {
+        const current = getCurrentTheme();
+        if (current === "system") {
+          applyTheme("system");
+        }
+      };
+
+      colorSchemeQuery.addEventListener("change", updateSystemTheme);
+      contrastQuery.addEventListener("change", updateSystemTheme);
+    }
+  }
+
+  // Initialize on load
+  initThemeController();
+
+  // Re-initialize after view transitions
+  document.addEventListener("astro:after-swap", initThemeController);
+</script>
+
+<style>
+  .theme-controller {
+    position: relative;
+  }
+
+  /* Dropdown styles */
+  .theme-dropdown {
+    position: relative;
+  }
+
+  .theme-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.375rem;
+    background: var(--theme-bg-primary, #ffffff);
+    color: var(--theme-fg-primary, #212529);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+  }
+
+  .theme-button:hover {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border-color: var(--theme-border-hover, #adb5bd);
+  }
+
+  .theme-button:focus {
+    outline: 2px solid var(--theme-border-focus, #0d6efd);
+    outline-offset: 2px;
+  }
+
+  .theme-icon,
+  .dropdown-arrow {
+    flex-shrink: 0;
+  }
+
+  .current-theme-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  .theme-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 16rem;
+    background: var(--theme-bg-primary, #ffffff);
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.5rem;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.5rem);
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+
+  .theme-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .theme-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--theme-fg-primary, #212529);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .theme-option:hover {
+    background: var(--theme-bg-secondary, #f8f9fa);
+  }
+
+  .theme-option:focus {
+    outline: 2px solid var(--theme-border-focus, #0d6efd);
+    outline-offset: -2px;
+  }
+
+  .option-icon {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  .option-label {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .option-description {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--theme-fg-tertiary, #6c757d);
+    margin-top: 0.125rem;
+  }
+
+  .check-icon {
+    flex-shrink: 0;
+    opacity: 0;
+    color: var(--theme-interactive-default, #0d6efd);
+  }
+
+  .theme-option.active .check-icon {
+    opacity: 1;
+  }
+
+  /* Inline styles */
+  .theme-inline {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
+  .theme-inline-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.375rem;
+    background: var(--theme-bg-primary, #ffffff);
+    color: var(--theme-fg-primary, #212529);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .theme-inline-button:hover {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border-color: var(--theme-border-hover, #adb5bd);
+  }
+
+  .theme-inline-button:focus {
+    outline: 2px solid var(--theme-border-focus, #0d6efd);
+    outline-offset: 2px;
+  }
+
+  .theme-inline-button.active {
+    background: var(--theme-interactive-default, #0d6efd);
+    color: white;
+    border-color: var(--theme-interactive-default, #0d6efd);
+  }
+
+  .theme-inline-button.with-label {
+    padding: 0.5rem 0.75rem;
+  }
+</style>
