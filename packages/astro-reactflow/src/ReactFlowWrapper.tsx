@@ -37,6 +37,7 @@ export default function ReactFlowWrapper({
         link.download = `diagram.${fileExtension}`;
         link.href = dataUrl;
         link.click();
+        link.remove();
       })
       .catch((error) => {
         console.error('Error exporting diagram:', error);
