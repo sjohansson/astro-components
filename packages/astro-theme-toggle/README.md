@@ -66,6 +66,46 @@ import { ThemeController } from '@sjohansson/astro-theme-toggle';
 
 The original simple light/dark toggle for basic use cases.
 
+### As an Astro Integration (Recommended)
+
+Use the integration for automatic setup and configuration:
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+
+export default defineConfig({
+  integrations: [
+    themeToggle({
+      // Optional: inject theme initialization script globally
+      injectScript: true,
+    })
+  ],
+});
+```
+
+Then use the component in your pages:
+
+```astro
+---
+import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
+---
+
+<ThemeToggle
+  class="rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-surface-12 hover:bg-surface-2"
+/>
+```
+
+**Benefits of using the integration:**
+- Automatic theme initialization script (eliminates FOUC)
+- Better SSR handling
+- Configuration validation
+
+### As a Standalone Component
+
+For minimal setup, import and use directly:
+
 ```astro
 ---
 import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
@@ -105,10 +145,20 @@ import { ThemePreview } from '@sjohansson/astro-theme-toggle';
 | `class` | `string` | Optional CSS classes | `""` |
 | `theme` | `"all" \| ThemeMode` | Theme(s) to display | `"all"` |
 | `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
+## API
+
+### Integration Options
+
+| Option         | Type      | Description                               | Default |
+| -------------- | --------- | ----------------------------------------- | ------- |
+| `injectScript` | `boolean` | Inject theme initialization script in head | `false` |
+
+### Component Props
 
 ## Using CSS Custom Properties
 
 The theme system exposes CSS custom properties that you can use in your styles:
+## Styling
 
 ```css
 .my-component {
@@ -277,3 +327,8 @@ pnpm clean      # Remove build output
 ```
 
 This package is designed to stay self-contained and publish-ready—no cross-package dependencies are required.
+
+## Learn More
+
+- [Integration Guide](../../INTEGRATION_GUIDE.md) - Detailed guide on using as integration vs component
+- [Packaging Guide](../../PACKAGING_GUIDE.md) - Architecture and best practices
