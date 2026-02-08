@@ -149,6 +149,9 @@
         "rules": {
           "style": {
             "useConst": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off"
           }
         }
       }
