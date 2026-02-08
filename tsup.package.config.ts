@@ -1,7 +1,7 @@
 import { type Options, defineConfig } from 'tsup';
 
 type PackageConfigOptions = {
-  entry?: string;
+  entry?: string | string[];
   external?: string[];
 };
 
@@ -14,8 +14,10 @@ export function createPackageConfig({
   entry = 'src/index.ts',
   external = [],
 }: PackageConfigOptions = {}) {
+  const entryArray = Array.isArray(entry) ? entry : [entry];
+
   return defineConfig({
-    entry: [entry],
+    entry: entryArray,
     format: ['esm'],
     target: 'es2022',
     dts: true,
