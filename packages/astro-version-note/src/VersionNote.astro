@@ -1,11 +1,11 @@
 ---
 interface Props {
   version: string;
-  type?: "info" | "warning" | "success" | "error";
+  type?: 'info' | 'warning' | 'success' | 'error';
   class?: string;
 }
 
-const { version, type = "info", class: className } = Astro.props;
+const { version, type = 'info', class: className } = Astro.props;
 ---
 
 <div
