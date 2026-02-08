@@ -1,0 +1,104 @@
+---
+import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
+import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
+import { VersionNote } from '@sjohansson/astro-version-note';
+import Layout from '../layouts/Layout.astro';
+
+const nodes = [
+  { id: '1', position: { x: 50, y: 50 }, data: { label: 'Start' } },
+  { id: '2', position: { x: 50, y: 150 }, data: { label: 'Process Data' } },
+  { id: '3', position: { x: 50, y: 250 }, data: { label: 'End' } },
+];
+
+const edges = [
+  { id: 'e1-2', source: '1', target: '2', animated: true },
+  { id: 'e2-3', source: '2', target: '3', animated: true },
+];
+---
+
+<Layout title="Astro Components - Basic Usage Example">
+  <header>
+    <h1>Astro Components Example</h1>
+    <ThemeToggle />
+  </header>
+
+  <main>
+    <VersionNote version="v1.0.0" type="info">
+      This example demonstrates all three Astro integrations working together.
+    </VersionNote>
+
+    <section>
+      <h2>Theme Toggle</h2>
+      <p>
+        Click the theme toggle button in the header to switch between light and dark modes.
+        Your preference is saved in localStorage.
+      </p>
+    </section>
+
+    <section>
+      <h2>Version Notes</h2>
+      <VersionNote version="v0.5.0" type="warning">
+        This feature requires version 0.5.0 or higher.
+      </VersionNote>
+      
+      <VersionNote version="v2.0.0" type="success">
+        This feature was added in version 2.0.0.
+      </VersionNote>
+    </section>
+
+    <section>
+      <h2>React Flow Diagram</h2>
+      <p>Interactive flowchart rendered with React Flow:</p>
+      <ReactFlowWrapper
+        client:only="react"
+        nodes={nodes}
+        edges={edges}
+        className="h-96 border rounded"
+      />
+    </section>
+
+    <section>
+      <h2>About This Example</h2>
+      <p>
+        This example shows how to use all three components as Astro integrations.
+        The integrations provide automatic configuration and setup, making it easy
+        to add these features to your Astro site.
+      </p>
+      
+      <h3>Integrations Used:</h3>
+      <ul>
+        <li><strong>Theme Toggle</strong> - Provides dark/light mode switching</li>
+        <li><strong>Version Note</strong> - Displays version-specific documentation notes</li>
+        <li><strong>React Flow</strong> - Renders interactive diagrams and flowcharts</li>
+      </ul>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 100%;
+  }
+
+  section {
+    margin: 2rem 0;
+    padding: 1rem 0;
+  }
+
+  p {
+    margin: 1rem 0;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    margin: 1rem 0 0.5rem;
+  }
+
+  ul {
+    margin: 1rem 0 1rem 2rem;
+  }
+
+  li {
+    margin: 0.5rem 0;
+  }
+</style>
