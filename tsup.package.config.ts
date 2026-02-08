@@ -14,8 +14,10 @@ export function createPackageConfig({
   entry = 'src/index.ts',
   external = [],
 }: PackageConfigOptions = {}) {
+  const entryArray = Array.isArray(entry) ? entry : [entry];
+
   return defineConfig({
-    entry: Array.isArray(entry) ? entry : [entry],
+    entry: entryArray,
     format: ['esm'],
     target: 'es2022',
     dts: true,
