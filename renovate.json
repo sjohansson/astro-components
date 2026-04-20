@@ -8,28 +8,16 @@
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
-      "groupName": "major dependencies",
-      "groupSlug": "major",
       "labels": ["dependencies", "major"],
-      "automerge": false
+      "groupName": "major dependencies"
     },
     {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "non-major dependencies",
-      "groupSlug": "non-major",
-      "labels": ["dependencies", "non-major"],
-      "automerge": false
+      "labels": ["dependencies", "non-major"]
     },
     {
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "dev dependencies (non-major)",
-      "groupSlug": "dev-deps",
-      "labels": ["dependencies", "dev"],
-      "automerge": false
-    },
-    {
-      "matchPackageNames": ["astro"],
+      "matchPackageNames": ["astro", "@astrojs/*"],
       "groupName": "Astro",
       "labels": ["dependencies", "astro"]
     },
@@ -44,7 +32,7 @@
       "labels": ["dependencies", "biome"]
     },
     {
-      "matchPackageNames": ["vitest", "@vitest/ui"],
+      "matchPackageNames": ["vitest", "@vitest/ui", "@vitest/coverage-v8"],
       "groupName": "Vitest",
       "labels": ["dependencies", "vitest"]
     },
@@ -54,15 +42,14 @@
       "labels": ["dependencies", "react"]
     },
     {
-      "matchPackageNames": ["tailwindcss"],
-      "groupName": "Tailwind CSS",
-      "labels": ["dependencies", "tailwind"]
+      "matchPackageNames": ["@xyflow/react"],
+      "groupName": "React Flow",
+      "labels": ["dependencies", "reactflow"]
     },
     {
-      "matchPackageNames": ["node"],
-      "matchDatasources": ["node-version"],
-      "enabled": true,
-      "labels": ["dependencies", "node"]
+      "matchPackageNames": ["@changesets/cli"],
+      "groupName": "Changesets",
+      "labels": ["dependencies", "changesets"]
     }
   ],
   "lockFileMaintenance": {
@@ -72,7 +59,5 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"]
-  },
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "🤖 Dependency Updates Dashboard"
+  }
 }

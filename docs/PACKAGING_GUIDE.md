@@ -112,9 +112,9 @@ Each package must:
   
   // Define peer dependencies (what consumers must have)
   "peerDependencies": {
-    "astro": "^5.0.0"
+    "astro": "^6.0.0"
   },
-  
+
   // NPM publishing configuration
   "publishConfig": {
     "access": "public"
@@ -373,8 +373,8 @@ Define what consumers **must** have:
 ```json
 {
   "peerDependencies": {
-    "astro": "^5.0.0",
-    "react": "^18.0.0"
+    "astro": "^6.0.0",
+    "react": "^19.0.0"
   },
   "peerDependenciesMeta": {
     "react": {

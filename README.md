@@ -1,6 +1,6 @@
 # Astro Components
 
-A collection of modern, well-tested Astro components built with TypeScript, designed for Astro 5+ projects.
+A collection of modern, well-tested Astro components built with TypeScript, designed for Astro 6+ projects.
 
 [![CI](https://github.com/sjohansson/astro-components/workflows/CI/badge.svg)](https://github.com/sjohansson/astro-components/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -59,7 +59,7 @@ Each example is a fully functional Astro project you can run and explore.
 
 This monorepo uses modern tooling for 2026:
 
-- **Node.js 20+** - Active LTS baseline tested against Node 22+
+- **Node.js 22+** - Active LTS baseline (Astro 6 requires Node 22.12.0+)
 - **pnpm** - Fast, disk space efficient package manager with workspaces
 - **TypeScript 5.7** - Strict type checking for reliability
 - **Biome** - Lightning-fast linter and formatter (replaces ESLint + Prettier)
@@ -69,7 +69,7 @@ This monorepo uses modern tooling for 2026:
 
 ### Prerequisites
 
-- Node.js >= 20.11.0
+- Node.js >= 22.12.0
 - pnpm >= 9.0.0
 
 ### Setup

@@ -1,6 +1,6 @@
 # Astro Theme Toggle
 
-A comprehensive, SSR-friendly theme system built for Astro 5+. Supports multiple theme modes including light, dark, high-contrast variants, and system preference detection. Works with Tailwind CSS 4 or plain CSS and persists user preferences using `localStorage`.
+A comprehensive, SSR-friendly theme system built for Astro 6+. Supports multiple theme modes including light, dark, high-contrast variants, and system preference detection. Works with Tailwind CSS 4 or plain CSS and persists user preferences using `localStorage`.
 
 ## Features
 
@@ -32,25 +32,26 @@ The enhanced theme controller with support for multiple theme modes and system p
 import { ThemeController } from '@sjohansson/astro-theme-toggle';
 ---
 
+<!-- Single icon button, expands on click -->
 <ThemeController />
 ```
 
-#### Dropdown Mode (Default)
+#### Expand Direction
+
+The component starts as a single icon button showing the current theme. On click it expands to reveal all theme options as icon buttons.
 
 ```astro
-<ThemeController 
-  position="dropdown"
-  class="my-custom-class"
-/>
-```
+<!-- Auto (default): vertical on desktop, horizontal on mobile -->
+<ThemeController expandDirection="auto" />
 
-#### Inline Mode
+<!-- Always expand vertically (column of buttons above/below) -->
+<ThemeController expandDirection="vertical" />
 
-```astro
-<ThemeController 
-  position="inline"
-  showLabels={true}
-/>
+<!-- Always expand horizontally (row of buttons to the side) -->
+<ThemeController expandDirection="horizontal" />
+
+<!-- With labels visible when expanded -->
+<ThemeController expandDirection="vertical" showLabels={true} />
 ```
 
 #### Props
@@ -58,8 +59,8 @@ import { ThemeController } from '@sjohansson/astro-theme-toggle';
 | Prop | Type | Description | Default |
 |------|------|-------------|---------|
 | `class` | `string` | Optional CSS classes | `""` |
-| `position` | `"inline" \| "dropdown"` | Display mode | `"dropdown"` |
-| `showLabels` | `boolean` | Show theme labels (inline mode) | `false` |
+| `expandDirection` | `"horizontal" \| "vertical" \| "auto"` | Direction the options panel expands | `"auto"` |
+| `showLabels` | `boolean` | Show theme labels next to icons | `false` |
 | `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
 
 ### ThemeToggle (Simple)
@@ -305,15 +306,19 @@ Target the built-in selectors for custom styling:
 
 ```css
 .theme-controller {
-  /* Custom styles */
+  /* Container */
 }
 
-.theme-button {
-  /* Button styles */
+.theme-trigger {
+  /* The single icon button */
 }
 
-.theme-menu {
-  /* Menu styles */
+.theme-panel {
+  /* The expandable options panel */
+}
+
+.theme-option-btn {
+  /* Individual theme option buttons */
 }
 ```
 

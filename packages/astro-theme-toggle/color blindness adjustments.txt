@@ -1,0 +1,5 @@
+Protanopia (No red)
+Deuteranopia (No green)
+Tritanopia (No blue)
+Achromatopsia (No color)
+Contrast loss

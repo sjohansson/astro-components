@@ -1,29 +1,55 @@
 {
   "name": "@sjohansson/astro-theme-toggle",
-  "version": "0.0.1",
-  "description": "Modern theme toggle component for Astro with Tailwind CSS 4 support",
+  "version": "0.1.0",
+  "description": "Framework-agnostic theme toggle with Web Components, optional Astro wrappers",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/core/index.js",
+  "types": "./dist/core/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./integration": {
-      "types": "./dist/integration.d.ts",
-      "import": "./dist/integration.js"
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
     },
-    "./styles": "./dist/styles.css"
+    "./astro": {
+      "types": "./dist/astro/index.d.ts",
+      "import": "./dist/astro/index.js"
+    },
+    "./integration": {
+      "types": "./dist/astro/integration.d.ts",
+      "import": "./dist/astro/integration.js"
+    },
+    "./themes": {
+      "types": "./dist/themes/index.d.ts",
+      "import": "./dist/themes/index.js"
+    },
+    "./themes/*": {
+      "types": "./dist/themes/*.d.ts",
+      "import": "./dist/themes/*.js"
+    }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest"
   },
-  "keywords": ["astro", "astro-component", "theme", "dark-mode", "light-mode", "tailwindcss"],
+  "keywords": [
+    "theme",
+    "dark-mode",
+    "light-mode",
+    "web-components",
+    "astro",
+    "astro-component",
+    "accessibility",
+    "color-blind"
+  ],
   "author": "sjohansson",
   "license": "MIT",
   "repository": {
@@ -32,22 +58,18 @@
     "directory": "packages/astro-theme-toggle"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "astro": "^5.0.0",
-    "tailwindcss": "^4.0.0"
+    "astro": "^6.0.0"
   },
   "peerDependenciesMeta": {
-    "tailwindcss": {
+    "astro": {
       "optional": true
     }
   },
-  "sideEffects": ["./dist/**/*.css", "./src/**/*.astro"],
-  "devDependencies": {
-    "tailwindcss": "^4.0.0"
-  }
+  "sideEffects": false
 }

@@ -1,6 +1,6 @@
 {
   "name": "@sjohansson/astro-version-note",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Version note component for Astro documentation sites",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,14 +15,22 @@
       "import": "./dist/integration.js"
     }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest"
   },
-  "keywords": ["astro", "astro-component", "version", "documentation", "notes"],
+  "keywords": [
+    "astro",
+    "astro-component",
+    "version",
+    "documentation",
+    "notes"
+  ],
   "author": "sjohansson",
   "license": "MIT",
   "repository": {
@@ -31,13 +39,13 @@
     "directory": "packages/astro-version-note"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "astro": "^5.0.0"
+    "astro": "^6.0.0"
   },
-  "sideEffects": ["./dist/**/*.css", "./src/**/*.astro"]
+  "sideEffects": false
 }

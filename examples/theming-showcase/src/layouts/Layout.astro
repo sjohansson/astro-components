@@ -1,0 +1,42 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Theme Showcase" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <style is:global>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        color: var(--theme-fg-primary, #212529);
+        background: var(--theme-bg-primary, #ffffff);
+        transition: background-color 0.2s, color 0.2s;
+      }
+
+      a {
+        color: var(--theme-interactive-default, #0d6efd);
+      }
+
+      a:hover {
+        color: var(--theme-interactive-hover, #0b5ed7);
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

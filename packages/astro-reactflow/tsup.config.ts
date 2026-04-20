@@ -1,6 +1,6 @@
-import { createPackageConfig } from '../../tsup.package.config';
+import { createPackageConfig } from "../../tsup.package.config";
 
 export default createPackageConfig({
-  entry: ['src/index.ts', 'src/integration.ts'],
-  external: ['react', 'react-dom', '@xyflow/react'],
+  entry: ["src/index.ts", "src/integration.ts"],
+  external: ["react", "react-dom", "@xyflow/react"],
 });

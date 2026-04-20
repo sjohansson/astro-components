@@ -1,1 +1,1 @@
-export { default as VersionNote } from './VersionNote.astro';
+export { registerVersionNote, VersionNoteElement } from "./version-note";

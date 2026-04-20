@@ -1,8 +1,8 @@
-import react from '@astrojs/react';
-import reactFlow from '@sjohansson/astro-reactflow/integration';
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
-import versionNote from '@sjohansson/astro-version-note/integration';
-import { defineConfig } from 'astro/config';
+import react from "@astrojs/react";
+import reactFlow from "@sjohansson/astro-reactflow/integration";
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
+import versionNote from "@sjohansson/astro-version-note/integration";
+import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
     }),
     versionNote({
       // Document version note conventions (informational)
-      defaultType: 'info',
+      defaultType: "info",
     }),
     reactFlow({
       // Configure SSR handling for React Flow

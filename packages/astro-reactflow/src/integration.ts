@@ -1,4 +1,4 @@
-import type { AstroIntegration } from 'astro';
+import type { AstroIntegration } from "astro";
 
 export interface ReactFlowOptions {
   /**
@@ -34,10 +34,10 @@ export default function reactFlowIntegration(options: ReactFlowOptions = {}): As
   const { configureSsr = true } = options;
 
   return {
-    name: '@sjohansson/astro-reactflow',
+    name: "@sjohansson/astro-reactflow",
     hooks: {
-      'astro:config:setup': ({ logger, updateConfig }) => {
-        logger.info('Setting up React Flow integration');
+      "astro:config:setup": ({ logger, updateConfig }) => {
+        logger.info("Setting up React Flow integration");
 
         // Configure SSR handling for React Flow if requested
         if (configureSsr) {
@@ -45,26 +45,22 @@ export default function reactFlowIntegration(options: ReactFlowOptions = {}): As
             vite: {
               ssr: {
                 // Ensure React Flow is bundled for SSR compatibility
-                noExternal: ['@xyflow/react'],
+                noExternal: ["@xyflow/react"],
               },
             },
           });
 
-          logger.debug('React Flow SSR configuration applied');
+          logger.debug("React Flow SSR configuration applied");
         }
       },
-      'astro:config:done': ({ config, logger }) => {
-        logger.info('React Flow integration configured');
+      "astro:config:done": ({ config, logger }) => {
+        logger.info("React Flow integration configured");
 
         // Verify React integration is present
-        const hasReactIntegration = config.integrations.some(
-          (integration) => integration.name === '@astrojs/react'
-        );
+        const hasReactIntegration = config.integrations.some((integration) => integration.name === "@astrojs/react");
 
         if (!hasReactIntegration) {
-          logger.warn(
-            'React Flow integration requires @astrojs/react. Please add it to your integrations.'
-          );
+          logger.warn("React Flow integration requires @astrojs/react. Please add it to your integrations.");
         }
       },
     },

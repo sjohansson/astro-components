@@ -1,4 +1,4 @@
-import type { AstroIntegration } from 'astro';
+import type { AstroIntegration } from "astro";
 
 export interface VersionNoteOptions {
   /**
@@ -10,7 +10,7 @@ export interface VersionNoteOptions {
    * Default type/variant for version notes
    * @default 'info'
    */
-  defaultType?: 'info' | 'warning' | 'success' | 'error';
+  defaultType?: "info" | "warning" | "success" | "error";
 }
 
 /**
@@ -39,10 +39,10 @@ export interface VersionNoteOptions {
  */
 export default function versionNoteIntegration(options: VersionNoteOptions = {}): AstroIntegration {
   return {
-    name: '@sjohansson/astro-version-note',
+    name: "@sjohansson/astro-version-note",
     hooks: {
-      'astro:config:setup': ({ logger }) => {
-        logger.info('Setting up Version Note integration');
+      "astro:config:setup": ({ logger }) => {
+        logger.info("Setting up Version Note integration");
         if (options.defaultVersion) {
           logger.debug(`Default version configured: ${options.defaultVersion}`);
         }
@@ -50,8 +50,8 @@ export default function versionNoteIntegration(options: VersionNoteOptions = {})
           logger.debug(`Default type configured: ${options.defaultType}`);
         }
       },
-      'astro:config:done': ({ logger }) => {
-        logger.info('Version Note integration configured');
+      "astro:config:done": ({ logger }) => {
+        logger.info("Version Note integration configured");
       },
     },
   };

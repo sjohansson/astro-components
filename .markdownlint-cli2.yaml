@@ -1,42 +1,30 @@
-# Markdown
-*.md
+globs:
+  - "**/*.md"
+  - "!node_modules"
+  - "!**/node_modules"
+  - "!**/dist"
+  - "!**/coverage"
+  - "!.changeset"
 
-# Headings
-MD001 # Heading levels should only increment by one level at a time
-MD003 # Heading style should be consistent
-MD018 # No space after hash on atx style heading
-MD019 # Multiple spaces after hash on atx style heading
-MD022 # Headings should be surrounded by blank lines
-MD023 # Headings must start at the beginning of the line
-MD025 # Multiple top-level headings in the same document
-MD041 # First line in file should be a top level heading
+config:
+  default: true
 
-# Lists
-MD004 # Unordered list style should be consistent
-MD005 # Inconsistent indentation for list items at the same level
-MD007 # Unordered list indentation should be consistent
-MD029 # Ordered list item prefix should be sequential
-MD030 # Spaces after list markers
+  # Line length — disabled, Biome handles code formatting
+  MD013: false
 
-# Code
-MD031 # Fenced code blocks should be surrounded by blank lines
-MD040 # Fenced code blocks should have a language specified
+  # Inline HTML — needed in documentation
+  MD033: false
 
-# Links
-MD034 # Bare URL used
-MD051 # Link fragments should be valid
+  # Duplicate headings — allow across sibling sections
+  MD024:
+    siblings_only: true
 
-# Emphasis
-MD036 # Emphasis used instead of a heading
-MD037 # Spaces inside emphasis markers
-MD049 # Emphasis style should be consistent
-MD050 # Strong style should be consistent
+  # Table column alignment — too pedantic for docs
+  MD060: false
 
-# Line length - disabled for flexibility
-MD013 false
+  # Trailing punctuation in headings — allow ! and ?
+  MD026:
+    punctuation: ".,;:"
 
-# Inline HTML - sometimes needed in documentation
-MD033 false
-
-# Hard tabs - allow hard tabs
-MD010 false
+  # First line heading — not all docs need a top-level heading
+  MD041: false

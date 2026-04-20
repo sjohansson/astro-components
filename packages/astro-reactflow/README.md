@@ -1,6 +1,6 @@
 # Astro React Flow
 
-Drop-in React Flow support for Astro 5+. Ships a thin React wrapper that stays independent from the rest of the monorepo so you can version and publish it on its own.
+Drop-in React Flow support for Astro 6+. Ships a thin React wrapper that stays independent from the rest of the monorepo so you can version and publish it on its own.
 
 ## Installation
 

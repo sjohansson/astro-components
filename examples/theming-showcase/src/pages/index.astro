@@ -1,0 +1,401 @@
+---
+import {
+  allBundledThemes,
+  defaultThemes,
+  kawaiiThemes,
+  lessIsMoreThemes,
+  seventiesThemes,
+  ThemeController,
+  ThemePreview,
+} from "@sjohansson/astro-theme-toggle";
+import Layout from "../layouts/Layout.astro";
+
+// Combine default + all bundled themes for the full experience
+const allThemes = [...defaultThemes, ...allBundledThemes];
+---
+
+<Layout title="Theme Showcase — astro-theme-toggle">
+  <div class="page">
+    {/* ── Header ── */}
+    <header class="header">
+      <div class="header-content">
+        <div>
+          <h1 class="title">Theme Showcase</h1>
+          <p class="subtitle">
+            Explore theme families, variants, and accessibility options
+          </p>
+        </div>
+        <div class="header-controls">
+          <ThemeController
+            themes={allThemes}
+            preset="full"
+            showLabels={true}
+            expandDirection="vertical"
+          />
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      {/* ── Live demo section ── */}
+      <section class="section">
+        <h2 class="section-title">Live Demo</h2>
+        <p class="section-desc">
+          Use the theme controller above to switch between families and variants.
+          All elements on this page respond to the active theme via CSS custom properties.
+        </p>
+
+        <div class="demo-grid">
+          {/* Card */}
+          <div class="demo-card">
+            <h3>Card Component</h3>
+            <p>This card uses theme tokens for all its colors — background, text, border, and interactive elements.</p>
+            <div class="card-actions">
+              <button class="btn btn-primary">Primary</button>
+              <button class="btn btn-secondary">Secondary</button>
+            </div>
+          </div>
+
+          {/* Form */}
+          <div class="demo-card">
+            <h3>Form Elements</h3>
+            <div class="form-group">
+              <label class="form-label">Text Input</label>
+              <input type="text" class="form-input" placeholder="Type something..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Select</label>
+              <select class="form-input">
+                <option>Option A</option>
+                <option>Option B</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Semantic colors */}
+          <div class="demo-card">
+            <h3>Semantic Colors</h3>
+            <div class="alert alert-success">Success — operation completed.</div>
+            <div class="alert alert-warning">Warning — check your input.</div>
+            <div class="alert alert-error">Error — something went wrong.</div>
+            <div class="alert alert-info">Info — FYI, here's a tip.</div>
+          </div>
+
+          {/* Text hierarchy */}
+          <div class="demo-card">
+            <h3>Text Hierarchy</h3>
+            <p class="text-primary">Primary foreground text</p>
+            <p class="text-secondary">Secondary foreground text</p>
+            <p class="text-tertiary">Tertiary foreground text</p>
+            <hr class="divider" />
+            <p>
+              Links use the <a href="#">interactive color</a> tokens,
+              ensuring consistent clickable affordance.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How to use ── */}
+      <section class="section">
+        <h2 class="section-title">Usage Examples</h2>
+
+        <div class="code-grid">
+          <div class="code-block">
+            <h3>Basic (light/dark/system)</h3>
+            <pre><code>&lt;ThemeController /&gt;</code></pre>
+            <p class="code-desc">Default preset shows light, dark, and system options.</p>
+          </div>
+
+          <div class="code-block">
+            <h3>With high contrast</h3>
+            <pre><code>&lt;ThemeController preset="accessible" /&gt;</code></pre>
+            <p class="code-desc">Adds high-contrast light and dark variants.</p>
+          </div>
+
+          <div class="code-block">
+            <h3>Multi-family with all variants</h3>
+            <pre><code>{'import { allBundledThemes, defaultThemes } from \'@sjohansson/astro-theme-toggle\';\n\n<ThemeController\n  themes={[...defaultThemes, ...allBundledThemes]}\n  preset="full"\n  showLabels={true}\n/>'}</code></pre>
+            <p class="code-desc">
+              Full family selector with variant picker. Includes kawaii,
+              less-is-more, and seventies themes with color-blind support.
+            </p>
+          </div>
+
+          <div class="code-block">
+            <h3>Single custom family</h3>
+            <pre><code>{'import { kawaiiThemes } from \'@sjohansson/astro-theme-toggle\';\n\n<ThemeController\n  themes={kawaiiThemes}\n  preset="accessible"\n/>'}</code></pre>
+            <p class="code-desc">Use one family with accessible variants.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Color palette preview ── */}
+      <section class="section">
+        <h2 class="section-title">Color Palettes</h2>
+        <p class="section-desc">
+          Full token preview for all bundled theme families.
+        </p>
+
+        <ThemePreview
+          themes={allThemes}
+          preset="accessible"
+        />
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <strong>@sjohansson/astro-theme-toggle</strong> — open-source theming for Astro
+      </p>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border-bottom: 1px solid var(--theme-border-default, #dee2e6);
+    padding: 2rem;
+  }
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--theme-fg-primary, #212529);
+  }
+
+  .subtitle {
+    color: var(--theme-fg-secondary, #495057);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--theme-fg-primary, #212529);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-desc {
+    color: var(--theme-fg-secondary, #495057);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Demo grid ── */
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .demo-card {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .demo-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--theme-fg-primary, #212529);
+    margin-bottom: 0.75rem;
+  }
+
+  .demo-card p {
+    color: var(--theme-fg-secondary, #495057);
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Buttons ── */
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+  }
+
+  .btn-primary {
+    background: var(--theme-interactive-default, #0d6efd);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--theme-interactive-hover, #0b5ed7);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--theme-fg-primary, #212529);
+    border-color: var(--theme-border-default, #dee2e6);
+  }
+
+  .btn-secondary:hover {
+    background: var(--theme-bg-tertiary, #e9ecef);
+    border-color: var(--theme-border-hover, #adb5bd);
+  }
+
+  /* ── Form elements ── */
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--theme-fg-primary, #212529);
+    margin-bottom: 0.25rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.375rem;
+    background: var(--theme-bg-primary, #ffffff);
+    color: var(--theme-fg-primary, #212529);
+    font-size: 0.875rem;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus {
+    outline: 2px solid var(--theme-border-focus, #0d6efd);
+    outline-offset: 1px;
+  }
+
+  /* ── Alerts ── */
+  .alert {
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid;
+  }
+
+  .alert-success {
+    color: var(--theme-success, #198754);
+    border-color: var(--theme-success, #198754);
+    background: color-mix(in srgb, var(--theme-success, #198754) 10%, var(--theme-bg-primary, #fff));
+  }
+
+  .alert-warning {
+    color: var(--theme-warning, #ffc107);
+    border-color: var(--theme-warning, #ffc107);
+    background: color-mix(in srgb, var(--theme-warning, #ffc107) 10%, var(--theme-bg-primary, #fff));
+  }
+
+  .alert-error {
+    color: var(--theme-error, #dc3545);
+    border-color: var(--theme-error, #dc3545);
+    background: color-mix(in srgb, var(--theme-error, #dc3545) 10%, var(--theme-bg-primary, #fff));
+  }
+
+  .alert-info {
+    color: var(--theme-info, #0dcaf0);
+    border-color: var(--theme-info, #0dcaf0);
+    background: color-mix(in srgb, var(--theme-info, #0dcaf0) 10%, var(--theme-bg-primary, #fff));
+  }
+
+  /* ── Text hierarchy ── */
+  .text-primary { color: var(--theme-fg-primary, #212529); }
+  .text-secondary { color: var(--theme-fg-secondary, #495057); }
+  .text-tertiary { color: var(--theme-fg-tertiary, #6c757d); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--theme-border-default, #dee2e6);
+    margin: 0.75rem 0;
+  }
+
+  /* ── Code blocks ── */
+  .code-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .code-block {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border: 1px solid var(--theme-border-default, #dee2e6);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+  }
+
+  .code-block h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-fg-primary, #212529);
+    margin-bottom: 0.75rem;
+  }
+
+  .code-block pre {
+    background: var(--theme-bg-tertiary, #e9ecef);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    overflow-x: auto;
+    margin-bottom: 0.75rem;
+  }
+
+  .code-block code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--theme-fg-primary, #212529);
+    white-space: pre;
+  }
+
+  .code-desc {
+    font-size: 0.875rem;
+    color: var(--theme-fg-secondary, #495057);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--theme-bg-secondary, #f8f9fa);
+    border-top: 1px solid var(--theme-border-default, #dee2e6);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    color: var(--theme-fg-tertiary, #6c757d);
+    font-size: 0.875rem;
+  }
+</style>

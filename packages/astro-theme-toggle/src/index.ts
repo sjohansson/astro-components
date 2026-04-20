@@ -1,10 +1,7 @@
-export { default as ThemeToggle } from './ThemeToggle.astro';
-export { default as ThemeController } from './ThemeController.astro';
-export { default as ThemePreview } from './ThemePreview.astro';
-export type {
-  ThemeMode,
-  ThemeConfig,
-  ThemeControllerProps,
-  ColorToken,
-} from './types';
-export { defaultThemes, generateThemeCSS } from './theme-config';
+/**
+ * @sjohansson/astro-theme-toggle
+ *
+ * Default export path — includes Astro wrapper components.
+ * For framework-agnostic usage, import from '@sjohansson/astro-theme-toggle/core' instead.
+ */
+export * from "./astro/index";

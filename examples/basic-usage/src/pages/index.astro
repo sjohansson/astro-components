@@ -1,31 +1,29 @@
 ---
-import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
-import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
-import { VersionNote } from '@sjohansson/astro-version-note';
-import Layout from '../layouts/Layout.astro';
+import { ReactFlowWrapper } from "@sjohansson/astro-reactflow";
+import Layout from "../layouts/Layout.astro";
 
 const nodes = [
-  { id: '1', position: { x: 50, y: 50 }, data: { label: 'Start' } },
-  { id: '2', position: { x: 50, y: 150 }, data: { label: 'Process Data' } },
-  { id: '3', position: { x: 50, y: 250 }, data: { label: 'End' } },
+  { id: "1", position: { x: 50, y: 50 }, data: { label: "Start" } },
+  { id: "2", position: { x: 50, y: 150 }, data: { label: "Process Data" } },
+  { id: "3", position: { x: 50, y: 250 }, data: { label: "End" } },
 ];
 
 const edges = [
-  { id: 'e1-2', source: '1', target: '2', animated: true },
-  { id: 'e2-3', source: '2', target: '3', animated: true },
+  { id: "e1-2", source: "1", target: "2", animated: true },
+  { id: "e2-3", source: "2", target: "3", animated: true },
 ];
 ---
 
 <Layout title="Astro Components - Basic Usage Example">
   <header>
     <h1>Astro Components Example</h1>
-    <ThemeToggle />
+    <theme-toggle></theme-toggle>
   </header>
 
   <main>
-    <VersionNote version="v1.0.0" type="info">
+    <version-note version="v1.0.0" type="info">
       This example demonstrates all three Astro integrations working together.
-    </VersionNote>
+    </version-note>
 
     <section>
       <h2>Theme Toggle</h2>
@@ -37,13 +35,13 @@ const edges = [
 
     <section>
       <h2>Version Notes</h2>
-      <VersionNote version="v0.5.0" type="warning">
+      <version-note version="v0.5.0" type="warning">
         This feature requires version 0.5.0 or higher.
-      </VersionNote>
-      
-      <VersionNote version="v2.0.0" type="success">
+      </version-note>
+
+      <version-note version="v2.0.0" type="success">
         This feature was added in version 2.0.0.
-      </VersionNote>
+      </version-note>
     </section>
 
     <section>
@@ -74,6 +72,13 @@ const edges = [
     </section>
   </main>
 </Layout>
+
+<script>
+  import { registerThemeToggle } from "@sjohansson/astro-theme-toggle";
+  import { registerVersionNote } from "@sjohansson/astro-version-note";
+  registerThemeToggle();
+  registerVersionNote();
+</script>
 
 <style>
   main {
