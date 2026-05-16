@@ -4,6 +4,11 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit"
   },
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github/copilot-commit-message-instructions.md"
+    }
+  ],
   "files.associations": {
     "*.astro": "astro"
   },
@@ -22,8 +27,6 @@
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
