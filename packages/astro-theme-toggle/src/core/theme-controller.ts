@@ -1,5 +1,6 @@
 import { defaultThemes, filterThemesByPreset, groupByFamily } from "../theme-config";
 import type { ThemeConfig, ThemeFamily, ThemePreset } from "../types";
+import { SSRSafeHTMLElement } from "./ssr-base";
 
 /**
  * <theme-controller> — Multi-theme selector with family and variant support.
@@ -16,7 +17,7 @@ import type { ThemeConfig, ThemeFamily, ThemePreset } from "../types";
  * @attr {boolean} show-labels - Show text labels next to icons
  * @attr {string} themes - JSON string of ThemeConfig[] (overrides preset)
  */
-export class ThemeControllerElement extends HTMLElement {
+export class ThemeControllerElement extends SSRSafeHTMLElement {
   private themes: ThemeConfig[] = [];
   private families: ThemeFamily[] = [];
   private hasMultipleFamilies = false;

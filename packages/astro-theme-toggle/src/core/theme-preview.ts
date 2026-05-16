@@ -1,5 +1,6 @@
 import { defaultThemes, filterThemesByPreset, groupByFamily } from "../theme-config";
 import type { ThemeConfig, ThemePreset } from "../types";
+import { SSRSafeHTMLElement } from "./ssr-base";
 
 /**
  * <theme-preview> — Renders a color palette grid for all theme tokens.
@@ -11,7 +12,7 @@ import type { ThemeConfig, ThemePreset } from "../types";
  * @attr {string} theme - Filter to a specific theme ID, or 'all'
  * @attr {string} themes - JSON string of ThemeConfig[] (overrides defaults)
  */
-export class ThemePreviewElement extends HTMLElement {
+export class ThemePreviewElement extends SSRSafeHTMLElement {
   static get observedAttributes(): string[] {
     return ["preset", "family", "theme", "themes"];
   }

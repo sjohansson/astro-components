@@ -9,7 +9,9 @@
  * <theme-toggle></theme-toggle>
  * ```
  */
-export class ThemeToggleElement extends HTMLElement {
+import { SSRSafeHTMLElement } from "./ssr-base";
+
+export class ThemeToggleElement extends SSRSafeHTMLElement {
   private button: HTMLButtonElement | null = null;
   private sunIcon: SVGElement | null = null;
   private moonIcon: SVGElement | null = null;

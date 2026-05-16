@@ -1,17 +1,9 @@
 ---
-import {
-  allBundledThemes,
-  defaultThemes,
-  kawaiiThemes,
-  lessIsMoreThemes,
-  seventiesThemes,
-  ThemeController,
-  ThemePreview,
-} from "@sjohansson/astro-theme-toggle";
+import { allBundledThemes, defaultThemes } from "@sjohansson/astro-theme-toggle";
 import Layout from "../layouts/Layout.astro";
 
 // Combine default + all bundled themes for the full experience
-const allThemes = [...defaultThemes, ...allBundledThemes];
+const allThemesJson = JSON.stringify([...defaultThemes, ...allBundledThemes]);
 ---
 
 <Layout title="Theme Showcase — astro-theme-toggle">
@@ -26,12 +18,12 @@ const allThemes = [...defaultThemes, ...allBundledThemes];
           </p>
         </div>
         <div class="header-controls">
-          <ThemeController
-            themes={allThemes}
+          <theme-controller
+            themes={allThemesJson}
             preset="full"
-            showLabels={true}
-            expandDirection="vertical"
-          />
+            show-labels
+            expand-direction="vertical"
+          ></theme-controller>
         </div>
       </div>
     </header>
@@ -137,10 +129,10 @@ const allThemes = [...defaultThemes, ...allBundledThemes];
           Full token preview for all bundled theme families.
         </p>
 
-        <ThemePreview
-          themes={allThemes}
+        <theme-preview
+          themes={allThemesJson}
           preset="accessible"
-        />
+        ></theme-preview>
       </section>
     </main>
 
@@ -151,6 +143,12 @@ const allThemes = [...defaultThemes, ...allBundledThemes];
     </footer>
   </div>
 </Layout>
+
+<script>
+  import { registerThemeController, registerThemePreview } from "@sjohansson/astro-theme-toggle";
+  registerThemeController();
+  registerThemePreview();
+</script>
 
 <style>
   .page {

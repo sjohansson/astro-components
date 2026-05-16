@@ -16,7 +16,9 @@
  * </version-note>
  * ```
  */
-export class VersionNoteElement extends HTMLElement {
+import { SSRSafeHTMLElement } from "./ssr-base";
+
+export class VersionNoteElement extends SSRSafeHTMLElement {
   static get observedAttributes(): string[] {
     return ["version", "type"];
   }
