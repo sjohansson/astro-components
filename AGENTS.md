@@ -4,7 +4,7 @@
 > Copilot Workspace, and GitHub agent session runners.
 
 A pnpm monorepo of framework-agnostic Web Component libraries designed for use in
-Astro 6 sites. Each package builds to pure ESM JavaScript — no `.astro` files are
+Astro v6 sites. Each package builds to pure ESM JavaScript — no `.astro` files are
 distributed.
 
 ## Project Layout

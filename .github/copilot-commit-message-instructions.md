@@ -3,7 +3,7 @@
 Use Conventional Commits format for all commit messages.
 
 Prefix every commit subject with one of these types, which map directly to
-Keep a Changelog headings:
+`Keep a Changelog` headings:
 
 - `feat:` → **Added** — new features
 - `refactor:` → **Changed** — changes to existing functionality
@@ -16,6 +16,6 @@ Keep a Changelog headings:
 
 Append `!` after the type/scope for breaking changes, e.g. `feat!:` or `fix!:`.
 
-Keep the subject line under 72 characters, imperative mood, no trailing period.
+Keep the subject line under 72 characters (including prefix), imperative mood, no trailing period.
 
 Based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
