@@ -1,7 +1,7 @@
 {
   "name": "@sjohansson/astro-reactflow",
   "version": "0.1.0",
-  "description": "React Flow integration for Astro",
+  "description": "React Flow integration for Astro sites",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,8 +16,7 @@
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
@@ -46,16 +45,17 @@
     "access": "public"
   },
   "peerDependencies": {
+    "@astrojs/react": "^5.0.0",
     "@xyflow/react": "^12.3.5",
     "astro": "^6.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "sideEffects": [
-    "./dist/**/*.css",
-    "./src/**/*.css"
+    "./dist/**/*.css"
   ],
   "devDependencies": {
+    "@astrojs/react": "^5.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@xyflow/react": "^12.10.2",

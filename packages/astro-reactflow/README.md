@@ -1,65 +1,32 @@
 # Astro React Flow
 
-Drop-in React Flow support for Astro 6+. Ships a thin React wrapper that stays independent from the rest of the monorepo so you can version and publish it on its own.
+Drop-in React Flow support for Astro 6+. The integration auto-registers `@astrojs/react` and configures the Vite SSR settings React Flow needs, so consumers only have to add a single line to `astro.config.mjs`.
 
 ## Installation
 
 ```bash
-pnpm add @sjohansson/astro-reactflow @xyflow/react react react-dom
+pnpm add @sjohansson/astro-reactflow @astrojs/react @xyflow/react react react-dom
 ```
+
+> If you already have `@astrojs/react` configured, the integration detects it and skips re-registration.
 
 ## Usage
 
-### As an Astro Integration (Recommended)
-
-Use the integration for automatic setup and validation:
+### 1. Register the integration
 
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 import reactFlow from '@sjohansson/astro-reactflow/integration';
 
 export default defineConfig({
-  integrations: [
-    react(), // Required
-    reactFlow({
-      // Optional: configure SSR handling for React Flow
-      configureSsr: true,
-    })
-  ],
+  integrations: [reactFlow()],
 });
 ```
 
-Then use the component in your pages:
+That's it — no need to manually add `react()` to your integrations. The React renderer is auto-registered.
 
-```astro
----
-import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
-
-const nodes = [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Start' } }];
-const edges = [];
----
-
-<ReactFlowWrapper
-  client:only="react"
-  nodes={nodes}
-  edges={edges}
-  className="h-96 rounded-xl bg-surface-1"
-/>
-```
-
-### With Export Feature
-
-To enable diagram export, set the `enableExport` prop to `true`:
-**Benefits of using the integration:**
-- Automatic detection of missing React integration
-- Optimized Vite configuration for React Flow SSR compatibility
-- Proper dependency validation
-
-### As a Standalone Component
-
-For minimal setup, ensure you have `@astrojs/react` configured and import directly:
+### 2. Use the component
 
 ```astro
 ---
@@ -67,7 +34,7 @@ import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
 
 const nodes = [
   { id: '1', position: { x: 0, y: 0 }, data: { label: 'Start' } },
-  { id: '2', position: { x: 100, y: 100 }, data: { label: 'End' } }
+  { id: '2', position: { x: 100, y: 100 }, data: { label: 'End' } },
 ];
 const edges = [{ id: 'e1-2', source: '1', target: '2' }];
 ---
@@ -76,50 +43,52 @@ const edges = [{ id: 'e1-2', source: '1', target: '2' }];
   client:only="react"
   nodes={nodes}
   edges={edges}
-  enableExport={true}
   className="h-96 rounded-xl bg-surface-1"
 />
 ```
 
-When enabled, two export buttons (PNG and SVG) will appear in the top-right corner of the diagram, allowing users to download the diagram.
+`client:only="react"` is required because React Flow renders to the DOM and has no SSR output.
 
-### Props
+### Export buttons (optional)
+
+```astro
+<ReactFlowWrapper client:only="react" nodes={nodes} edges={edges} enableExport={true} />
+```
+
+PNG / SVG download buttons appear in the top-right when `enableExport` is enabled.
+
 ## API
 
-### Integration Options
+### Integration options
 
-| Option          | Type      | Description                                   | Default |
-| --------------- | --------- | --------------------------------------------- | ------- |
-| `configureSsr`  | `boolean` | Configure React Flow for SSR compatibility    | `true`  |
+| Option              | Type      | Default | Description                                                                                       |
+| ------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `configureSsr`      | `boolean` | `true`  | Add `@xyflow/react` to Vite's `ssr.noExternal` so React Flow bundles correctly during SSR builds. |
+| `autoRegisterReact` | `boolean` | `true`  | Auto-add `@astrojs/react` if it isn't in the consumer's `integrations` array.                     |
 
-**Note:** React Flow styles are automatically imported by the ReactFlowWrapper component and cannot be disabled via integration options.
+If `autoRegisterReact` is disabled and `@astrojs/react` is not present, the integration throws a clear error at config-load time instead of failing later with `NoMatchingRenderer`.
 
-### Component Props
+### Component props
 
-| Prop       | Type                    | Description                                     |
-| ---------- | ----------------------- | ----------------------------------------------- |
-| `nodes`    | `Node[]`                | Nodes to render.                                |
-| `edges`    | `Edge[]`                | Edges to render.                                |
-| `className`| `string` (optional)     | Additional classes applied to the outer wrapper |
-| `enableExport` | `boolean` (optional) | Enable export buttons for PNG/SVG download (default: `false`) |
+| Prop           | Type                  | Description                                                       |
+| -------------- | --------------------- | ----------------------------------------------------------------- |
+| `nodes`        | `Node[]`              | Nodes to render.                                                  |
+| `edges`        | `Edge[]`              | Edges to render.                                                  |
+| `className`    | `string` (optional)   | Additional classes applied to the outer wrapper.                  |
+| `enableExport` | `boolean` (optional)  | Enable PNG / SVG export buttons (default: `false`).               |
 
 ## Styling
 
-- Base styles ship with the package (`styles.css`) to keep the canvas predictable. You can override them with your own classes on the wrapper div.
-- The upstream React Flow styles are imported automatically from `@xyflow/react/dist/style.css`.
+- Base styles ship with the package (`styles.css`) and load with the component.
+- Upstream React Flow styles are imported automatically from `@xyflow/react/dist/style.css`.
 
 ## Development
 
 ```bash
-pnpm dev        # Rebuild on changes
-pnpm test       # Run package tests
-pnpm build      # Emit ESM, types, and copy assets to dist/
-pnpm clean      # Remove build output
+pnpm dev    # rebuild on changes
+pnpm test   # run package tests
+pnpm build  # emit ESM + .d.ts to dist/
+pnpm clean  # remove build output
 ```
 
-This package deliberately keeps all dependencies peer-based so consumers bring their own React and React Flow versions.
-
-## Learn More
-
-- [Integration Guide](../../INTEGRATION_GUIDE.md) - Detailed guide on using as integration vs component
-- [Packaging Guide](../../PACKAGING_GUIDE.md) - Architecture and best practices
+All React, React Flow, and `@astrojs/react` deps are peer-based — consumers bring their own versions.
