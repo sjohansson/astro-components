@@ -5,6 +5,9 @@
   "timezone": "UTC",
   "labels": ["dependencies"],
   "prConcurrentLimit": 5,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
