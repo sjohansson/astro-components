@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- Commit prefix conventions
   - Adheres to [conventional commits](https://www.conventionalcommits.org)
   - Uses scopes to map changes to relevant modules, i.e. `feat(astro-reactflow): new thing added`
-  - relies on these to update changelog
+  - `scripts/update-changelog.ps1` relies on these to auto-update this changelog
 -->
 
 <!-- Commit prefix → Changelog heading (1:1 mapping)
