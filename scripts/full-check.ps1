@@ -4,7 +4,14 @@
 
 Write-Host "🚀 Running full verification workflow..." -ForegroundColor Cyan
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$repoRoot = Split-Path -Parent $scriptDir
+Push-Location $repoRoot
+Write-Host "📂 Working directory: $repoRoot" -ForegroundColor DarkGray
+
 $failed = $false
+
+try {
 
 # Clean
 Write-Host ""
@@ -90,4 +97,8 @@ if ($failed) {
 } else {
     Write-Host "✨ Full verification passed! Everything is ready." -ForegroundColor Green
     exit 0
+}
+}
+finally {
+    Pop-Location
 }
