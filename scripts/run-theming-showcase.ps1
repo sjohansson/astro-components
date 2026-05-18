@@ -24,7 +24,8 @@ Push-Location $repoRoot
 try {
     if ($SkipCheck) {
         Write-Host "⏭️  Skipping full check (per -SkipCheck flag)" -ForegroundColor Yellow
-    } else {
+    }
+    else {
         Write-Host "🔎 Running full check at repo root: $repoRoot" -ForegroundColor Cyan
         & (Join-Path $scriptDir "full-check.ps1")
         if ($LASTEXITCODE -ne 0) {

@@ -50,5 +50,8 @@
     "**/node_modules/**": true,
     "**/dist/**": true,
     "**/coverage/**": true
+  },
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
   }
 }
