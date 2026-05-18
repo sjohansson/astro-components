@@ -576,12 +576,12 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     }
     [data-direction="vertical"] .theme-panel {
       flex-direction: column;
-      bottom: calc(100% + 0.375rem);
-      left: 50%;
-      transform: translateX(-50%) translateY(0.5rem);
+      top: calc(100% + 0.375rem);
+      right: 0;
+      transform: translateY(-0.5rem);
     }
     [data-direction="vertical"] .theme-panel.open {
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
     }
     [data-direction="horizontal"] .theme-panel {
       flex-direction: row;
