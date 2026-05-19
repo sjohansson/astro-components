@@ -15,7 +15,8 @@ import { SSRSafeHTMLElement } from "./ssr-base";
  * @attr {string} preset - 'basic' | 'accessible' | 'full' (default: 'basic')
  * @attr {string} expand-direction - 'horizontal' | 'vertical' | 'auto' (default: 'auto')
  * @attr {boolean} show-labels - Show text labels next to icons
- * @attr {string} themes - JSON string of ThemeConfig[] (overrides preset)
+ * @attr {string} themes - JSON string of ThemeConfig[] (filtered by preset)
+ * @attr {string} family - Restrict to a single family by id (variant-only UI)
  */
 export class ThemeControllerElement extends SSRSafeHTMLElement {
   private themes: ThemeConfig[] = [];
@@ -27,7 +28,7 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   private resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
   static get observedAttributes(): string[] {
-    return ["preset", "expand-direction", "show-labels", "themes"];
+    return ["preset", "expand-direction", "show-labels", "themes", "family"];
   }
 
   connectedCallback(): void {
@@ -62,17 +63,26 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
 
   private resolveThemes(): void {
     const themesAttr = this.getAttribute("themes");
+    let source: ThemeConfig[];
     if (themesAttr) {
       try {
-        this.themes = JSON.parse(themesAttr);
+        source = JSON.parse(themesAttr);
       } catch {
-        this.themes = defaultThemes;
+        source = defaultThemes;
       }
     } else {
-      const preset = (this.getAttribute("preset") || "basic") as ThemePreset;
-      this.themes = filterThemesByPreset(defaultThemes, preset);
+      source = defaultThemes;
     }
 
+    const preset = (this.getAttribute("preset") || "basic") as ThemePreset;
+    let filtered = filterThemesByPreset(source, preset);
+
+    const family = this.getAttribute("family");
+    if (family) {
+      filtered = filtered.filter((t) => (t.family ?? t.id) === family);
+    }
+
+    this.themes = filtered;
     this.families = groupByFamily(this.themes);
     this.hasMultipleFamilies = this.families.length > 1;
   }
