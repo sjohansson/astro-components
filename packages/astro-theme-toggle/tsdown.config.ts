@@ -1,4 +1,4 @@
-import { createPackageConfig } from "../../tsup.package.config";
+import { createPackageConfig } from "../../tsdown.package.config.ts";
 
 export default createPackageConfig({
   entry: [

@@ -16,16 +16,16 @@ This guide documents the best practices and architecture for packaging Astro com
 ### Design Principles
 
 1. **Independence**: Each component is fully self-contained with no cross-package dependencies
-2. **Dual Export**: Components export both raw components and Astro integrations
-3. **Version Freedom**: Each package versions and releases independently via Changesets
-4. **Modern Tooling**: Uses pnpm workspaces, Biome, TypeScript, and Vitest
-5. **CI/CD Automation**: Automated testing, linting, and publishing via GitHub Actions
+1. **Dual Export**: Components export both raw components and Astro integrations
+1. **Version Freedom**: Each package versions and releases independently via Changesets
+1. **Modern Tooling**: Uses pnpm workspaces, Biome, TypeScript, and Vitest
+1. **CI/CD Automation**: Automated testing, linting, and publishing via GitHub Actions
 
 ### Key Technologies
 
 - **pnpm Workspaces**: Efficient monorepo package management
 - **Changesets**: Independent versioning and changelog generation
-- **tsup**: Fast TypeScript bundler with ESM output
+- **tsdown**: Rolldown-based TypeScript bundler with ESM output and Oxc-powered DTS
 - **Biome**: Fast linting and formatting (replaces ESLint + Prettier)
 - **Vitest**: Modern test framework with ESM support
 - **GitHub Actions**: CI/CD pipeline for testing and publishing
@@ -34,7 +34,7 @@ This guide documents the best practices and architecture for packaging Astro com
 
 ```
 astro-components/
-├── .changeset/                  # Changesets configuration
+├── .changeset/                 # Changesets configuration
 │   ├── config.json             # Independent versioning config
 │   └── *.md                    # Individual changesets
 ├── .github/
@@ -50,12 +50,12 @@ astro-components/
 │   │   ├── tests/              # Package-specific tests
 │   │   ├── package.json        # Independent versioning
 │   │   ├── README.md           # Package documentation
-│   │   └── tsup.config.ts      # Build configuration
+│   │   └── tsdown.config.ts    # Build configuration
 │   ├── astro-theme-toggle/
 │   └── astro-version-note/
 ├── package.json                # Root workspace config
 ├── pnpm-workspace.yaml         # Workspace definition
-├── tsup.package.config.ts      # Shared build utilities
+├── tsdown.package.config.ts    # Shared build utilities
 ├── tsconfig.json               # Shared TypeScript config
 ├── vitest.config.ts            # Shared test config
 └── biome.json                  # Linting and formatting config
@@ -74,11 +74,12 @@ astro-components/
 ### Ensuring Independence
 
 Each package must:
+
 1. Have its own `package.json` with independent version
-2. Define all dependencies (including peer dependencies)
-3. Include its own tests
-4. Have complete documentation
-5. Build independently of other packages
+1. Define all dependencies (including peer dependencies)
+1. Include its own tests
+1. Have complete documentation
+1. Build independently of other packages
 
 ### Package.json Structure
 
@@ -191,43 +192,34 @@ Common hooks and their use cases:
 ### Integration Best Practices
 
 1. **Provide helpful logging**: Use `logger.info()`, `logger.warn()`, `logger.debug()`
-2. **Validate configuration**: Check requirements in `astro:config:done`
-3. **Fail fast**: Throw clear errors if requirements aren't met
-4. **Document options**: Use JSDoc comments with examples
-5. **Be conservative**: Only inject global code when necessary
+1. **Validate configuration**: Check requirements in `astro:config:done`
+1. **Fail fast**: Throw clear errors if requirements aren't met
+1. **Document options**: Use JSDoc comments with examples
+1. **Be conservative**: Only inject global code when necessary
 
 ## Build Configuration
 
 ### Shared Build Config
 
 ```typescript
-// tsup.package.config.ts
-import { defineConfig } from 'tsup';
+// tsdown.package.config.ts
+import { defineConfig, type Options } from 'tsdown';
 
 export function createPackageConfig({
   entry = 'src/index.ts',
   external = []
-}) {
+}: { entry?: string | string[]; external?: (string | RegExp)[] } = {}): Options {
   return defineConfig({
     entry: Array.isArray(entry) ? entry : [entry],
     format: ['esm'],
     target: 'es2022',
-    dts: true,              // Generate .d.ts files
+    dts: true,              // Generate .d.ts files (Oxc-powered)
     sourcemap: true,        // Include source maps
     clean: true,            // Clean output before build
     treeshake: true,        // Remove unused code
-    splitting: false,       // No code splitting for libraries
-    minify: false,          // Keep code readable
     platform: 'browser',    // Target browser environment
-    external: ['astro', ...external],
-    esbuildOptions(options) {
-      // Copy .astro and .css files to dist
-      options.loader = {
-        ...options.loader,
-        '.astro': 'copy',
-        '.css': 'copy',
-      };
-    },
+    external: [/^node:/, 'astro', ...external],
+    loader: { '.css': 'copy' },
   });
 }
 ```
@@ -235,8 +227,8 @@ export function createPackageConfig({
 ### Package-Specific Config
 
 ```typescript
-// packages/astro-theme-toggle/tsup.config.ts
-import { createPackageConfig } from '../../tsup.package.config';
+// packages/astro-theme-toggle/tsdown.config.ts
+import { createPackageConfig } from '../../tsdown.package.config.ts';
 
 export default createPackageConfig({
   // Build both component and integration
@@ -244,26 +236,28 @@ export default createPackageConfig({
 });
 ```
 
+> **Note**: The `.ts` extension on the import is required — tsdown's native config loader does not resolve extensionless TS imports.
+
 ### Build Output
 
 Each package builds to `dist/` with:
 - **ESM JavaScript**: `*.js` files
-- **Type definitions**: `*.d.ts` files
+- **Type definitions**: `*.d.ts` files (and `.d.ts.map` files)
 - **Source maps**: `*.js.map` files
-- **Copied assets**: `.astro`, `.css` files
+- **CSS assets**: emitted to `dist/assets/` with content hashing
 
 ## Publishing Strategy
 
 ### Changesets Workflow
 
 1. **Make changes** to package code
-2. **Create changeset**: `pnpm changeset`
+1. **Create changeset**: `pnpm changeset`
    - Select affected packages
    - Choose bump type (major/minor/patch)
    - Describe changes
-3. **Commit changeset**: Git commit the `.changeset/*.md` file
-4. **CI creates version PR**: Automated PR with version bumps
-5. **Merge version PR**: Triggers automated publish to npm
+1. **Commit changeset**: Git commit the `.changeset/*.md` file
+1. **CI creates version PR**: Automated PR with version bumps
+1. **Merge version PR**: Triggers automated publish to npm
 
 ### Changeset Configuration
 
@@ -388,9 +382,9 @@ Define what consumers **must** have:
 
 When making breaking changes:
 1. Document migration path in CHANGELOG
-2. Bump major version
-3. Consider deprecation period for gradual migration
-4. Update examples and documentation
+1. Bump major version
+1. Consider deprecation period for gradual migration
+1. Update examples and documentation
 
 ### 8. Security
 
@@ -464,7 +458,8 @@ export default function myIntegration(options = {}) {
 - [Astro Integration API](https://docs.astro.build/en/reference/integrations-reference/)
 - [Changesets Documentation](https://github.com/changesets/changesets)
 - [pnpm Workspaces](https://pnpm.io/workspaces)
-- [tsup Documentation](https://tsup.egoist.dev/)
+- [tsdown Documentation](https://tsdown.dev/)
+- [Rolldown Documentation](https://rolldown.rs/)
 - [Semantic Versioning](https://semver.org/)
 
 ## Conclusion

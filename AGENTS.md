@@ -19,7 +19,7 @@ examples/
   theming-showcase/      # Theme toggle showcase
 .changeset/              # Changesets config (versioning & publishing)
 .github/workflows/       # CI/CD (GitHub Actions)
-tsup.package.config.ts   # Shared tsup build factory
+tsdown.package.config.ts # Shared tsdown build factory
 vitest.config.ts         # Shared test config
 tsconfig.json            # Root TypeScript config (all packages extend this)
 biome.json               # Linter & formatter config
@@ -34,7 +34,7 @@ biome.json               # Linter & formatter config
 | pnpm            | 10.x      | Package manager (corepack-managed)    |
 | TypeScript      | 6.x       | Type checking & declaration emit      |
 | Astro           | 6.x       | Peer dependency for integrations      |
-| tsup            | 8.x       | Build (ESM bundles + .d.ts)           |
+| tsdown          | 0.22.x    | Build (ESM bundles + .d.ts, Rolldown) |
 | Vite            | 8.x       | Dev server & test infrastructure      |
 | Vitest          | 4.x       | Test runner (happy-dom environment)   |
 | Biome           | 2.x       | Linting & formatting (no eslint/prettier) |
@@ -111,8 +111,8 @@ pnpm changeset:publish   # build + publish to npm
 
 - Packages build to **pure JavaScript** (ESM only, ES2022 target).
 - No `.astro` files in `dist/` — components are Web Components or React components.
-- Each package uses `tsup` via the shared factory in `tsup.package.config.ts`.
-- CSS files are copied as-is to `dist/` (esbuild copy loader).
+- Each package uses `tsdown` (Rolldown-based) via the shared factory in `tsdown.package.config.ts`.
+- CSS files are emitted to `dist/assets/` with content hashing (Rolldown asset pipeline).
 - `"astro"` is always externalized; package-specific externals are configured per package.
 
 ### Web Components
@@ -130,8 +130,8 @@ pnpm changeset:publish   # build + publish to npm
 
 - Root `tsconfig.json` is the single base config; packages extend it.
 - Strict mode is fully enabled (all strict flags on).
-- `"ignoreDeprecations": "6.0"` is set because tsup's DTS plugin injects `baseUrl`
-  internally, which is deprecated in TS 6.
+- `"ignoreDeprecations": "5.0"` is set in the root tsconfig for forward-compat with
+  the TypeScript deprecation timeline.
 - `verbatimModuleSyntax: true` — use `import type` for type-only imports.
 
 ### Code Style
@@ -174,7 +174,7 @@ All CI jobs use `pnpm/action-setup@v4` + `actions/setup-node@v4` with
 
 - Do **not** distribute `.astro` files in packages — build to JS.
 - Do **not** use Shadow DOM for Web Components (Light DOM only, for dark mode compat).
-- Do **not** use npm, yarn, eslint, prettier, jest, or webpack.
+- Do **not** use npm, yarn, eslint, prettier, jest, webpack, or tsup.
 - Do **not** add dependencies without necessity — these are lightweight packages.
 - Do **not** bypass Biome rules or skip CI checks.
 - Do **not** target or require pnpm 11 until a stable release ships.

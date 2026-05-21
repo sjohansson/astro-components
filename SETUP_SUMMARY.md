@@ -18,7 +18,7 @@ A fully configured, production-ready monorepo for publishing Astro components wi
 ### Development Tools
 - **Biome 1.9**: Ultra-fast linter and formatter (replaces ESLint + Prettier)
 - **Vitest 2**: Modern test framework with native ESM support
-- **tsup 8**: TypeScript bundler for component libraries
+- **tsdown 0.22**: Rolldown-based TypeScript bundler for component libraries
 - **happy-dom**: Lightweight DOM implementation for testing
 
 ### Automation & Publishing
@@ -51,7 +51,7 @@ astro-components/
 │   │   │   └── index.test.ts
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   └── tsup.config.ts
+│   │   └── tsdown.config.ts
 │   ├── astro-theme-toggle/
 │   │   ├── src/
 │   │   │   ├── index.ts
@@ -60,7 +60,7 @@ astro-components/
 │   │   │   └── index.test.ts
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   └── tsup.config.ts
+│   │   └── tsdown.config.ts
 │   └── astro-version-note/
 │       ├── src/
 │       │   ├── index.ts
@@ -69,7 +69,7 @@ astro-components/
 │       │   └── index.test.ts
 │       ├── package.json
 │       ├── tsconfig.json
-│       └── tsup.config.ts
+│       └── tsdown.config.ts
 ├── .gitignore
 ├── .markdownlint-cli2.yaml
 ├── .npmrc
@@ -110,7 +110,7 @@ astro-components/
   - Test file patterns
 
 ### Build
-- **packages/*/tsup.config.ts**: Build configuration per package
+- **packages/*/tsdown.config.ts**: Build configuration per package
   - ESM output
   - TypeScript declarations
   - Source maps
@@ -236,7 +236,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 
 ### Adding a New Component
 1. Create new folder in `packages/`
-2. Add package.json, tsconfig.json, tsup.config.ts
+2. Add package.json, tsconfig.json, tsdown.config.ts
 3. Implement component in `src/`
 4. Add tests in `tests/` or `test/`
 5. Run `pnpm build` and `pnpm test`
