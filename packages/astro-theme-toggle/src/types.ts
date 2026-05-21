@@ -133,8 +133,30 @@ export interface ThemeControllerProps {
    * @default 'auto'
    */
   expandDirection?: "horizontal" | "vertical" | "auto";
+  /**
+   * When both Theme (family) and Mode (variant) sections are shown, controls
+   * whether the two sections sit side-by-side ('horizontal') or stacked
+   * ('vertical'). 'auto' stacks them vertically so each section's option row
+   * can grow horizontally on its own.
+   * @default 'auto'
+   */
+  sectionsDirection?: "horizontal" | "vertical" | "auto";
+  /**
+   * Which side of the trigger the panel opens toward.
+   * - 'end': right (horizontal expand) or below (vertical expand) — the default direction
+   * - 'start': left or above
+   * - 'auto': measure available viewport space when the panel opens and flip if needed
+   * @default 'auto'
+   */
+  expandSide?: "auto" | "start" | "end";
   /** Show labels next to icons (only visible when expanded) */
   showLabels?: boolean;
+  /**
+   * Where the label sits relative to the icon when `showLabels` is enabled.
+   * 'auto' = 'below' in horizontal expand, 'right' in vertical expand.
+   * @default 'auto'
+   */
+  labelPosition?: "auto" | "below" | "above" | "right" | "left";
   /**
    * Which categories of variants to offer in the selector.
    * - 'basic': base variants only (light/dark + system)

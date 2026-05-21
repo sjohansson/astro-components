@@ -14,9 +14,30 @@ import { SSRSafeHTMLElement } from "./ssr-base";
  *
  * @attr {string} preset - 'basic' | 'accessible' | 'full' (default: 'basic')
  * @attr {string} expand-direction - 'horizontal' | 'vertical' | 'auto' (default: 'auto')
+ *   Controls how the option buttons inside each section flow.
+ * @attr {string} sections-direction - 'horizontal' | 'vertical' | 'auto' (default: 'auto')
+ *   When both Theme (family) and Mode (variant) sections are shown, controls
+ *   whether the two sections sit side-by-side ('horizontal') or stacked
+ *   ('vertical'). 'auto' stacks them vertically so each section's row can
+ *   grow horizontally independently.
+ * @attr {string} expand-side - 'auto' | 'start' | 'end' (default: 'auto')
+ *   Which side of the trigger the panel opens toward. 'end' = right (horizontal)
+ *   or below (vertical); 'start' = left or above. 'auto' picks the side with
+ *   the most room when the panel opens.
  * @attr {boolean} show-labels - Show text labels next to icons
+ * @attr {string} label-position - 'auto' | 'below' | 'above' | 'right' | 'left'
+ *   (default: 'auto'). Where the label sits relative to the icon when
+ *   `show-labels` is enabled. 'auto' = 'below' in horizontal expand, 'right'
+ *   in vertical expand.
  * @attr {string} themes - JSON string of ThemeConfig[] (filtered by preset)
  * @attr {string} family - Restrict to a single family by id (variant-only UI)
+ *
+ * @cssprop --theme-controller-label-font-size - Label text size (default 0.75rem)
+ * @cssprop --theme-controller-label-font-family - Label font family (default inherit)
+ * @cssprop --theme-controller-label-font-weight - Label font weight (default 500)
+ * @cssprop --theme-controller-label-color - Label text color (default inherit)
+ * @cssprop --theme-controller-label-letter-spacing - Label letter spacing (default normal)
+ * @cssprop --theme-controller-label-line-height - Label line height (default 1.2)
  */
 export class ThemeControllerElement extends SSRSafeHTMLElement {
   private themes: ThemeConfig[] = [];
@@ -28,7 +49,16 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   private resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
   static get observedAttributes(): string[] {
-    return ["preset", "expand-direction", "show-labels", "themes", "family"];
+    return [
+      "preset",
+      "expand-direction",
+      "sections-direction",
+      "expand-side",
+      "show-labels",
+      "label-position",
+      "themes",
+      "family",
+    ];
   }
 
   connectedCallback(): void {
@@ -89,6 +119,18 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
 
   private get expandDirection(): string {
     return this.getAttribute("expand-direction") || "auto";
+  }
+
+  private get sectionsDirection(): string {
+    return this.getAttribute("sections-direction") || "auto";
+  }
+
+  private get labelPosition(): string {
+    return this.getAttribute("label-position") || "auto";
+  }
+
+  private get expandSide(): string {
+    return this.getAttribute("expand-side") || "auto";
   }
 
   private get showLabels(): boolean {
@@ -243,8 +285,48 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     this.isOpen = !this.isOpen;
     const panel = this.querySelector(".theme-panel");
     const trigger = this.querySelector("[data-theme-trigger]");
+    if (this.isOpen) {
+      this.resolveSide();
+    }
     panel?.classList.toggle("open", this.isOpen);
     trigger?.setAttribute("aria-expanded", String(this.isOpen));
+  }
+
+  /**
+   * Decide which side of the trigger the panel should open toward.
+   * Honors an explicit `expand-side` attribute; otherwise measures available
+   * viewport space along the active axis and flips when the natural side
+   * would clip.
+   */
+  private resolveSide(): void {
+    const inner = this.querySelector<HTMLElement>(".theme-controller-inner");
+    const trigger = this.querySelector<HTMLElement>("[data-theme-trigger]");
+    const panel = this.querySelector<HTMLElement>(".theme-panel");
+    if (!inner || !trigger || !panel) {
+      return;
+    }
+
+    const explicit = this.expandSide;
+    let side: "start" | "end";
+    if (explicit === "start" || explicit === "end") {
+      side = explicit;
+    } else {
+      const axis = inner.getAttribute("data-direction") === "horizontal" ? "horizontal" : "vertical";
+      const triggerRect = trigger.getBoundingClientRect();
+      // Panel is visibility:hidden but laid out — measurable.
+      const panelRect = panel.getBoundingClientRect();
+      const gap = 6; // matches CSS 0.375rem offset
+      if (axis === "horizontal") {
+        const roomEnd = window.innerWidth - triggerRect.right - gap;
+        const roomStart = triggerRect.left - gap;
+        side = panelRect.width <= roomEnd || roomEnd >= roomStart ? "end" : "start";
+      } else {
+        const roomEnd = window.innerHeight - triggerRect.bottom - gap;
+        const roomStart = triggerRect.top - gap;
+        side = panelRect.height <= roomEnd || roomEnd >= roomStart ? "end" : "start";
+      }
+    }
+    inner.setAttribute("data-side", side);
   }
 
   private closePanel(): void {
@@ -266,7 +348,38 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     } else {
       effective = window.innerWidth > 768 ? "vertical" : "horizontal";
     }
-    this.querySelector<HTMLElement>(".theme-controller-inner")?.setAttribute("data-direction", effective);
+
+    const sectionsDir = this.sectionsDirection;
+    // 'auto' defaults to stacking sections vertically — keeps each section's
+    // option row free to grow horizontally without sections fighting for width.
+    const effectiveSections = sectionsDir === "horizontal" || sectionsDir === "vertical" ? sectionsDir : "vertical";
+
+    const labelPos = this.labelPosition;
+    let effectiveLabelPos: string;
+    if (labelPos === "above" || labelPos === "below" || labelPos === "left" || labelPos === "right") {
+      effectiveLabelPos = labelPos;
+    } else {
+      effectiveLabelPos = effective === "horizontal" ? "below" : "right";
+    }
+
+    const explicitSide = this.expandSide;
+    const initialSide = explicitSide === "start" ? "start" : "end";
+
+    const inner = this.querySelector<HTMLElement>(".theme-controller-inner");
+    if (inner) {
+      inner.setAttribute("data-direction", effective);
+      inner.setAttribute("data-sections-direction", effectiveSections);
+      inner.setAttribute("data-label-position", effectiveLabelPos);
+      // Set a baseline side; auto-detection runs again when the panel opens.
+      if (!inner.hasAttribute("data-side")) {
+        inner.setAttribute("data-side", initialSide);
+      }
+      if (this.showLabels) {
+        inner.setAttribute("data-show-labels", "");
+      } else {
+        inner.removeAttribute("data-show-labels");
+      }
+    }
   }
 
   // ── Events ──
@@ -321,8 +434,8 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     // Outside click
     document.addEventListener("click", this.handleOutsideClick);
 
-    // Resize for auto direction
-    if (this.expandDirection === "auto") {
+    // Resize for auto direction and/or auto side detection
+    if (this.expandDirection === "auto" || this.expandSide === "auto") {
       window.addEventListener("resize", this.handleResize);
     }
 
@@ -349,6 +462,9 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     clearTimeout(this.resizeTimer);
     this.resizeTimer = setTimeout(() => {
       this.applyDirection();
+      if (this.isOpen) {
+        this.resolveSide();
+      }
     }, 100);
   };
 
@@ -579,33 +695,64 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       border-radius: 0.5rem;
       padding: 0.375rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      width: max-content;
+      max-width: calc(100vw - 1rem);
+      align-items: stretch;
     }
     .theme-panel.open {
       opacity: 1;
       visibility: visible;
     }
-    [data-direction="vertical"] .theme-panel {
-      flex-direction: column;
+    /* Vertical expand: end = below trigger, start = above trigger */
+    [data-direction="vertical"][data-side="end"] .theme-panel {
       top: calc(100% + 0.375rem);
       right: 0;
       transform: translateY(-0.5rem);
     }
-    [data-direction="vertical"] .theme-panel.open {
+    [data-direction="vertical"][data-side="end"] .theme-panel.open {
       transform: translateY(0);
     }
-    [data-direction="horizontal"] .theme-panel {
-      flex-direction: row;
+    [data-direction="vertical"][data-side="start"] .theme-panel {
+      bottom: calc(100% + 0.375rem);
+      right: 0;
+      transform: translateY(0.5rem);
+    }
+    [data-direction="vertical"][data-side="start"] .theme-panel.open {
+      transform: translateY(0);
+    }
+    /* Horizontal expand: end = right of trigger, start = left of trigger */
+    [data-direction="horizontal"][data-side="end"] .theme-panel {
       top: 50%;
       left: calc(100% + 0.375rem);
       transform: translateY(-50%) translateX(-0.5rem);
     }
-    [data-direction="horizontal"] .theme-panel.open {
+    [data-direction="horizontal"][data-side="end"] .theme-panel.open {
       transform: translateY(-50%) translateX(0);
+    }
+    [data-direction="horizontal"][data-side="start"] .theme-panel {
+      top: 50%;
+      right: calc(100% + 0.375rem);
+      transform: translateY(-50%) translateX(0.5rem);
+    }
+    [data-direction="horizontal"][data-side="start"] .theme-panel.open {
+      transform: translateY(-50%) translateX(0);
+    }
+    /* Arrangement of family/mode sections inside the panel */
+    [data-sections-direction="vertical"] .theme-panel {
+      flex-direction: column;
+    }
+    [data-sections-direction="horizontal"] .theme-panel {
+      flex-direction: row;
+      align-items: stretch;
     }
     .panel-section {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
+      min-width: 0;
+    }
+    [data-sections-direction="horizontal"] .panel-section {
+      flex: 0 1 auto;
     }
     .section-label {
       font-size: 0.625rem;
@@ -619,19 +766,42 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       display: flex;
       gap: 0.25rem;
     }
+    /* Option flow follows expand-direction */
+    [data-direction="vertical"] .section-options {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    [data-direction="horizontal"] .section-options {
+      flex-direction: row;
+      align-items: stretch;
+    }
+    /* In simple (single-family) mode, buttons sit directly under .theme-panel */
+    [data-direction="vertical"] .theme-panel > .theme-option-btn {
+      align-self: stretch;
+    }
     .panel-divider {
-      height: 1px;
       background: var(--theme-border-default, #dee2e6);
+      flex-shrink: 0;
+    }
+    [data-sections-direction="vertical"] .panel-divider {
+      height: 1px;
+      width: auto;
       margin: 0.125rem 0;
+    }
+    [data-sections-direction="horizontal"] .panel-divider {
+      width: 1px;
+      height: auto;
+      margin: 0 0.125rem;
+      align-self: stretch;
     }
     .theme-option-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 0.375rem;
-      width: 2.25rem;
-      height: 2.25rem;
-      padding: 0;
+      min-width: 2.25rem;
+      min-height: 2.25rem;
+      padding: 0.25rem 0.375rem;
       border: 1px solid transparent;
       border-radius: 0.375rem;
       background: transparent;
@@ -639,6 +809,38 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       cursor: pointer;
       transition: background 0.15s, border-color 0.15s, color 0.15s;
       flex-shrink: 0;
+    }
+    /* Without labels keep the original compact square shape */
+    .theme-controller-inner:not([data-show-labels]) .theme-option-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+    }
+    /* With labels, let buttons grow to fit text content */
+    [data-show-labels] .theme-option-btn {
+      width: auto;
+      height: auto;
+    }
+    /* Label position relative to icon */
+    [data-show-labels][data-label-position="below"] .theme-option-btn {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.375rem 0.5rem;
+    }
+    [data-show-labels][data-label-position="above"] .theme-option-btn {
+      flex-direction: column-reverse;
+      gap: 0.25rem;
+      padding: 0.375rem 0.5rem;
+    }
+    [data-show-labels][data-label-position="right"] .theme-option-btn {
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 0.375rem 0.625rem;
+    }
+    [data-show-labels][data-label-position="left"] .theme-option-btn {
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+      padding: 0.375rem 0.625rem;
     }
     .theme-option-btn:hover {
       background: var(--theme-bg-secondary, #f8f9fa);
@@ -661,8 +863,12 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       flex-shrink: 0;
     }
     .option-label {
-      font-size: 0.75rem;
-      font-weight: 500;
+      font-size: var(--theme-controller-label-font-size, 0.75rem);
+      font-family: var(--theme-controller-label-font-family, inherit);
+      font-weight: var(--theme-controller-label-font-weight, 500);
+      color: var(--theme-controller-label-color, inherit);
+      letter-spacing: var(--theme-controller-label-letter-spacing, normal);
+      line-height: var(--theme-controller-label-line-height, 1.2);
       white-space: nowrap;
     }
     .option-swatch {

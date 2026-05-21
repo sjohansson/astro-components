@@ -72,6 +72,58 @@ const allThemesJson = JSON.stringify([...defaultThemes, ...allBundledThemes]);
           </div>
 
           <div class="config-group">
+            <label class="form-label" for="config-sections">Sections direction</label>
+            <select
+              id="config-sections"
+              class="form-input"
+              data-config="sections-direction"
+            >
+              <option value="auto" selected>auto</option>
+              <option value="horizontal">horizontal</option>
+              <option value="vertical">vertical</option>
+            </select>
+            <p class="config-desc">
+              Arrangement of the Theme + Mode sections when both are shown.
+              'auto' follows expand direction.
+            </p>
+          </div>
+
+          <div class="config-group">
+            <label class="form-label" for="config-side">Expand side</label>
+            <select
+              id="config-side"
+              class="form-input"
+              data-config="expand-side"
+            >
+              <option value="auto" selected>auto</option>
+              <option value="end">end (right / below)</option>
+              <option value="start">start (left / above)</option>
+            </select>
+            <p class="config-desc">
+              Which side of the trigger the panel opens toward. 'auto' picks
+              the side with more viewport room.
+            </p>
+          </div>
+
+          <div class="config-group">
+            <label class="form-label" for="config-label-pos">Label position</label>
+            <select
+              id="config-label-pos"
+              class="form-input"
+              data-config="label-position"
+            >
+              <option value="auto" selected>auto</option>
+              <option value="below">below</option>
+              <option value="above">above</option>
+              <option value="right">right</option>
+              <option value="left">left</option>
+            </select>
+            <p class="config-desc">
+              Where the label sits relative to the icon (when labels are shown).
+            </p>
+          </div>
+
+          <div class="config-group">
             <label class="form-label" for="config-family">Family</label>
             <select id="config-family" class="form-input" data-config="family">
               <option value="" selected>All families</option>
