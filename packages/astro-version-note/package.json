@@ -1,6 +1,6 @@
 {
   "name": "@sjohansson/astro-version-note",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Version note component for Astro sites. Shows the current version of the site in case you want to make sure it is running what you think.",
   "type": "module",
   "main": "./dist/index.js",
