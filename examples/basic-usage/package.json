@@ -14,7 +14,7 @@
     "@sjohansson/astro-version-note": "workspace:*",
     "@astrojs/react": "^5.0.0",
     "@xyflow/react": "^12.3.5",
-    "astro": "^6.1.0",
+    "astro": "^6.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
