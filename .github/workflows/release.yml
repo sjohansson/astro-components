@@ -27,7 +27,10 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
-      
+
+      - name: Ensure npm supports OIDC trusted publishing
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       
@@ -44,5 +47,3 @@ jobs:
           title: 'chore: release packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
