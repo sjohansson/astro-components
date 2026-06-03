@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { registerThemeController, registerThemeToggle } from "../src/core/index";
+import { registerThemeController, registerThemeToggle, seventiesThemes } from "../src/core/index";
 
 /**
  * DOM behavior tests for the new data-attribute apply modes. The shared vitest
@@ -86,7 +86,8 @@ describe("<theme-controller> apply modes", () => {
     expect(root().getAttribute("data-theme")).toBe("light");
     expect(root().getAttribute("data-theme-family")).toBe("default");
     expect(root().getAttribute("data-theme-scheme")).toBe("light");
-    expect(root().getAttribute("data-theme-category")).toBe("base");
+    expect(root().getAttribute("data-theme-contrast")).toBe("normal");
+    expect(root().getAttribute("data-theme-category")).toBeNull(); // retired
     expect(root().style.getPropertyValue("--theme-bg-primary")).toBe("");
     // classes are still applied in every mode
     expect(root().classList.contains("scheme-light")).toBe(true);
@@ -128,6 +129,49 @@ describe("<theme-controller> apply modes", () => {
     expect(localStorage.getItem("theme-resolved-scheme")).toBe("light");
     expect(localStorage.getItem("theme-attr-companions")).toBe("1");
   });
+
+  it("drives scheme/contrast/color-vision independently, with combined fallback", () => {
+    const el = mount("theme-controller", {
+      "apply-mode": "attribute",
+      themes: JSON.stringify(seventiesThemes),
+      preset: "full",
+    }) as HTMLElement & {
+      setScheme(v: string): void;
+      setContrast(v: string): void;
+      setVariation(v: string): void;
+    };
+
+    // A specific color-vision variation, no longer collapsed.
+    el.setScheme("light");
+    el.setVariation("protanopia");
+    expect(root().getAttribute("data-theme")).toBe("seventies-protanopia-light");
+    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
+    expect(root().getAttribute("data-theme-contrast")).toBe("normal");
+    expect(root().getAttribute("data-theme-category")).toBeNull(); // retired
+    expect(localStorage.getItem("theme-resolved-variation")).toBe("protanopia");
+
+    // A different color-vision type is reachable (not stuck on protanopia).
+    el.setScheme("dark");
+    el.setVariation("deuteranopia");
+    expect(root().getAttribute("data-theme")).toBe("seventies-deuteranopia-dark");
+    expect(root().getAttribute("data-theme-variation")).toBe("deuteranopia");
+
+    // Combined high-contrast + color-vision: no concrete hc+protanopia palette
+    // exists, so `data-theme` falls back to hc-light, but BOTH axis attributes
+    // are set from the control state so a composed CSS selector still matches.
+    el.setScheme("light");
+    el.setContrast("more");
+    el.setVariation("protanopia");
+    expect(root().getAttribute("data-theme-contrast")).toBe("more");
+    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
+    expect(root().getAttribute("data-theme")).toBe("seventies-hc-light");
+
+    // Back to normal clears the variation companion + key.
+    el.setContrast("normal");
+    el.setVariation("normal");
+    expect(root().getAttribute("data-theme-variation")).toBeNull();
+    expect(localStorage.getItem("theme-resolved-variation")).toBeNull();
+  });
 });
 
 describe("<theme-toggle> apply modes", () => {
@@ -162,21 +206,25 @@ describe("<theme-toggle> apply modes", () => {
 });
 
 describe("initTheme() attribute replay", () => {
-  it("replays persisted attributes onto <html>", async () => {
+  it("replays persisted attributes onto <html>, keeping variation through replay", async () => {
     const { initTheme } = await import("../src/core/index");
-    localStorage.setItem("theme-mode", "dark");
+    localStorage.setItem("theme-mode", "dark"); // scheme not 'system' → use stored scheme
+    localStorage.setItem("theme-contrast", "more"); // contrast axis not 'system' → use stored
     localStorage.setItem("theme-attr-name", "data-theme");
-    localStorage.setItem("theme-resolved-id", "high-contrast-dark");
-    localStorage.setItem("theme-resolved-family", "default");
+    localStorage.setItem("theme-resolved-id", "seventies-hc-dark");
+    localStorage.setItem("theme-resolved-family", "seventies");
     localStorage.setItem("theme-resolved-scheme", "dark");
-    localStorage.setItem("theme-resolved-category", "high-contrast");
+    localStorage.setItem("theme-resolved-contrast", "more");
+    localStorage.setItem("theme-resolved-variation", "protanopia");
     localStorage.setItem("theme-attr-companions", "1");
 
     initTheme();
 
-    expect(root().getAttribute("data-theme")).toBe("high-contrast-dark");
-    expect(root().getAttribute("data-theme-family")).toBe("default");
+    expect(root().getAttribute("data-theme")).toBe("seventies-hc-dark");
+    expect(root().getAttribute("data-theme-family")).toBe("seventies");
     expect(root().getAttribute("data-theme-scheme")).toBe("dark");
-    expect(root().getAttribute("data-theme-category")).toBe("high-contrast");
+    expect(root().getAttribute("data-theme-contrast")).toBe("more");
+    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
+    expect(root().getAttribute("data-theme-category")).toBeNull();
   });
 });

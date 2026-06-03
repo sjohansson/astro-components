@@ -68,10 +68,10 @@ describe("Default themes", () => {
     expect(ids).toContain("high-contrast-dark");
   });
 
-  it("should have correct categories", async () => {
+  it("should have normal + high-contrast variants on the contrast axis", async () => {
     const { defaultThemes } = await import("../src/theme-config");
-    expect(defaultThemes.filter((t) => t.category === "base")).toHaveLength(2);
-    expect(defaultThemes.filter((t) => t.category === "high-contrast")).toHaveLength(2);
+    expect(defaultThemes.filter((t) => (t.contrast ?? "normal") === "normal")).toHaveLength(2);
+    expect(defaultThemes.filter((t) => t.contrast === "more")).toHaveLength(2);
   });
 
   it("should have scheme and family on all themes", async () => {
@@ -82,23 +82,26 @@ describe("Default themes", () => {
     }
   });
 
-  it('should filter by preset "basic"', async () => {
+  it('should filter by preset "basic" (scheme only)', async () => {
     const { defaultThemes, filterThemesByPreset } = await import("../src/theme-config");
     const basic = filterThemesByPreset(defaultThemes, "basic");
     expect(basic).toHaveLength(2);
-    expect(basic.every((t) => t.category === "base")).toBe(true);
+    expect(basic.every((t) => (t.contrast ?? "normal") === "normal" && !t.variation)).toBe(true);
   });
 
-  it('should filter by preset "accessible"', async () => {
+  it('should filter by preset "accessible" (adds contrast)', async () => {
     const { defaultThemes, filterThemesByPreset } = await import("../src/theme-config");
     expect(filterThemesByPreset(defaultThemes, "accessible")).toHaveLength(4);
   });
 
-  it("should filter by custom category array", async () => {
+  it("should filter by a custom axis list (legacy category values mapped)", async () => {
     const { defaultThemes, filterThemesByPreset } = await import("../src/theme-config");
-    const hc = filterThemesByPreset(defaultThemes, ["high-contrast"]);
-    expect(hc).toHaveLength(2);
-    expect(hc.every((t) => t.category === "high-contrast")).toBe(true);
+    // scheme-only drops the high-contrast variants
+    expect(filterThemesByPreset(defaultThemes, ["scheme"])).toHaveLength(2);
+    // enabling the contrast axis keeps them
+    expect(filterThemesByPreset(defaultThemes, ["contrast"])).toHaveLength(4);
+    // legacy "high-contrast" category value is tolerated and maps to the contrast axis
+    expect(filterThemesByPreset(defaultThemes, ["high-contrast"] as never)).toHaveLength(4);
   });
 
   it("should generate valid CSS from theme config", async () => {
@@ -182,7 +185,7 @@ describe("Theme families", () => {
 
   it("seventies should include color-blind variants", async () => {
     const { seventiesThemes } = await import("../src/themes/seventies");
-    const cb = seventiesThemes.filter((t) => t.category === "color-blind");
+    const cb = seventiesThemes.filter((t) => t.variation);
     expect(cb.length).toBeGreaterThan(0);
     const ids = cb.map((t) => t.id);
     expect(ids.some((id) => id.includes("protanopia"))).toBe(true);
@@ -191,13 +194,24 @@ describe("Theme families", () => {
     expect(ids.some((id) => id.includes("achromatopsia"))).toBe(true);
   });
 
+  it("color-blind variants carry a specific variation; base/high-contrast do not", async () => {
+    const { seventiesThemes } = await import("../src/themes/seventies");
+    const variations = new Set(seventiesThemes.filter((t) => t.variation).map((t) => t.variation));
+    expect(variations).toEqual(new Set(["protanopia", "deuteranopia", "tritanopia", "achromatopsia"]));
+    // Only the color-vision variants carry a variation; base + high-contrast don't.
+    const nonCvd = seventiesThemes.filter((t) => !t.variation);
+    expect(nonCvd).toHaveLength(4); // light, dark, hc-light, hc-dark
+  });
+
   it("each family should have light + dark base variants", async () => {
     const { kawaiiThemes } = await import("../src/themes/kawaii");
     const { lessIsMoreThemes } = await import("../src/themes/less-is-more");
     const { seventiesThemes } = await import("../src/themes/seventies");
+    const isBase = (t: { contrast?: string; variation?: string }) =>
+      (t.contrast ?? "normal") === "normal" && !t.variation;
     for (const family of [kawaiiThemes, lessIsMoreThemes, seventiesThemes]) {
-      expect(family.find((t) => t.category === "base" && t.scheme === "light")).toBeDefined();
-      expect(family.find((t) => t.category === "base" && t.scheme === "dark")).toBeDefined();
+      expect(family.find((t) => isBase(t) && t.scheme === "light")).toBeDefined();
+      expect(family.find((t) => isBase(t) && t.scheme === "dark")).toBeDefined();
     }
   });
 });
@@ -222,17 +236,20 @@ describe("Family helpers", () => {
     expect(ids).toHaveLength(3);
   });
 
-  it("should resolve best variant for a family", async () => {
-    const { groupByFamily, resolveVariant } = await import("../src/theme-config");
+  it("should resolve the best theme for an axis tuple", async () => {
+    const { groupByFamily, resolveTheme } = await import("../src/theme-config");
     const { kawaiiThemes } = await import("../src/themes/kawaii");
     const families = groupByFamily(kawaiiThemes);
     const kawaii = families[0];
 
-    expect(resolveVariant(kawaii, "light", "base").id).toBe("kawaii-light");
-    expect(resolveVariant(kawaii, "dark", "high-contrast").id).toBe("kawaii-hc-dark");
+    expect(resolveTheme(kawaii, "light", "normal", "normal").id).toBe("kawaii-light");
+    expect(resolveTheme(kawaii, "dark", "more", "normal").id).toBe("kawaii-hc-dark");
 
-    // Fallback: color-blind not available, should get base
-    const fallback = resolveVariant(kawaii, "light", "color-blind");
-    expect(fallback.scheme).toBe("light");
+    // Fallback: kawaii has no color-vision variant → drops to the plain light palette.
+    const fallback = resolveTheme(kawaii, "light", "normal", "protanopia");
+    expect(fallback.id).toBe("kawaii-light");
+
+    // Fallback relaxes variation before contrast: hc + (missing) protanopia → hc light.
+    expect(resolveTheme(kawaii, "light", "more", "protanopia").id).toBe("kawaii-hc-light");
   });
 });

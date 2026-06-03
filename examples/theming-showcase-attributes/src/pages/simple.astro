@@ -1,0 +1,152 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const usageSnippet = `// in your .astro frontmatter:
+import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
+
+// in the template — attribute mode (no .dark class):
+<theme-toggle apply-mode="attribute"></theme-toggle>`;
+---
+
+<Layout title="Simple Toggle — Data Attributes">
+  {/*
+    This page is light/dark ONLY. If you arrived from the advanced page, the
+    FOUC script may have replayed a family / contrast / variation the controller
+    chose. The simple toggle doesn't own those companions, so drop them up front
+    to keep this page purely scheme-driven. Runs inline before the body paints.
+  */}
+  <script is:inline>
+    document.documentElement.removeAttribute("data-theme-family");
+    document.documentElement.removeAttribute("data-theme-contrast");
+    document.documentElement.removeAttribute("data-theme-variation");
+    try {
+      localStorage.removeItem("theme-resolved-family");
+      localStorage.removeItem("theme-resolved-contrast");
+      localStorage.removeItem("theme-resolved-variation");
+    } catch (e) {
+      /* storage unavailable — ignore */
+    }
+  </script>
+
+  <div class="page">
+    <header class="header">
+      <div class="header-content">
+        <div>
+          <span class="badge">Simple toggle</span>
+          <h1 class="title">Light / Dark Only</h1>
+          <p class="subtitle">
+            <code>&lt;theme-toggle apply-mode="attribute"&gt;</code> sets just
+            <code>data-theme</code> and <code>data-theme-scheme</code> — no
+            family, contrast, or variation. The same <code>tokens.css</code>
+            baseline themes the whole page from the scheme alone.
+          </p>
+        </div>
+        <div class="header-controls">
+          <a class="nav-link" href="/">← Advanced controller</a>
+          <theme-toggle apply-mode="attribute" aria-label="Toggle light/dark"
+          ></theme-toggle>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="section">
+        <h2 class="section-title">What's on <code>&lt;html&gt;</code> right now</h2>
+        <p class="section-desc">
+          The simple toggle only manages the scheme dimension, so it writes two
+          attributes. Everything else on this page resolves from
+          <code>data-theme-scheme</code>.
+        </p>
+
+        <div class="readout">
+          <div class="readout-item">
+            <span class="readout-key">data-theme</span>
+            <span class="readout-val" data-readout="data-theme">—</span>
+          </div>
+          <div class="readout-item">
+            <span class="readout-key">data-theme-scheme</span>
+            <span class="readout-val" data-readout="data-theme-scheme">—</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Live Components</h2>
+        <p class="section-desc">
+          Identical token-driven components to the advanced page — proof the CSS
+          doesn't care which switcher set the attribute.
+        </p>
+
+        <div class="demo-grid">
+          <div class="card">
+            <h3>Card &amp; Buttons</h3>
+            <p>
+              Surfaces, borders, and the accent all come from the
+              <code>[data-theme-scheme]</code> baseline in <code>tokens.css</code>.
+            </p>
+            <div class="actions">
+              <button class="btn btn-primary">Primary</button>
+              <button class="btn btn-secondary">Secondary</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Semantic Colors</h3>
+            <div class="alert alert-success">Success — saved.</div>
+            <div class="alert alert-warning">Warning — double-check.</div>
+            <div class="alert alert-error">Error — try again.</div>
+            <div class="alert alert-info">Info — <a href="#">learn more</a>.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Usage</h2>
+        <div class="code-grid">
+          <div class="code-block">
+            <h3>The whole thing</h3>
+            <pre><code>{usageSnippet}</code></pre>
+            <p class="code-desc">
+              Need families, high-contrast, or system detection? Use the
+              <a href="/">advanced controller</a> instead.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <strong>@sjohansson/astro-theme-toggle</strong> — one switcher owns
+        <code>&lt;html&gt;</code> per page. Back to the
+        <a href="/">advanced controller</a>.
+      </p>
+    </footer>
+  </div>
+</Layout>
+
+<script>
+  import { registerThemeToggle } from "@sjohansson/astro-theme-toggle";
+
+  registerThemeToggle();
+
+  // Reflect the live <html> data attributes into the readout panel.
+  const root = document.documentElement;
+  const cells = document.querySelectorAll<HTMLElement>("[data-readout]");
+
+  function updateReadout(): void {
+    for (const cell of cells) {
+      const attr = cell.dataset.readout;
+      if (attr) {
+        cell.textContent = root.getAttribute(attr) ?? "—";
+      }
+    }
+  }
+
+  updateReadout();
+  new MutationObserver(updateReadout).observe(root, {
+    attributes: true,
+    attributeFilter: ["data-theme", "data-theme-scheme"],
+  });
+  document.addEventListener("astro:after-swap", updateReadout);
+</script>

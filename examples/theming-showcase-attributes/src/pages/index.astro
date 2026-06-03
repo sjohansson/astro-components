@@ -18,16 +18,16 @@ const tokensSnippet = `/* tokens.css — every theme gets a palette from its sch
   --app-accent: #5b9dff;
 }`;
 
-const advancedSnippet = `/* advanced.css — layer concerns with the companions */
-[data-theme-category="high-contrast"] {
+const advancedSnippet = `/* advanced.css — compose the orthogonal axes */
+[data-theme-contrast="more"] {
   --app-border-width: 2px;
-  --app-border: currentColor;
 }
-[data-theme-family="kawaii"] {
-  --app-accent: #ff5fa2;   /* just the accent; scheme baseline stays */
+[data-theme-variation="protanopia"] {
+  --app-accent: #6a5acd;   /* one color-vision type; scales to more */
 }
-[data-theme="dark"] {
-  --app-shadow: 0 8px 24px rgba(0,0,0,0.55);  /* one exact variant */
+/* high contrast AND protanopia at once — impossible with one category */
+[data-theme-contrast="more"][data-theme-variation="protanopia"] {
+  --app-accent: #4b0082;
 }`;
 
 const configSnippet = `// astro.config.mjs
@@ -58,8 +58,7 @@ export default defineConfig({
           </p>
         </div>
         <div class="header-controls">
-          <theme-toggle apply-mode="attribute" aria-label="Toggle light/dark"
-          ></theme-toggle>
+          <a class="nav-link" href="/simple">Simple toggle →</a>
           <theme-controller
             id="controller"
             themes={allThemesJson}
@@ -95,8 +94,12 @@ export default defineConfig({
             <span class="readout-val" data-readout="data-theme-scheme">—</span>
           </div>
           <div class="readout-item">
-            <span class="readout-key">data-theme-category</span>
-            <span class="readout-val" data-readout="data-theme-category">—</span>
+            <span class="readout-key">data-theme-contrast</span>
+            <span class="readout-val" data-readout="data-theme-contrast">—</span>
+          </div>
+          <div class="readout-item">
+            <span class="readout-key">data-theme-variation</span>
+            <span class="readout-val" data-readout="data-theme-variation">—</span>
           </div>
         </div>
       </section>
@@ -109,6 +112,9 @@ export default defineConfig({
           defined in <code>tokens.css</code> and <code>advanced.css</code>.
           Pick a bundled family (Kawaii, Seventies…) to see the family accent
           override layer in while the scheme baseline carries everything else.
+          The Seventies family also exposes color-vision variations (protanopia,
+          deuteranopia…) — each is its own option, surfaced as
+          <code>data-theme-variation</code>.
         </p>
 
         <div class="demo-grid">
@@ -117,7 +123,7 @@ export default defineConfig({
             <p>
               Surfaces, borders, and accents all resolve from data-attribute
               selectors. High-contrast themes thicken every border via a single
-              <code>[data-theme-category="high-contrast"]</code> rule.
+              <code>[data-theme-contrast="more"]</code> rule.
             </p>
             <div class="actions">
               <button class="btn btn-primary">Primary</button>
@@ -192,21 +198,18 @@ export default defineConfig({
     <footer class="footer">
       <p>
         <strong>@sjohansson/astro-theme-toggle</strong> — data-attribute theming
-        with your own CSS. Compare with the inline-tokens
-        <code>theming-showcase</code> example.
+        with your own CSS. The simple light/dark <code>&lt;theme-toggle&gt;</code>
+        gets its <a href="/simple">own page</a>: one switcher owns
+        <code>&lt;html&gt;</code> per page, so the two never fight.
       </p>
     </footer>
   </div>
 </Layout>
 
 <script>
-  import {
-    registerThemeController,
-    registerThemeToggle,
-  } from "@sjohansson/astro-theme-toggle";
+  import { registerThemeController } from "@sjohansson/astro-theme-toggle";
 
   registerThemeController();
-  registerThemeToggle();
 
   // Reflect the live <html> data attributes into the readout panel.
   const root = document.documentElement;
@@ -229,7 +232,8 @@ export default defineConfig({
       "data-theme",
       "data-theme-family",
       "data-theme-scheme",
-      "data-theme-category",
+      "data-theme-contrast",
+      "data-theme-variation",
     ],
   });
   // Re-sync after Astro view transitions, if used.

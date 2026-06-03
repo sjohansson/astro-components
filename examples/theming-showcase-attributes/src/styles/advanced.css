@@ -4,16 +4,17 @@
  *
  * This is the payoff of attribute-based theming: instead of one flat set of
  * inline variables, you can target broad slices of theme-space with plain CSS
- * selectors and layer concerns independently (scheme → category → family → id).
+ * selectors and layer concerns independently (scheme → contrast → variation →
+ * family → id). The three accessibility axes are orthogonal, so they compose.
  */
 
-/* ── Category: high contrast (regardless of family or scheme) ── */
-[data-theme-category="high-contrast"] {
+/* ── Contrast axis: high contrast (regardless of family or scheme) ── */
+[data-theme-contrast="more"] {
   --app-border-width: 2px;
   --app-radius: 0.25rem;
 }
 
-[data-theme-category="high-contrast"][data-theme-scheme="light"] {
+[data-theme-contrast="more"][data-theme-scheme="light"] {
   --app-bg: #ffffff;
   --app-surface: #ffffff;
   --app-surface-2: #f0f0f0;
@@ -24,7 +25,7 @@
   --app-accent-contrast: #ffffff;
 }
 
-[data-theme-category="high-contrast"][data-theme-scheme="dark"] {
+[data-theme-contrast="more"][data-theme-scheme="dark"] {
   --app-bg: #000000;
   --app-surface: #000000;
   --app-surface-2: #141414;
@@ -36,7 +37,7 @@
 }
 
 /* High-contrast themes also get underlined links for extra affordance. */
-[data-theme-category="high-contrast"] a {
+[data-theme-contrast="more"] a {
   text-decoration: underline;
 }
 
@@ -56,6 +57,36 @@
 [data-theme-family="less-is-more"] {
   --app-accent: #555c66;
   --app-accent-contrast: #ffffff;
+}
+
+/* ── Variation: target a specific color-vision type via data-theme-variation ── */
+/* Each color-vision sub-type is its own value, so this scales as new ones are
+   added — no need to enumerate them in a preset. */
+[data-theme-variation="protanopia"] {
+  --app-accent: #6a5acd;
+  --app-accent-contrast: #ffffff;
+}
+[data-theme-variation="deuteranopia"] {
+  --app-accent: #1f6feb;
+  --app-accent-contrast: #ffffff;
+}
+[data-theme-variation="tritanopia"] {
+  --app-accent: #c2185b;
+  --app-accent-contrast: #ffffff;
+}
+[data-theme-variation="achromatopsia"] {
+  --app-accent: #555555;
+  --app-accent-contrast: #ffffff;
+}
+
+/* ── Combined axes: high contrast AND a color-vision type at once ── */
+/* The headline win of orthogonal axes — impossible with a single category.
+   No concrete hc+protanopia palette has to exist; the two attributes simply
+   compose, so this rule fine-tunes the combination on top of the layers above. */
+[data-theme-contrast="more"][data-theme-variation="protanopia"] {
+  --app-accent: #4b0082;
+  --app-accent-contrast: #ffffff;
+  --app-border-width: 3px;
 }
 
 /* ── Exact theme: fine-tune a single variant by id when you really need to ── */

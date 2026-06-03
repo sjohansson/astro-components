@@ -24,7 +24,7 @@ export interface ThemeToggleOptions {
   attributeName?: string;
   /**
    * Whether the injected script sets companion attributes (`-family`/`-scheme`/
-   * `-category`) on a first visit, before any preference is persisted.
+   * `-contrast`/`-variation`) on a first visit, before any preference is persisted.
    * @default true
    */
   attributeCompanions?: boolean;

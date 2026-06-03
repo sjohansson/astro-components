@@ -69,7 +69,7 @@ The component starts as a single icon button showing the current theme. On click
 | `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
 | `applyMode` | `"inline" \| "attribute" \| "both"` | How the active theme is reflected on `<html>` | `"inline"` |
 | `attributeName` | `string` | Base data-attribute name (coerced to `data-…`) | `"data-theme"` |
-| `attributeCompanions` | `boolean` | Also set `-family`/`-scheme`/`-category` companions | `true` |
+| `attributeCompanions` | `boolean` | Also set `-family`/`-scheme`/`-contrast`/`-variation` companions | `true` |
 
 ### Data-attribute theming
 
@@ -82,14 +82,14 @@ drive all styling from your own CSS:
 <ThemeController applyMode="attribute" />
 ```
 
-This sets, on `<html>`:
+This sets, on `<html>`, one attribute per axis:
 
 ```html
 <html
   data-theme="high-contrast-dark"
   data-theme-family="default"
   data-theme-scheme="dark"
-  data-theme-category="high-contrast"
+  data-theme-contrast="more"
 >
 ```
 
@@ -99,12 +99,59 @@ Then style with whatever granularity you need:
 /* exact theme */
 [data-theme="high-contrast-dark"] { --my-bg: #000; }
 
-/* any dark scheme, regardless of family/category */
+/* any dark scheme */
 [data-theme-scheme="dark"] { color-scheme: dark; }
+
+/* any high-contrast theme */
+[data-theme-contrast="more"] { --border-width: 2px; }
 
 /* a whole family */
 [data-theme-family="kawaii"] { --accent: hotpink; }
 ```
+
+#### Three orthogonal axes
+
+Theme selection is modelled as three independent axes, each its own attribute,
+control, and `ThemeConfig` facet:
+
+| Axis | Attribute | `ThemeConfig` field | Values |
+| --- | --- | --- | --- |
+| scheme | `data-theme-scheme` | `scheme` | `light` / `dark` |
+| contrast | `data-theme-contrast` | `contrast` | `normal` / `more` |
+| color-vision | `data-theme-variation` | `variation` | `normal` + e.g. `protanopia` |
+
+Because they're independent, a theme (and the controller) can combine them —
+e.g. **high contrast _and_ protanopia at the same time**, which a single
+`category` could never express. In attribute mode the attributes simply compose
+in your CSS, so the combination needs no hand-authored palette:
+
+```html
+<html data-theme-scheme="light" data-theme-contrast="more" data-theme-variation="protanopia">
+```
+
+```css
+[data-theme-variation="protanopia"] { --accent: #6a5acd; }
+[data-theme-contrast="more"][data-theme-variation="protanopia"] {
+  /* high-contrast tuning for protanopia, composed from two axes */
+}
+```
+
+A `ThemeConfig` opts into the non-default end of an axis with the optional
+`contrast` / `variation` fields (omit them for normal contrast / normal vision):
+
+```ts
+{ id: "seventies-protanopia-light", variation: "protanopia", scheme: "light", /* … */ }
+```
+
+Presets gate which axis controls appear (`basic` = scheme; `accessible` =
++ contrast; `full` = + color-vision), and each variation is offered as its own
+option — no collapsing. New color-vision types scale in just by adding themes
+with a new `variation`; no preset changes needed.
+
+> **Inline-mode note:** in `inline`/`both` mode the component resolves to the
+> nearest authored palette and falls back (relaxing color-vision, then contrast)
+> when a combination has no concrete theme. Attribute mode has no such limit —
+> the axis attributes always reflect your exact selection.
 
 > **Clean slate:** in `attribute` mode the component sets *only* the attributes —
 > it does **not** inject any colors. You author the `[data-theme=…]` rules. (In
@@ -280,15 +327,18 @@ const withAttrs = generateThemeInitScript({
 The components persist the last resolved selection to `localStorage` so the
 script can replay it without bundling the theme list. Keys written in
 attribute/both mode: `theme-attr-name`, `theme-resolved-id`,
-`theme-resolved-family`, `theme-resolved-scheme`, `theme-resolved-category`,
-`theme-attr-companions` (the existing `theme-family` / `theme-variant` /
-`theme-mode` keys are unchanged).
+`theme-resolved-family`, `theme-resolved-scheme`, `theme-resolved-contrast`,
+`theme-resolved-variation`, `theme-attr-companions`. The controller also stores
+the raw axis selections `theme-family` / `theme-scheme` / `theme-contrast` /
+`theme-variation`, plus a `theme-mode` mirror of the scheme axis for the base
+script and `<theme-toggle>` interop.
 
-> **System-mode caveat:** when the selection is `system`, the script recomputes
-> `-scheme`/`-category` live from `matchMedia`, so scheme-based CSS is always
-> correct on first paint. The combined `data-theme` id may be one frame stale
-> across an OS color-scheme change made while the page was closed; the component
-> corrects it as soon as it hydrates.
+> **System-mode caveat:** when an axis is following the OS (`scheme` or
+> `contrast` set to `system`), the script recomputes that axis live from
+> `matchMedia`, so scheme/contrast-based CSS is always correct on first paint.
+> The combined `data-theme` id may be one frame stale across an OS preference
+> change made while the page was closed; the component corrects it as soon as it
+> hydrates.
 
 ### Component Props
 

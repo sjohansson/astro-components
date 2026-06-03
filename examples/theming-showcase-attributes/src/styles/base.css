@@ -85,6 +85,21 @@ code {
   gap: 0.75rem;
 }
 
+.nav-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--app-accent);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: var(--app-surface-2);
+}
+
 .badge {
   display: inline-block;
   font-size: 0.7rem;

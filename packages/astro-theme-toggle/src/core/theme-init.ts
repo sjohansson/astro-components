@@ -41,13 +41,24 @@ export function initTheme(): void {
     const base = localStorage.getItem("theme-attr-name");
     if (base) {
       const id = localStorage.getItem("theme-resolved-id");
-      let scheme = localStorage.getItem("theme-resolved-scheme");
-      let category = localStorage.getItem("theme-resolved-category");
       const family = localStorage.getItem("theme-resolved-family");
-      if (mode === "system") {
-        scheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        category = window.matchMedia("(prefers-contrast: more)").matches ? "high-contrast" : "base";
-      }
+      // Scheme & contrast each follow the OS when their axis is "system";
+      // otherwise replay the stored resolved value. Variation has no OS signal,
+      // so it is always replayed as stored.
+      const scheme =
+        mode === "system"
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : localStorage.getItem("theme-resolved-scheme");
+      const rawContrast = localStorage.getItem("theme-contrast") || "system";
+      const contrast =
+        rawContrast === "system"
+          ? window.matchMedia("(prefers-contrast: more)").matches
+            ? "more"
+            : "normal"
+          : localStorage.getItem("theme-resolved-contrast");
+      const variation = localStorage.getItem("theme-resolved-variation");
       if (id) {
         root.setAttribute(base, id);
       }
@@ -58,8 +69,11 @@ export function initTheme(): void {
         if (scheme) {
           root.setAttribute(`${base}-scheme`, scheme);
         }
-        if (category) {
-          root.setAttribute(`${base}-category`, category);
+        if (contrast) {
+          root.setAttribute(`${base}-contrast`, contrast);
+        }
+        if (variation) {
+          root.setAttribute(`${base}-variation`, variation);
         }
       }
     }
@@ -82,8 +96,8 @@ export interface ThemeInitScriptOptions {
    */
   attributeName?: string;
   /**
-   * Whether to set companion attributes (`-family`/`-scheme`/`-category`) when
-   * no `theme-attr-companions` preference is persisted yet.
+   * Whether to set companion attributes (`-family`/`-scheme`/`-contrast`/
+   * `-variation`) when no `theme-attr-companions` preference is persisted yet.
    * @default true
    */
   companions?: boolean;
@@ -95,9 +109,8 @@ export interface ThemeInitScriptOptions {
  *
  * Always applies the `scheme-{light|dark}` class for system mode (the original
  * behavior). When `applyAttribute` is enabled, it also replays the persisted
- * theme data attribute(s); on a first visit (nothing persisted) it still sets
- * the companion `-scheme`/`-category` attributes from system preferences using
- * the configured `attributeName`.
+ * theme data attribute(s); scheme and contrast each fall back to the matching
+ * system preference when their axis is following the OS.
  */
 export function generateThemeInitScript(options: ThemeInitScriptOptions = {}): string {
   const { applyAttribute = false, attributeName = "data-theme", companions = true } = options;
@@ -113,15 +126,18 @@ export function generateThemeInitScript(options: ThemeInitScriptOptions = {}): s
   if (applyAttribute) {
     body += `var B=localStorage.getItem('theme-attr-name')||${JSON.stringify(base)};`;
     body += "var id=localStorage.getItem('theme-resolved-id');";
-    body += "var sc=localStorage.getItem('theme-resolved-scheme');";
-    body += "var ca=localStorage.getItem('theme-resolved-category');";
     body += "var fa=localStorage.getItem('theme-resolved-family');";
+    body += "var rc=localStorage.getItem('theme-contrast')||'system';";
+    // Scheme follows OS when theme-mode is 'system'; contrast follows OS when
+    // its axis is 'system'; variation has no OS signal so it is replayed as-is.
+    body += "var sc=(m==='system')?(sysDark?'dark':'light'):localStorage.getItem('theme-resolved-scheme');";
     body +=
-      "if(m==='system'){sc=sysDark?'dark':'light';ca=window.matchMedia('(prefers-contrast: more)').matches?'high-contrast':'base'}";
+      "var co=(rc==='system')?(window.matchMedia('(prefers-contrast: more)').matches?'more':'normal'):localStorage.getItem('theme-resolved-contrast');";
+    body += "var va=localStorage.getItem('theme-resolved-variation');";
     body += "if(id){R.setAttribute(B,id)}";
     body += `var cp=localStorage.getItem('theme-attr-companions');cp=cp===null?${companions ? "true" : "false"}:cp!=='0';`;
     body +=
-      "if(cp){if(fa){R.setAttribute(B+'-family',fa)}if(sc){R.setAttribute(B+'-scheme',sc)}if(ca){R.setAttribute(B+'-category',ca)}}";
+      "if(cp){if(fa){R.setAttribute(B+'-family',fa)}if(sc){R.setAttribute(B+'-scheme',sc)}if(co){R.setAttribute(B+'-contrast',co)}if(va){R.setAttribute(B+'-variation',va)}}";
   }
 
   return `(function(){try{${body}}catch(e){}})();`;

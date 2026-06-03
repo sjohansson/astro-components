@@ -1,22 +1,41 @@
 /**
- * Categories that group theme variants for progressive disclosure in the UI.
- * The controller uses these to filter which variants to show based on the preset.
- */
-export type ThemeCategory = "base" | "high-contrast" | "color-blind";
-
-/**
  * The underlying color scheme a theme derives from.
  * Used for system preference resolution and fallback behavior.
  */
 export type ThemeScheme = "light" | "dark";
 
 /**
- * Preset configurations for the theme controller's variant selector.
- * - 'basic': light/dark/system only
- * - 'accessible': + high contrast themes
- * - 'full': + color blindness variations
+ * Contrast level a theme is tuned for. An orthogonal accessibility axis —
+ * independent of scheme and color-vision.
+ * - 'normal': standard contrast (the default when omitted)
+ * - 'more': enhanced contrast (mirrors the `prefers-contrast: more` media query)
+ */
+export type ThemeContrast = "normal" | "more";
+
+/**
+ * The three independent axes a theme is selected along. Presets enable a
+ * progressive subset of these controls in the UI.
+ * - 'scheme': light / dark (system-aware)
+ * - 'contrast': normal / more (system-aware)
+ * - 'variation': color-vision adaptation (normal + e.g. protanopia)
+ */
+export type ThemeAxis = "scheme" | "contrast" | "variation";
+
+/**
+ * Preset configurations for the theme controller. Each preset enables a
+ * progressive set of {@link ThemeAxis} controls:
+ * - 'basic': scheme only (light/dark/system)
+ * - 'accessible': + the contrast control
+ * - 'full': + the color-vision control
  */
 export type ThemePreset = "basic" | "accessible" | "full";
+
+/**
+ * @deprecated Superseded by the orthogonal `contrast` + `variation` axes.
+ * Kept for migration: `base` ≈ normal contrast + normal vision,
+ * `high-contrast` ≈ `contrast: "more"`, `color-blind` ≈ a `variation`.
+ */
+export type ThemeCategory = "base" | "high-contrast" | "color-blind";
 
 /**
  * How `<theme-controller>` reflects the active theme on `<html>`.
@@ -88,13 +107,16 @@ export interface ThemeColors {
 /**
  * Complete theme configuration.
  *
- * Themes are organized in two dimensions:
+ * Themes are organized along a family plus three orthogonal axes:
  * - **Family**: the brand identity (e.g., 'kawaii', 'seventies', 'less-is-more')
- * - **Variant**: the accessibility/preference adaptation (light, dark, high-contrast, color-blind)
+ * - **scheme**: light / dark
+ * - **contrast**: normal / more (high contrast)
+ * - **variation**: color-vision adaptation (normal + e.g. protanopia)
  *
  * The `family` field groups related variants so the controller can offer
- * family-level switching while resolving the variant automatically from
- * OS preferences or user override.
+ * family-level switching while resolving each axis automatically from OS
+ * preferences or user override. The three axes are independent, so a theme can
+ * be high-contrast AND color-vision-adjusted at once.
  *
  * Theme IDs are open strings — not a closed union — so consumers can define
  * arbitrary themes without modifying library types.
@@ -110,8 +132,24 @@ export interface ThemeConfig {
   family?: string;
   /** Human-readable family display name (e.g., 'Kawaii', '70s Groove') */
   familyLabel?: string;
-  /** Which category this variant belongs to — controls visibility via presets */
-  category: ThemeCategory;
+  /**
+   * Contrast level this theme is tuned for. Omit (or 'normal') for standard
+   * contrast; 'more' marks a high-contrast variant. Independent of `variation`,
+   * so a theme may set both. Surfaced as `data-theme-contrast` and gated by the
+   * `accessible`/`full` presets.
+   */
+  contrast?: ThemeContrast;
+  /**
+   * Color-vision adaptation this theme is tuned for, when not the normal palette.
+   * e.g. `protanopia`, `deuteranopia`, `tritanopia`, `achromatopsia`. Open string
+   * so new variations scale without changing library types or presets. Omit for
+   * the normal-vision palette. Independent of `contrast`.
+   *
+   * Surfaced as the `data-theme-variation` companion attribute and offered as a
+   * distinct option in the controller's color-vision control (gated by the
+   * `full` preset).
+   */
+  variation?: string;
   /** Base color scheme this derives from — used for system preference fallback */
   scheme: ThemeScheme;
   /** Display name for this specific variant (e.g., 'Light', 'High Contrast Dark') */
@@ -176,14 +214,15 @@ export interface ThemeControllerProps {
    */
   labelPosition?: "auto" | "below" | "above" | "right" | "left";
   /**
-   * Which categories of variants to offer in the selector.
-   * - 'basic': base variants only (light/dark + system)
-   * - 'accessible': base + high contrast
-   * - 'full': all categories including color blindness
-   * - ThemeCategory[]: custom selection of categories
+   * Which axis controls to offer in the selector (progressive disclosure).
+   * - 'basic': scheme control only (light/dark + system)
+   * - 'accessible': + the contrast control
+   * - 'full': + the color-vision control
+   * - ThemeAxis[]: a custom set of enabled axes (e.g. `["scheme", "variation"]`).
+   *   Legacy `ThemeCategory[]` values are still accepted and mapped.
    * @default 'basic'
    */
-  preset?: ThemePreset | ThemeCategory[];
+  preset?: ThemePreset | ThemeAxis[];
   /** Custom theme configurations (replaces defaults when provided) */
   themes?: ThemeConfig[];
   /**
@@ -204,8 +243,9 @@ export interface ThemeControllerProps {
    */
   attributeName?: string;
   /**
-   * Also set derived companion attributes for family/scheme/category
-   * (e.g. `data-theme-family`, `data-theme-scheme`, `data-theme-category`).
+   * Also set derived companion attributes for family/scheme/contrast/variation
+   * (e.g. `data-theme-family`, `data-theme-scheme`, `data-theme-contrast`,
+   * `data-theme-variation`).
    * @default true
    */
   attributeCompanions?: boolean;

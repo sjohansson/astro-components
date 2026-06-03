@@ -9,8 +9,10 @@ export {
   generateThemeStylesheet,
   getFamilyIds,
   groupByFamily,
-  resolveCategories,
-  resolveVariant,
+  resolveAxes,
+  resolveTheme,
+  themeContrast,
+  themeVariation,
 } from "../theme-config";
 export { allBundledThemes } from "../themes/index";
 // Bundled theme families
@@ -20,9 +22,11 @@ export { seventiesThemes } from "../themes/seventies";
 // Re-export types and config so core consumers don't need a separate import
 export type {
   ThemeApplyMode,
+  ThemeAxis,
   ThemeCategory,
   ThemeColors,
   ThemeConfig,
+  ThemeContrast,
   ThemeControllerProps,
   ThemeFamily,
   ThemeIcon,
