@@ -2,13 +2,17 @@
 
 export {
   applyThemeColors,
+  clearThemeColors,
   defaultThemes,
   filterThemesByPreset,
   generateThemeCSS,
+  generateThemeStylesheet,
   getFamilyIds,
   groupByFamily,
-  resolveCategories,
-  resolveVariant,
+  resolveAxes,
+  resolveTheme,
+  themeContrast,
+  themeVariation,
 } from "../theme-config";
 export { allBundledThemes } from "../themes/index";
 // Bundled theme families
@@ -17,21 +21,25 @@ export { lessIsMoreThemes } from "../themes/less-is-more";
 export { seventiesThemes } from "../themes/seventies";
 // Re-export types and config so core consumers don't need a separate import
 export type {
+  ThemeApplyMode,
+  ThemeAxis,
   ThemeCategory,
   ThemeColors,
   ThemeConfig,
+  ThemeContrast,
   ThemeControllerProps,
   ThemeFamily,
   ThemeIcon,
   ThemePreset,
   ThemeScheme,
+  ToggleApplyMode,
 } from "../types";
 export {
   registerThemeController,
   ThemeControllerElement,
 } from "./theme-controller";
 // FOUC prevention
-export { initTheme, themeInitScript } from "./theme-init";
+export { generateThemeInitScript, initTheme, type ThemeInitScriptOptions, themeInitScript } from "./theme-init";
 export { registerThemePreview, ThemePreviewElement } from "./theme-preview";
 export { registerThemeToggle, ThemeToggleElement } from "./theme-toggle";
 

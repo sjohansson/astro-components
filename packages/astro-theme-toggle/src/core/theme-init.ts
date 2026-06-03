@@ -29,18 +29,141 @@
  */
 export function initTheme(): void {
   try {
+    const root = document.documentElement;
     const mode = localStorage.getItem("theme-mode") || "system";
     if (mode === "system") {
       const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.classList.add(dark ? "scheme-dark" : "scheme-light");
+      root.classList.add(dark ? "scheme-dark" : "scheme-light");
+    }
+
+    // Replay data attributes persisted by a component running in attribute/both
+    // mode, so CSS keyed on them applies before first paint.
+    const base = localStorage.getItem("theme-attr-name");
+    if (base) {
+      const id = localStorage.getItem("theme-resolved-id");
+      const family = localStorage.getItem("theme-resolved-family");
+      // Scheme & contrast each follow the OS when their axis is "system";
+      // otherwise replay the stored resolved value. Variation has no OS signal,
+      // so it is always replayed as stored.
+      const scheme =
+        mode === "system"
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : localStorage.getItem("theme-resolved-scheme");
+      const rawContrast = localStorage.getItem("theme-contrast") || "system";
+      const contrast =
+        rawContrast === "system"
+          ? window.matchMedia("(prefers-contrast: more)").matches
+            ? "more"
+            : "normal"
+          : localStorage.getItem("theme-resolved-contrast");
+      const variation = localStorage.getItem("theme-resolved-variation");
+      if (id) {
+        root.setAttribute(base, id);
+      }
+      if (localStorage.getItem("theme-attr-companions") !== "0") {
+        if (family) {
+          root.setAttribute(`${base}-family`, family);
+        }
+        if (scheme) {
+          root.setAttribute(`${base}-scheme`, scheme);
+        }
+        if (contrast) {
+          root.setAttribute(`${base}-contrast`, contrast);
+        }
+        if (variation) {
+          root.setAttribute(`${base}-variation`, variation);
+        }
+      }
     }
   } catch {
     // localStorage not available (SSR, privacy mode) — fail silently
   }
 }
 
+const INLINE_SCRIPT_ESCAPE_MAP: Record<string, string> = {
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "/": "\\u002F",
+  "\\": "\\\\",
+  "\b": "\\b",
+  "\f": "\\f",
+  "\n": "\\n",
+  "\r": "\\r",
+  "\t": "\\t",
+  "\0": "\\0",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+};
+
+function escapeUnsafeForInlineScript(value: string): string {
+  return value.replace(/[<>/\\\b\f\n\r\t\0\u2028\u2029]/g, (ch) => INLINE_SCRIPT_ESCAPE_MAP[ch] ?? ch);
+}
+
+/** Options for {@link generateThemeInitScript}. */
+export interface ThemeInitScriptOptions {
+  /**
+   * Also replay theme data attribute(s) before paint (for components using the
+   * 'attribute' or 'both' apply mode).
+   * @default false
+   */
+  applyAttribute?: boolean;
+  /**
+   * Fallback base attribute name when none has been persisted yet (first visit).
+   * @default 'data-theme'
+   */
+  attributeName?: string;
+  /**
+   * Whether to set companion attributes (`-family`/`-scheme`/`-contrast`/
+   * `-variation`) when no `theme-attr-companions` preference is persisted yet.
+   * @default true
+   */
+  companions?: boolean;
+}
+
 /**
- * Returns the FOUC prevention script as an inline string.
- * Useful for server-side injection into <head>.
+ * Build the FOUC-prevention script as an inline string, suitable for
+ * server-side injection into `<head>`.
+ *
+ * Always applies the `scheme-{light|dark}` class for system mode (the original
+ * behavior). When `applyAttribute` is enabled, it also replays the persisted
+ * theme data attribute(s); scheme and contrast each fall back to the matching
+ * system preference when their axis is following the OS.
  */
-export const themeInitScript = `(function(){try{var m=localStorage.getItem('theme-mode')||'system';if(m==='system'){var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(d?'scheme-dark':'scheme-light')}}catch(e){}})();`;
+export function generateThemeInitScript(options: ThemeInitScriptOptions = {}): string {
+  const { applyAttribute = false, attributeName = "data-theme", companions = true } = options;
+  const base = attributeName.startsWith("data-") ? attributeName : `data-${attributeName}`;
+
+  // Base script: scheme class for system mode (unchanged contract — must
+  // reference 'theme-mode').
+  let body = "var m=localStorage.getItem('theme-mode')||'system';";
+  body += "var R=document.documentElement;";
+  body += "var sysDark=window.matchMedia('(prefers-color-scheme: dark)').matches;";
+  body += "if(m==='system'){R.classList.add(sysDark?'scheme-dark':'scheme-light')}";
+
+  if (applyAttribute) {
+    body += `var B=localStorage.getItem('theme-attr-name')||${escapeUnsafeForInlineScript(JSON.stringify(base))};`;
+    body += "var id=localStorage.getItem('theme-resolved-id');";
+    body += "var fa=localStorage.getItem('theme-resolved-family');";
+    body += "var rc=localStorage.getItem('theme-contrast')||'system';";
+    // Scheme follows OS when theme-mode is 'system'; contrast follows OS when
+    // its axis is 'system'; variation has no OS signal so it is replayed as-is.
+    body += "var sc=(m==='system')?(sysDark?'dark':'light'):localStorage.getItem('theme-resolved-scheme');";
+    body +=
+      "var co=(rc==='system')?(window.matchMedia('(prefers-contrast: more)').matches?'more':'normal'):localStorage.getItem('theme-resolved-contrast');";
+    body += "var va=localStorage.getItem('theme-resolved-variation');";
+    body += "if(id){R.setAttribute(B,id)}";
+    body += `var cp=localStorage.getItem('theme-attr-companions');cp=cp===null?${companions ? "true" : "false"}:cp!=='0';`;
+    body +=
+      "if(cp){if(fa){R.setAttribute(B+'-family',fa)}if(sc){R.setAttribute(B+'-scheme',sc)}if(co){R.setAttribute(B+'-contrast',co)}if(va){R.setAttribute(B+'-variation',va)}}";
+  }
+
+  return `(function(){try{${body}}catch(e){}})();`;
+}
+
+/**
+ * The default FOUC-prevention script (scheme class only), as an inline string.
+ * Equivalent to `generateThemeInitScript()`.
+ */
+export const themeInitScript = generateThemeInitScript();

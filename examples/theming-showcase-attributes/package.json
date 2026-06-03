@@ -1,0 +1,15 @@
+{
+  "name": "theming-showcase-attributes-example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@sjohansson/astro-theme-toggle": "workspace:*",
+    "astro": "^6.1.0"
+  }
+}

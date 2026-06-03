@@ -1,4 +1,13 @@
-import type { ThemeCategory, ThemeColors, ThemeConfig, ThemeFamily, ThemePreset } from "./types";
+import type {
+  ThemeAxis,
+  ThemeCategory,
+  ThemeColors,
+  ThemeConfig,
+  ThemeContrast,
+  ThemeFamily,
+  ThemePreset,
+  ThemeScheme,
+} from "./types";
 
 /**
  * Default theme configurations — a neutral family with no strong brand identity.
@@ -10,7 +19,6 @@ export const defaultThemes: ThemeConfig[] = [
     id: "light",
     family: "default",
     familyLabel: "Default",
-    category: "base",
     scheme: "light",
     label: "Light",
     description: "Standard light theme with comfortable contrast",
@@ -48,7 +56,6 @@ export const defaultThemes: ThemeConfig[] = [
     id: "dark",
     family: "default",
     familyLabel: "Default",
-    category: "base",
     scheme: "dark",
     label: "Dark",
     description: "Standard dark theme with reduced eye strain",
@@ -88,7 +95,7 @@ export const defaultThemes: ThemeConfig[] = [
     id: "high-contrast-light",
     family: "default",
     familyLabel: "Default",
-    category: "high-contrast",
+    contrast: "more",
     scheme: "light",
     label: "High Contrast Light",
     description: "Enhanced contrast for better accessibility",
@@ -126,7 +133,7 @@ export const defaultThemes: ThemeConfig[] = [
     id: "high-contrast-dark",
     family: "default",
     familyLabel: "Default",
-    category: "high-contrast",
+    contrast: "more",
     scheme: "dark",
     label: "High Contrast Dark",
     description: "High contrast dark theme for maximum readability",
@@ -162,30 +169,69 @@ export const defaultThemes: ThemeConfig[] = [
   },
 ];
 
-// ─── Preset → category mapping ───
+// ─── Preset → axis mapping ───
 
-const presetCategories: Record<ThemePreset, ThemeCategory[]> = {
-  basic: ["base"],
-  accessible: ["base", "high-contrast"],
-  full: ["base", "high-contrast", "color-blind"],
+const presetAxes: Record<ThemePreset, ThemeAxis[]> = {
+  basic: ["scheme"],
+  accessible: ["scheme", "contrast"],
+  full: ["scheme", "contrast", "variation"],
+};
+
+/** Legacy ThemeCategory → the axis it now corresponds to (for migration). */
+const legacyCategoryAxis: Record<ThemeCategory, ThemeAxis | null> = {
+  base: null,
+  "high-contrast": "contrast",
+  "color-blind": "variation",
 };
 
 /**
- * Resolve a preset name or category array to a list of categories.
+ * Resolve a preset name or explicit axis list to the set of enabled axes.
+ * The `scheme` axis is always enabled. Legacy `ThemeCategory[]` values are
+ * accepted and mapped for migration (`"high-contrast"` → `contrast`,
+ * `"color-blind"` → `variation`).
  */
-export function resolveCategories(preset: ThemePreset | ThemeCategory[]): ThemeCategory[] {
-  if (Array.isArray(preset)) {
-    return preset;
+export function resolveAxes(preset: ThemePreset | Array<ThemeAxis | ThemeCategory>): ThemeAxis[] {
+  if (!Array.isArray(preset)) {
+    return presetAxes[preset];
   }
-  return presetCategories[preset];
+  const axes = new Set<ThemeAxis>(["scheme"]);
+  for (const entry of preset) {
+    if (entry === "scheme" || entry === "contrast" || entry === "variation") {
+      axes.add(entry);
+    } else {
+      const mapped = legacyCategoryAxis[entry as ThemeCategory];
+      if (mapped) {
+        axes.add(mapped);
+      }
+    }
+  }
+  return Array.from(axes);
 }
 
 /**
- * Filter themes by a preset or category list.
+ * Filter themes to those reachable under a preset / axis set: a theme that
+ * exercises a disabled axis is dropped (a high-contrast theme needs the
+ * `contrast` axis; a color-vision variation needs the `variation` axis).
+ *
+ * Used by `<theme-preview>` and as a display helper. The controller does NOT
+ * filter with this — it resolves across all of a family's variants.
  */
-export function filterThemesByPreset(themes: ThemeConfig[], preset: ThemePreset | ThemeCategory[]): ThemeConfig[] {
-  const categories = resolveCategories(preset);
-  return themes.filter((t) => categories.includes(t.category));
+export function filterThemesByPreset(
+  themes: ThemeConfig[],
+  preset: ThemePreset | Array<ThemeAxis | ThemeCategory>,
+): ThemeConfig[] {
+  const axes = resolveAxes(preset);
+  const contrastOn = axes.includes("contrast");
+  const variationOn = axes.includes("variation");
+  return themes.filter((t) => {
+    if (!contrastOn && (t.contrast ?? "normal") !== "normal") {
+      return false;
+    }
+    if (!variationOn && t.variation) {
+      return false;
+    }
+    return true;
+  });
 }
 
 // ─── Family helpers ───
@@ -225,88 +271,120 @@ export function getFamilyIds(themes: ThemeConfig[]): string[] {
   return Array.from(seen);
 }
 
+/** A theme's contrast axis value, defaulting to "normal" when unset. */
+export function themeContrast(theme: ThemeConfig): ThemeContrast {
+  return theme.contrast ?? "normal";
+}
+
+/** A theme's color-vision axis value, defaulting to "normal" when unset. */
+export function themeVariation(theme: ThemeConfig): string {
+  return theme.variation ?? "normal";
+}
+
 /**
- * Resolve the best variant within a family based on scheme and category preferences.
+ * Resolve the best concrete theme within a family for a (scheme, contrast,
+ * variation) selection. Not every combination has a hand-authored palette
+ * (e.g. high-contrast + a color-vision variation), so this falls back by
+ * relaxing the *softer* axes first:
  *
- * Priority: exact category+scheme match > same-scheme base > first matching scheme > first variant.
+ *   exact → drop variation → drop contrast → drop both → any same scheme → first
+ *
+ * Contrast is treated as the stronger stated accessibility need, so the
+ * color-vision tuning degrades before contrast does. The "drop both" rung
+ * (plain scheme palette) always exists because every family ships light + dark
+ * base variants.
  */
-export function resolveVariant(
+export function resolveTheme(
   family: ThemeFamily,
-  scheme: "light" | "dark",
-  category: ThemeCategory = "base",
+  scheme: ThemeScheme,
+  contrast: ThemeContrast = "normal",
+  variation = "normal",
 ): ThemeConfig {
   const { variants } = family;
-
-  // Exact match: right category and scheme
-  const exact = variants.find((v) => v.category === category && v.scheme === scheme);
-  if (exact) {
-    return exact;
-  }
-
-  // Fallback: base category with right scheme
-  const baseScheme = variants.find((v) => v.category === "base" && v.scheme === scheme);
-  if (baseScheme) {
-    return baseScheme;
-  }
-
-  // Fallback: any variant with right scheme
-  const anyScheme = variants.find((v) => v.scheme === scheme);
-  if (anyScheme) {
-    return anyScheme;
-  }
-
-  // Last resort: first variant (non-null assertion safe — families always have at least one variant)
-  return variants[0] as ThemeConfig;
+  const match = (c: ThemeContrast, v: string): ThemeConfig | undefined =>
+    variants.find((t) => t.scheme === scheme && themeContrast(t) === c && themeVariation(t) === v);
+  return (
+    match(contrast, variation) ??
+    match(contrast, "normal") ??
+    match("normal", variation) ??
+    match("normal", "normal") ??
+    variants.find((t) => t.scheme === scheme) ??
+    (variants[0] as ThemeConfig)
+  );
 }
 
 // ─── CSS helpers ───
 
 /**
- * Generate CSS custom properties string from a theme configuration.
+ * The CSS custom property names exposed by a theme, paired with a function
+ * that reads the matching value from a {@link ThemeColors} object. Single
+ * source of truth for `generateThemeCSS`, `applyThemeColors`, and
+ * `clearThemeColors` so the list never drifts.
  */
-export function generateThemeCSS(theme: ThemeConfig): string {
+const themeColorVars: ReadonlyArray<[name: string, get: (c: ThemeColors) => string]> = [
+  ["--theme-bg-primary", (c) => c.background.primary],
+  ["--theme-bg-secondary", (c) => c.background.secondary],
+  ["--theme-bg-tertiary", (c) => c.background.tertiary],
+  ["--theme-fg-primary", (c) => c.foreground.primary],
+  ["--theme-fg-secondary", (c) => c.foreground.secondary],
+  ["--theme-fg-tertiary", (c) => c.foreground.tertiary],
+  ["--theme-border-default", (c) => c.border.default],
+  ["--theme-border-hover", (c) => c.border.hover],
+  ["--theme-border-focus", (c) => c.border.focus],
+  ["--theme-interactive-default", (c) => c.interactive.default],
+  ["--theme-interactive-hover", (c) => c.interactive.hover],
+  ["--theme-interactive-active", (c) => c.interactive.active],
+  ["--theme-interactive-disabled", (c) => c.interactive.disabled],
+  ["--theme-success", (c) => c.semantic.success],
+  ["--theme-warning", (c) => c.semantic.warning],
+  ["--theme-error", (c) => c.semantic.error],
+  ["--theme-info", (c) => c.semantic.info],
+];
+
+/**
+ * Generate CSS custom properties from a theme configuration.
+ *
+ * @param theme - The theme to emit variables for.
+ * @param selector - Optional CSS selector. When provided, the variables are
+ *   wrapped in a rule (e.g. `[data-theme="dark"] { ... }`). When omitted, the
+ *   bare indented declarations are returned (suitable for inlining inside an
+ *   existing rule such as `:root`).
+ */
+export function generateThemeCSS(theme: ThemeConfig, selector?: string): string {
   const { colors } = theme;
-  const vars: string[] = [
-    `  --theme-bg-primary: ${colors.background.primary};`,
-    `  --theme-bg-secondary: ${colors.background.secondary};`,
-    `  --theme-bg-tertiary: ${colors.background.tertiary};`,
-    `  --theme-fg-primary: ${colors.foreground.primary};`,
-    `  --theme-fg-secondary: ${colors.foreground.secondary};`,
-    `  --theme-fg-tertiary: ${colors.foreground.tertiary};`,
-    `  --theme-border-default: ${colors.border.default};`,
-    `  --theme-border-hover: ${colors.border.hover};`,
-    `  --theme-border-focus: ${colors.border.focus};`,
-    `  --theme-interactive-default: ${colors.interactive.default};`,
-    `  --theme-interactive-hover: ${colors.interactive.hover};`,
-    `  --theme-interactive-active: ${colors.interactive.active};`,
-    `  --theme-interactive-disabled: ${colors.interactive.disabled};`,
-    `  --theme-success: ${colors.semantic.success};`,
-    `  --theme-warning: ${colors.semantic.warning};`,
-    `  --theme-error: ${colors.semantic.error};`,
-    `  --theme-info: ${colors.semantic.info};`,
-  ];
-  return vars.join("\n");
+  const body = themeColorVars.map(([name, get]) => `  ${name}: ${get(colors)};`).join("\n");
+  return selector ? `${selector} {\n${body}\n}` : body;
+}
+
+/**
+ * Generate a full stylesheet of `[attribute="id"] { ...vars... }` rules for a
+ * set of themes. Useful with the `attribute` apply mode when you want a
+ * ready-made default stylesheet instead of authoring every rule yourself.
+ * The component does NOT inject this automatically.
+ *
+ * @param themes - Themes to emit rules for.
+ * @param attributeName - Base data attribute used by the controller (default 'data-theme').
+ */
+export function generateThemeStylesheet(themes: ThemeConfig[], attributeName = "data-theme"): string {
+  return themes.map((t) => generateThemeCSS(t, `[${attributeName}="${t.id}"]`)).join("\n");
 }
 
 /**
  * Apply a theme's color tokens as CSS custom properties on an element.
  */
 export function applyThemeColors(colors: ThemeColors, element: HTMLElement): void {
-  element.style.setProperty("--theme-bg-primary", colors.background.primary);
-  element.style.setProperty("--theme-bg-secondary", colors.background.secondary);
-  element.style.setProperty("--theme-bg-tertiary", colors.background.tertiary);
-  element.style.setProperty("--theme-fg-primary", colors.foreground.primary);
-  element.style.setProperty("--theme-fg-secondary", colors.foreground.secondary);
-  element.style.setProperty("--theme-fg-tertiary", colors.foreground.tertiary);
-  element.style.setProperty("--theme-border-default", colors.border.default);
-  element.style.setProperty("--theme-border-hover", colors.border.hover);
-  element.style.setProperty("--theme-border-focus", colors.border.focus);
-  element.style.setProperty("--theme-interactive-default", colors.interactive.default);
-  element.style.setProperty("--theme-interactive-hover", colors.interactive.hover);
-  element.style.setProperty("--theme-interactive-active", colors.interactive.active);
-  element.style.setProperty("--theme-interactive-disabled", colors.interactive.disabled);
-  element.style.setProperty("--theme-success", colors.semantic.success);
-  element.style.setProperty("--theme-warning", colors.semantic.warning);
-  element.style.setProperty("--theme-error", colors.semantic.error);
-  element.style.setProperty("--theme-info", colors.semantic.info);
+  for (const [name, get] of themeColorVars) {
+    element.style.setProperty(name, get(colors));
+  }
+}
+
+/**
+ * Remove the theme color custom properties previously set by {@link applyThemeColors}.
+ * Used when switching to `attribute` apply mode so stale inline variables don't
+ * win over attribute-driven CSS.
+ */
+export function clearThemeColors(element: HTMLElement): void {
+  for (const [name] of themeColorVars) {
+    element.style.removeProperty(name);
+  }
 }

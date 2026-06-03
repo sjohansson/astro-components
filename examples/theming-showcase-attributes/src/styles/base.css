@@ -1,0 +1,346 @@
+/*
+ * base.css — Page + component styling. Consumes only the `--app-*` tokens, so
+ * it never needs to know which theme is active; switching the data attribute on
+ * <html> re-resolves every token via tokens.css / advanced.css.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Hint native form controls / scrollbars to follow the active scheme. */
+  color-scheme: light;
+}
+[data-theme-scheme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  color: var(--app-fg);
+  background: var(--app-bg);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+a {
+  color: var(--app-accent);
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+/* Inline code (outside the <pre> blocks) gets a subtle chip background. */
+:not(pre) > code {
+  background: var(--app-surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--app-surface);
+  border-bottom: var(--app-border-width) solid var(--app-border);
+  padding: 2rem;
+}
+
+.header-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--app-muted);
+  margin-top: 0.25rem;
+  max-width: 46ch;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--app-accent);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: var(--app-surface-2);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--app-accent);
+  border: var(--app-border-width) solid var(--app-accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.section-desc {
+  color: var(--app-muted);
+  margin-bottom: 1.5rem;
+  max-width: 70ch;
+}
+
+/* ── Live attribute readout ── */
+.readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: var(--app-radius);
+  margin-bottom: 1.5rem;
+}
+
+.readout-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.readout-key {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--app-muted);
+}
+
+.readout-val {
+  font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-accent);
+  word-break: break-all;
+}
+
+/* ── Demo grid ── */
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: var(--app-radius);
+  padding: 1.5rem;
+  box-shadow: var(--app-shadow);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.card p {
+  color: var(--app-muted);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Buttons ── */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: var(--app-border-width) solid transparent;
+  transition:
+    filter 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--app-accent);
+  color: var(--app-accent-contrast);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--app-fg);
+  border-color: var(--app-border);
+}
+
+.btn-secondary:hover {
+  background: var(--app-surface-2);
+}
+
+/* ── Form ── */
+.field {
+  margin-bottom: 0.75rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  background: var(--app-bg);
+  color: var(--app-fg);
+  font-size: 0.875rem;
+}
+
+.input:focus {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 1px;
+}
+
+/* ── Alerts (semantic tokens) ── */
+.alert {
+  padding: 0.6rem 0.85rem;
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  border: var(--app-border-width) solid;
+}
+
+.alert-success {
+  color: var(--app-success);
+  border-color: var(--app-success);
+  background: color-mix(in srgb, var(--app-success) 12%, var(--app-bg));
+}
+.alert-warning {
+  color: var(--app-warning);
+  border-color: var(--app-warning);
+  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-bg));
+}
+.alert-error {
+  color: var(--app-error);
+  border-color: var(--app-error);
+  background: color-mix(in srgb, var(--app-error) 12%, var(--app-bg));
+}
+.alert-info {
+  color: var(--app-info);
+  border-color: var(--app-info);
+  background: color-mix(in srgb, var(--app-info) 12%, var(--app-bg));
+}
+
+/* ── Code blocks ── */
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.code-block {
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-border);
+  border-radius: var(--app-radius);
+  padding: 1.25rem;
+}
+
+.code-block h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.code-block pre {
+  background: var(--app-surface-2);
+  border-radius: calc(var(--app-radius) - 0.125rem);
+  padding: 0.85rem;
+  overflow-x: auto;
+  margin-bottom: 0.6rem;
+}
+
+.code-block code {
+  font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+  font-size: 0.8rem;
+  white-space: pre;
+}
+
+.code-desc {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+/* ── Footer ── */
+.footer {
+  background: var(--app-surface);
+  border-top: var(--app-border-width) solid var(--app-border);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  color: var(--app-muted);
+  font-size: 0.875rem;
+}
