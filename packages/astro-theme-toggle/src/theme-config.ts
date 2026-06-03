@@ -216,7 +216,7 @@ export function resolveAxes(preset: ThemePreset | Array<ThemeAxis | ThemeCategor
  * Used by `<theme-preview>` and as a display helper. The controller does NOT
  * filter with this — it resolves across all of a family's variants.
  */
-export function filterThemesByPreset(themes: ThemeConfig[], preset: ThemePreset | ThemeAxis[]): ThemeConfig[] {
+export function filterThemesByPreset(themes: ThemeConfig[], preset: ThemePreset | Array<ThemeAxis | ThemeCategory>): ThemeConfig[] {
   const axes = resolveAxes(preset);
   const contrastOn = axes.includes("contrast");
   const variationOn = axes.includes("variation");
