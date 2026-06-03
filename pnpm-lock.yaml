@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.9
-        version: 0.9.9(prettier@3.8.3)(typescript@5.9.3)
+        version: 0.9.9(prettier@3.8.3)(typescript@6.0.3)
       '@biomejs/biome':
         specifier: ^2.4.16
         version: 2.4.16
@@ -37,10 +37,10 @@ importers:
         version: 0.22.1
       tsdown:
         specifier: ^0.22.1
-        version: 0.22.1(typescript@5.9.3)
+        version: 0.22.1(typescript@6.0.3)
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
       vite:
         specifier: ^7.3.3
         version: 7.3.3(@types/node@25.9.1)(lightningcss@1.32.0)(yaml@2.9.0)
@@ -3091,6 +3091,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
@@ -3524,12 +3529,12 @@ packages:
 
 snapshots:
 
-  '@astrojs/check@0.9.9(prettier@3.8.3)(typescript@5.9.3)':
+  '@astrojs/check@0.9.9(prettier@3.8.3)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/language-server': 2.16.10(prettier@3.8.3)(typescript@5.9.3)
+      '@astrojs/language-server': 2.16.10(prettier@3.8.3)(typescript@6.0.3)
       chokidar: 4.0.3
       kleur: 4.1.5
-      typescript: 5.9.3
+      typescript: 6.0.3
       yargs: 17.7.2
     transitivePeerDependencies:
       - prettier
@@ -3556,12 +3561,12 @@ snapshots:
     dependencies:
       picomatch: 4.0.4
 
-  '@astrojs/language-server@2.16.10(prettier@3.8.3)(typescript@5.9.3)':
+  '@astrojs/language-server@2.16.10(prettier@3.8.3)(typescript@6.0.3)':
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/yaml2ts': 0.2.4
       '@jridgewell/sourcemap-codec': 1.5.5
-      '@volar/kit': 2.4.28(typescript@5.9.3)
+      '@volar/kit': 2.4.28(typescript@6.0.3)
       '@volar/language-core': 2.4.28
       '@volar/language-server': 2.4.28
       '@volar/language-service': 2.4.28
@@ -4811,12 +4816,12 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  '@volar/kit@2.4.28(typescript@5.9.3)':
+  '@volar/kit@2.4.28(typescript@6.0.3)':
     dependencies:
       '@volar/language-service': 2.4.28
       '@volar/typescript': 2.4.28
       typesafe-path: 0.2.2
-      typescript: 5.9.3
+      typescript: 6.0.3
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.1.0
 
@@ -6580,7 +6585,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.25.2(rolldown@1.0.3)(typescript@5.9.3):
+  rolldown-plugin-dts@0.25.2(rolldown@1.0.3)(typescript@6.0.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.6
       '@babel/helper-validator-identifier': 8.0.0-rc.6
@@ -6592,7 +6597,7 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.0.3
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
 
@@ -6839,7 +6844,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  tsdown@0.22.1(typescript@5.9.3):
+  tsdown@0.22.1(typescript@6.0.3):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -6850,14 +6855,14 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.4
       rolldown: 1.0.3
-      rolldown-plugin-dts: 0.25.2(rolldown@1.0.3)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.25.2(rolldown@1.0.3)(typescript@6.0.3)
       semver: 7.8.1
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -6873,7 +6878,10 @@ snapshots:
     dependencies:
       semver: 7.8.1
 
-  typescript@5.9.3: {}
+  typescript@5.9.3:
+    optional: true
+
+  typescript@6.0.3: {}
 
   uc.micro@2.1.0: {}
 
