@@ -98,7 +98,7 @@ const INLINE_SCRIPT_ESCAPE_MAP: Record<string, string> = {
 };
 
 function escapeUnsafeForInlineScript(value: string): string {
-  return value.replace(/[<>\/\\\b\f\n\r\t\0\u2028\u2029]/g, (ch) => INLINE_SCRIPT_ESCAPE_MAP[ch]);
+  return value.replace(/[<>/\\\b\f\n\r\t\0\u2028\u2029]/g, (ch) => INLINE_SCRIPT_ESCAPE_MAP[ch] ?? ch);
 }
 
 /** Options for {@link generateThemeInitScript}. */

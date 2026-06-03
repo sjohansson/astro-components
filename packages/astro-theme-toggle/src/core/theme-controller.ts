@@ -3,7 +3,7 @@ import type { ThemeApplyMode, ThemeAxis, ThemeConfig, ThemeFamily, ThemePreset }
 import { SSRSafeHTMLElement } from "./ssr-base";
 
 /** Return `value` when it is one of `allowed`, else `fallback`. */
-function oneOf<T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
+function oneOf<T extends string>(value: string | null | undefined, allowed: readonly T[], fallback: T): T {
   return value != null && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
 }
 
@@ -355,7 +355,7 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       this.currentScheme === "system" && (!this.showContrastControl || this.currentContrast === "system");
     const want = allSystem ? "system" : `scheme-${effScheme}`;
     for (const icon of this.querySelectorAll<HTMLElement>("[data-trigger-icon]")) {
-      icon.style.display = icon.getAttribute("data-trigger-icon") === want ? "block" : "none";
+      icon.style.display = icon.dataset["triggerIcon"] === want ? "block" : "none";
     }
   }
 
@@ -510,7 +510,7 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     if (explicit === "start" || explicit === "end") {
       side = explicit;
     } else {
-      const axis = inner.getAttribute("data-direction") === "horizontal" ? "horizontal" : "vertical";
+      const axis = inner.dataset["direction"] === "horizontal" ? "horizontal" : "vertical";
       const triggerRect = trigger.getBoundingClientRect();
       // Panel is visibility:hidden but laid out — measurable.
       const panelRect = panel.getBoundingClientRect();
@@ -594,11 +594,11 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     );
 
     // Family clicks
-    for (const btn of this.querySelectorAll("[data-family-option]")) {
+    for (const btn of this.querySelectorAll<HTMLElement>("[data-family-option]")) {
       btn.addEventListener(
         "click",
         () => {
-          this.currentFamily = btn.getAttribute("data-family-option") || this.currentFamily;
+          this.currentFamily = btn.dataset["familyOption"] || this.currentFamily;
           this.applyCurrentSelection();
         },
         { passive: true },
@@ -607,26 +607,22 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
 
     // Axis clicks — scheme / contrast / color-vision. Each is independent and
     // leaves the panel open so several axes can be adjusted in one go.
-    for (const btn of this.querySelectorAll("[data-scheme-option]")) {
+    for (const btn of this.querySelectorAll<HTMLElement>("[data-scheme-option]")) {
       btn.addEventListener(
         "click",
         () => {
-          this.currentScheme = oneOf(
-            btn.getAttribute("data-scheme-option"),
-            ["system", "light", "dark"],
-            this.currentScheme,
-          );
+          this.currentScheme = oneOf(btn.dataset["schemeOption"], ["system", "light", "dark"], this.currentScheme);
           this.applyCurrentSelection();
         },
         { passive: true },
       );
     }
-    for (const btn of this.querySelectorAll("[data-contrast-option]")) {
+    for (const btn of this.querySelectorAll<HTMLElement>("[data-contrast-option]")) {
       btn.addEventListener(
         "click",
         () => {
           this.currentContrast = oneOf(
-            btn.getAttribute("data-contrast-option"),
+            btn.dataset["contrastOption"],
             ["system", "normal", "more"],
             this.currentContrast,
           );
@@ -635,11 +631,11 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
         { passive: true },
       );
     }
-    for (const btn of this.querySelectorAll("[data-variation-option]")) {
+    for (const btn of this.querySelectorAll<HTMLElement>("[data-variation-option]")) {
       btn.addEventListener(
         "click",
         () => {
-          this.currentVariation = btn.getAttribute("data-variation-option") || this.currentVariation;
+          this.currentVariation = btn.dataset["variationOption"] || this.currentVariation;
           this.applyCurrentSelection();
         },
         { passive: true },

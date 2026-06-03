@@ -27,6 +27,14 @@ export class ThemeToggleElement extends SSRSafeHTMLElement {
   /** Last data-attribute base name applied, so we can clean it up if it changes. */
   private lastAttributeName: string | undefined;
 
+  /**
+   * Companion dimensions the toggle does NOT own — these belong to
+   * <theme-controller>. The toggle strips them from <html> and from the FOUC
+   * replay keys so a prior controller session can't apply them on scheme-only
+   * pages.
+   */
+  private static readonly foreignCompanions = ["family", "contrast", "variation"] as const;
+
   static get observedAttributes(): string[] {
     return ["apply-mode", "attribute-name", "attribute-companions"];
   }
@@ -141,6 +149,10 @@ export class ThemeToggleElement extends SSRSafeHTMLElement {
     } else {
       root.removeAttribute(`${base}-scheme`);
     }
+    // The toggle owns only the scheme dimension. Strip any family/contrast/
+    // variation companions a prior <theme-controller> (or the FOUC replay) may
+    // have left, so CSS keyed on them doesn't apply on toggle-only pages.
+    this.removeForeignCompanions(base);
 
     this.lastAttributeName = base;
     this.storeAttributeState(base, theme);
@@ -158,6 +170,15 @@ export class ThemeToggleElement extends SSRSafeHTMLElement {
     const root = document.documentElement;
     root.removeAttribute(base);
     root.removeAttribute(`${base}-scheme`);
+    this.removeForeignCompanions(base);
+  }
+
+  /** Remove the controller-only companion attributes the toggle never owns. */
+  private removeForeignCompanions(base: string): void {
+    const root = document.documentElement;
+    for (const axis of ThemeToggleElement.foreignCompanions) {
+      root.removeAttribute(`${base}-${axis}`);
+    }
   }
 
   /**
@@ -172,6 +193,11 @@ export class ThemeToggleElement extends SSRSafeHTMLElement {
     localStorage.setItem("theme-resolved-id", theme);
     localStorage.setItem("theme-resolved-scheme", theme);
     localStorage.setItem("theme-attr-companions", this.attributeCompanions ? "1" : "0");
+    // Drop the controller-only replay keys so the FOUC init script doesn't
+    // replay stale family/contrast/variation companions on toggle-only pages.
+    for (const axis of ThemeToggleElement.foreignCompanions) {
+      localStorage.removeItem(`theme-resolved-${axis}`);
+    }
   }
 
   private render(): void {

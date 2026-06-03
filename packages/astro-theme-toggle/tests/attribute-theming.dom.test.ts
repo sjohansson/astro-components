@@ -76,18 +76,18 @@ beforeEach(() => {
 describe("<theme-controller> apply modes", () => {
   it("default mode sets inline vars + classes but NO data attribute (backwards compat)", () => {
     mount("theme-controller");
-    expect(root().getAttribute("data-theme")).toBeNull();
+    expect(root().dataset.theme).toBeUndefined();
     expect(root().style.getPropertyValue("--theme-bg-primary")).not.toBe("");
     expect(root().classList.contains("scheme-light")).toBe(true);
   });
 
   it("attribute mode sets data attribute + companions and NO inline vars", () => {
     mount("theme-controller", { "apply-mode": "attribute" });
-    expect(root().getAttribute("data-theme")).toBe("light");
-    expect(root().getAttribute("data-theme-family")).toBe("default");
-    expect(root().getAttribute("data-theme-scheme")).toBe("light");
-    expect(root().getAttribute("data-theme-contrast")).toBe("normal");
-    expect(root().getAttribute("data-theme-category")).toBeNull(); // retired
+    expect(root().dataset.theme).toBe("light");
+    expect(root().dataset.themeFamily).toBe("default");
+    expect(root().dataset.themeScheme).toBe("light");
+    expect(root().dataset.themeContrast).toBe("normal");
+    expect(root().dataset.themeCategory).toBeUndefined(); // retired
     expect(root().style.getPropertyValue("--theme-bg-primary")).toBe("");
     // classes are still applied in every mode
     expect(root().classList.contains("scheme-light")).toBe(true);
@@ -95,30 +95,30 @@ describe("<theme-controller> apply modes", () => {
 
   it("both mode sets the data attribute AND inline vars", () => {
     mount("theme-controller", { "apply-mode": "both" });
-    expect(root().getAttribute("data-theme")).toBe("light");
+    expect(root().dataset.theme).toBe("light");
     expect(root().style.getPropertyValue("--theme-bg-primary")).not.toBe("");
   });
 
   it("attribute-companions=false sets only the base attribute", () => {
     mount("theme-controller", { "apply-mode": "attribute", "attribute-companions": "false" });
-    expect(root().getAttribute("data-theme")).toBe("light");
-    expect(root().getAttribute("data-theme-scheme")).toBeNull();
-    expect(root().getAttribute("data-theme-family")).toBeNull();
+    expect(root().dataset.theme).toBe("light");
+    expect(root().dataset.themeScheme).toBeUndefined();
+    expect(root().dataset.themeFamily).toBeUndefined();
   });
 
   it("custom attribute-name is used and coerced to start with data-", () => {
     mount("theme-controller", { "apply-mode": "attribute", "attribute-name": "color" });
-    expect(root().getAttribute("data-color")).toBe("light");
-    expect(root().getAttribute("data-color-scheme")).toBe("light");
+    expect(root().dataset.color).toBe("light");
+    expect(root().dataset.colorScheme).toBe("light");
   });
 
   it("switching attribute -> inline removes the data attributes and restores inline vars", () => {
     const el = mount("theme-controller", { "apply-mode": "attribute" });
-    expect(root().getAttribute("data-theme")).toBe("light");
+    expect(root().dataset.theme).toBe("light");
 
     el.setAttribute("apply-mode", "inline");
-    expect(root().getAttribute("data-theme")).toBeNull();
-    expect(root().getAttribute("data-theme-scheme")).toBeNull();
+    expect(root().dataset.theme).toBeUndefined();
+    expect(root().dataset.themeScheme).toBeUndefined();
     expect(root().style.getPropertyValue("--theme-bg-primary")).not.toBe("");
   });
 
@@ -144,17 +144,17 @@ describe("<theme-controller> apply modes", () => {
     // A specific color-vision variation, no longer collapsed.
     el.setScheme("light");
     el.setVariation("protanopia");
-    expect(root().getAttribute("data-theme")).toBe("seventies-protanopia-light");
-    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
-    expect(root().getAttribute("data-theme-contrast")).toBe("normal");
-    expect(root().getAttribute("data-theme-category")).toBeNull(); // retired
+    expect(root().dataset.theme).toBe("seventies-protanopia-light");
+    expect(root().dataset.themeVariation).toBe("protanopia");
+    expect(root().dataset.themeContrast).toBe("normal");
+    expect(root().dataset.themeCategory).toBeUndefined(); // retired
     expect(localStorage.getItem("theme-resolved-variation")).toBe("protanopia");
 
     // A different color-vision type is reachable (not stuck on protanopia).
     el.setScheme("dark");
     el.setVariation("deuteranopia");
-    expect(root().getAttribute("data-theme")).toBe("seventies-deuteranopia-dark");
-    expect(root().getAttribute("data-theme-variation")).toBe("deuteranopia");
+    expect(root().dataset.theme).toBe("seventies-deuteranopia-dark");
+    expect(root().dataset.themeVariation).toBe("deuteranopia");
 
     // Combined high-contrast + color-vision: no concrete hc+protanopia palette
     // exists, so `data-theme` falls back to hc-light, but BOTH axis attributes
@@ -162,14 +162,14 @@ describe("<theme-controller> apply modes", () => {
     el.setScheme("light");
     el.setContrast("more");
     el.setVariation("protanopia");
-    expect(root().getAttribute("data-theme-contrast")).toBe("more");
-    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
-    expect(root().getAttribute("data-theme")).toBe("seventies-hc-light");
+    expect(root().dataset.themeContrast).toBe("more");
+    expect(root().dataset.themeVariation).toBe("protanopia");
+    expect(root().dataset.theme).toBe("seventies-hc-light");
 
     // Back to normal clears the variation companion + key.
     el.setContrast("normal");
     el.setVariation("normal");
-    expect(root().getAttribute("data-theme-variation")).toBeNull();
+    expect(root().dataset.themeVariation).toBeUndefined();
     expect(localStorage.getItem("theme-resolved-variation")).toBeNull();
   });
 });
@@ -179,14 +179,14 @@ describe("<theme-toggle> apply modes", () => {
     localStorage.setItem("theme", "dark");
     mount("theme-toggle");
     expect(root().classList.contains("dark")).toBe(true);
-    expect(root().getAttribute("data-theme")).toBeNull();
+    expect(root().dataset.theme).toBeUndefined();
   });
 
   it("attribute mode sets data attribute(s) and no .dark class", () => {
     localStorage.setItem("theme", "dark");
     mount("theme-toggle", { "apply-mode": "attribute" });
-    expect(root().getAttribute("data-theme")).toBe("dark");
-    expect(root().getAttribute("data-theme-scheme")).toBe("dark");
+    expect(root().dataset.theme).toBe("dark");
+    expect(root().dataset.themeScheme).toBe("dark");
     expect(root().classList.contains("dark")).toBe(false);
   });
 
@@ -194,14 +194,40 @@ describe("<theme-toggle> apply modes", () => {
     localStorage.setItem("theme", "dark");
     mount("theme-toggle", { "apply-mode": "both" });
     expect(root().classList.contains("dark")).toBe(true);
-    expect(root().getAttribute("data-theme")).toBe("dark");
+    expect(root().dataset.theme).toBe("dark");
   });
 
   it("honors a custom attribute name", () => {
     localStorage.setItem("theme", "light");
     mount("theme-toggle", { "apply-mode": "attribute", "attribute-name": "data-mode" });
-    expect(root().getAttribute("data-mode")).toBe("light");
-    expect(root().getAttribute("data-mode-scheme")).toBe("light");
+    expect(root().dataset.mode).toBe("light");
+    expect(root().dataset.modeScheme).toBe("light");
+  });
+
+  it("strips controller-only companions (family/contrast/variation) it doesn't own", () => {
+    // Simulate a prior <theme-controller apply-mode="attribute"> session: stale
+    // companion attributes on <html> plus the FOUC replay keys in storage.
+    root().setAttribute("data-theme-family", "seventies");
+    root().setAttribute("data-theme-contrast", "more");
+    root().setAttribute("data-theme-variation", "protanopia");
+    localStorage.setItem("theme-resolved-family", "seventies");
+    localStorage.setItem("theme-resolved-contrast", "more");
+    localStorage.setItem("theme-resolved-variation", "protanopia");
+    localStorage.setItem("theme", "light");
+
+    mount("theme-toggle", { "apply-mode": "attribute" });
+
+    // DOM: the toggle keeps only the scheme companion; foreign ones are removed.
+    expect(root().dataset.theme).toBe("light");
+    expect(root().dataset.themeScheme).toBe("light");
+    expect(root().dataset.themeFamily).toBeUndefined();
+    expect(root().dataset.themeContrast).toBeUndefined();
+    expect(root().dataset.themeVariation).toBeUndefined();
+
+    // Storage: replay keys cleared so the FOUC init script won't replay them.
+    expect(localStorage.getItem("theme-resolved-family")).toBeNull();
+    expect(localStorage.getItem("theme-resolved-contrast")).toBeNull();
+    expect(localStorage.getItem("theme-resolved-variation")).toBeNull();
   });
 });
 
@@ -220,11 +246,11 @@ describe("initTheme() attribute replay", () => {
 
     initTheme();
 
-    expect(root().getAttribute("data-theme")).toBe("seventies-hc-dark");
-    expect(root().getAttribute("data-theme-family")).toBe("seventies");
-    expect(root().getAttribute("data-theme-scheme")).toBe("dark");
-    expect(root().getAttribute("data-theme-contrast")).toBe("more");
-    expect(root().getAttribute("data-theme-variation")).toBe("protanopia");
-    expect(root().getAttribute("data-theme-category")).toBeNull();
+    expect(root().dataset.theme).toBe("seventies-hc-dark");
+    expect(root().dataset.themeFamily).toBe("seventies");
+    expect(root().dataset.themeScheme).toBe("dark");
+    expect(root().dataset.themeContrast).toBe("more");
+    expect(root().dataset.themeVariation).toBe("protanopia");
+    expect(root().dataset.themeCategory).toBeUndefined();
   });
 });
