@@ -2,7 +2,7 @@ import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 import { defineConfig } from "astro/config";
 
 // This showcase uses the **data-attribute** apply mode. The component sets
-// `data-theme` / `data-theme-family` / `data-theme-scheme` / `data-theme-category`
+// `data-theme` plus companion attributes (`data-theme-family`, `data-theme-scheme`, `data-theme-contrast`, `data-theme-variation`)
 // on <html>, and ALL theming is driven by the separate CSS files in
 // src/styles/ — the library injects no colors of its own ("clean slate").
 //
