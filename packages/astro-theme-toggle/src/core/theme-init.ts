@@ -82,6 +82,25 @@ export function initTheme(): void {
   }
 }
 
+const INLINE_SCRIPT_ESCAPE_MAP: Record<string, string> = {
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "/": "\\u002F",
+  "\\": "\\\\",
+  "\b": "\\b",
+  "\f": "\\f",
+  "\n": "\\n",
+  "\r": "\\r",
+  "\t": "\\t",
+  "\0": "\\0",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+};
+
+function escapeUnsafeForInlineScript(value: string): string {
+  return value.replace(/[<>\/\\\b\f\n\r\t\0\u2028\u2029]/g, (ch) => INLINE_SCRIPT_ESCAPE_MAP[ch]);
+}
+
 /** Options for {@link generateThemeInitScript}. */
 export interface ThemeInitScriptOptions {
   /**
@@ -124,7 +143,7 @@ export function generateThemeInitScript(options: ThemeInitScriptOptions = {}): s
   body += "if(m==='system'){R.classList.add(sysDark?'scheme-dark':'scheme-light')}";
 
   if (applyAttribute) {
-    body += `var B=localStorage.getItem('theme-attr-name')||${JSON.stringify(base)};`;
+    body += `var B=localStorage.getItem('theme-attr-name')||${escapeUnsafeForInlineScript(JSON.stringify(base))};`;
     body += "var id=localStorage.getItem('theme-resolved-id');";
     body += "var fa=localStorage.getItem('theme-resolved-family');";
     body += "var rc=localStorage.getItem('theme-contrast')||'system';";
