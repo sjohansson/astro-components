@@ -222,7 +222,7 @@ export interface ThemeControllerProps {
    *   Legacy `ThemeCategory[]` values are still accepted and mapped.
    * @default 'basic'
    */
-  preset?: ThemePreset | ThemeAxis[];
+  preset?: ThemePreset | Array<ThemeAxis | ThemeCategory>;
   /** Custom theme configurations (replaces defaults when provided) */
   themes?: ThemeConfig[];
   /**
