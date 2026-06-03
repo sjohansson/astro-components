@@ -187,7 +187,7 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   // ── Derived axis state ──
 
   private get preset(): ThemePreset {
-    return (this.getAttribute("preset") as ThemePreset) || "basic";
+    return oneOf(this.getAttribute("preset"), ["basic", "accessible", "full"] as const, "basic");
   }
 
   /** Axes enabled by the current preset (scheme is always enabled). */
