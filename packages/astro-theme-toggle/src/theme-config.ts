@@ -190,7 +190,7 @@ const legacyCategoryAxis: Record<ThemeCategory, ThemeAxis | null> = {
  * accepted and mapped for migration (`"high-contrast"` → `contrast`,
  * `"color-blind"` → `variation`).
  */
-export function resolveAxes(preset: ThemePreset | ThemeAxis[]): ThemeAxis[] {
+export function resolveAxes(preset: ThemePreset | Array<ThemeAxis | ThemeCategory>): ThemeAxis[] {
   if (!Array.isArray(preset)) {
     return presetAxes[preset];
   }
