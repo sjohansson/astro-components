@@ -1,0 +1,64 @@
+/*
+ * advanced.css — Cross-cutting overrides that only the companion attributes
+ * make possible. Loaded AFTER tokens.css so these win where they apply.
+ *
+ * This is the payoff of attribute-based theming: instead of one flat set of
+ * inline variables, you can target broad slices of theme-space with plain CSS
+ * selectors and layer concerns independently (scheme → category → family → id).
+ */
+
+/* ── Category: high contrast (regardless of family or scheme) ── */
+[data-theme-category="high-contrast"] {
+  --app-border-width: 2px;
+  --app-radius: 0.25rem;
+}
+
+[data-theme-category="high-contrast"][data-theme-scheme="light"] {
+  --app-bg: #ffffff;
+  --app-surface: #ffffff;
+  --app-surface-2: #f0f0f0;
+  --app-fg: #000000;
+  --app-muted: #1a1a1a;
+  --app-border: #000000;
+  --app-accent: #0000cc;
+  --app-accent-contrast: #ffffff;
+}
+
+[data-theme-category="high-contrast"][data-theme-scheme="dark"] {
+  --app-bg: #000000;
+  --app-surface: #000000;
+  --app-surface-2: #141414;
+  --app-fg: #ffffff;
+  --app-muted: #f0f0f0;
+  --app-border: #ffffff;
+  --app-accent: #ffff00;
+  --app-accent-contrast: #000000;
+}
+
+/* High-contrast themes also get underlined links for extra affordance. */
+[data-theme-category="high-contrast"] a {
+  text-decoration: underline;
+}
+
+/* ── Family: layer a brand accent over the scheme baseline ── */
+/* Selecting a bundled family (e.g. Kawaii) only needs to override the accent —
+   everything else still comes from the scheme baseline in tokens.css. */
+[data-theme-family="kawaii"] {
+  --app-accent: #ff5fa2;
+  --app-accent-contrast: #2a0d1c;
+}
+
+[data-theme-family="seventies"] {
+  --app-accent: #e07b39;
+  --app-accent-contrast: #1c1006;
+}
+
+[data-theme-family="less-is-more"] {
+  --app-accent: #555c66;
+  --app-accent-contrast: #ffffff;
+}
+
+/* ── Exact theme: fine-tune a single variant by id when you really need to ── */
+[data-theme="dark"] {
+  --app-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}

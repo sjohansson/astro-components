@@ -1,0 +1,237 @@
+---
+import { allBundledThemes, defaultThemes } from "@sjohansson/astro-theme-toggle";
+import Layout from "../layouts/Layout.astro";
+
+// Offer every bundled theme. Because tokens.css keys the baseline palette on
+// `data-theme-scheme`, even families we never enumerate in CSS still render.
+const allThemesJson = JSON.stringify([...defaultThemes, ...allBundledThemes]);
+
+const tokensSnippet = `/* tokens.css — every theme gets a palette from its scheme */
+[data-theme-scheme="light"] {
+  --app-bg: #ffffff;
+  --app-fg: #1a1d21;
+  --app-accent: #2563eb;
+}
+[data-theme-scheme="dark"] {
+  --app-bg: #0e1116;
+  --app-fg: #eef1f5;
+  --app-accent: #5b9dff;
+}`;
+
+const advancedSnippet = `/* advanced.css — layer concerns with the companions */
+[data-theme-category="high-contrast"] {
+  --app-border-width: 2px;
+  --app-border: currentColor;
+}
+[data-theme-family="kawaii"] {
+  --app-accent: #ff5fa2;   /* just the accent; scheme baseline stays */
+}
+[data-theme="dark"] {
+  --app-shadow: 0 8px 24px rgba(0,0,0,0.55);  /* one exact variant */
+}`;
+
+const configSnippet = `// astro.config.mjs
+import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+
+export default defineConfig({
+  integrations: [
+    themeToggle({
+      injectScript: true,        // FOUC: replay attrs before paint
+      applyMode: 'attribute',    // set data-theme*, no inline colors
+      attributeName: 'data-theme',
+    }),
+  ],
+});`;
+---
+
+<Layout title="Theme Showcase — Data Attributes">
+  <div class="page">
+    <header class="header">
+      <div class="header-content">
+        <div>
+          <span class="badge">Data-attribute mode</span>
+          <h1 class="title">CSS-Driven Theme Showcase</h1>
+          <p class="subtitle">
+            The component sets <code>data-theme</code> on <code>&lt;html&gt;</code>
+            and nothing else — every color here comes from separate
+            <code>.css</code> files you own.
+          </p>
+        </div>
+        <div class="header-controls">
+          <theme-toggle apply-mode="attribute" aria-label="Toggle light/dark"
+          ></theme-toggle>
+          <theme-controller
+            id="controller"
+            themes={allThemesJson}
+            preset="full"
+            apply-mode="attribute"
+            expand-direction="vertical"
+            show-labels></theme-controller>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      {/* ── How it works ── */}
+      <section class="section">
+        <h2 class="section-title">What's on <code>&lt;html&gt;</code> right now</h2>
+        <p class="section-desc">
+          As you switch themes, the component updates these data attributes
+          live. Your CSS reacts to them — no inline styles, no JavaScript in
+          your stylesheets.
+        </p>
+
+        <div class="readout">
+          <div class="readout-item">
+            <span class="readout-key">data-theme</span>
+            <span class="readout-val" data-readout="data-theme">—</span>
+          </div>
+          <div class="readout-item">
+            <span class="readout-key">data-theme-family</span>
+            <span class="readout-val" data-readout="data-theme-family">—</span>
+          </div>
+          <div class="readout-item">
+            <span class="readout-key">data-theme-scheme</span>
+            <span class="readout-val" data-readout="data-theme-scheme">—</span>
+          </div>
+          <div class="readout-item">
+            <span class="readout-key">data-theme-category</span>
+            <span class="readout-val" data-readout="data-theme-category">—</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Live demo ── */}
+      <section class="section">
+        <h2 class="section-title">Live Components</h2>
+        <p class="section-desc">
+          Each element styles itself purely from the <code>--app-*</code> tokens
+          defined in <code>tokens.css</code> and <code>advanced.css</code>.
+          Pick a bundled family (Kawaii, Seventies…) to see the family accent
+          override layer in while the scheme baseline carries everything else.
+        </p>
+
+        <div class="demo-grid">
+          <div class="card">
+            <h3>Card &amp; Buttons</h3>
+            <p>
+              Surfaces, borders, and accents all resolve from data-attribute
+              selectors. High-contrast themes thicken every border via a single
+              <code>[data-theme-category="high-contrast"]</code> rule.
+            </p>
+            <div class="actions">
+              <button class="btn btn-primary">Primary</button>
+              <button class="btn btn-secondary">Secondary</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Form Elements</h3>
+            <div class="field">
+              <label class="label" for="demo-text">Text input</label>
+              <input id="demo-text" class="input" type="text" placeholder="Type something…" />
+            </div>
+            <div class="field">
+              <label class="label" for="demo-select">Select</label>
+              <select id="demo-select" class="input">
+                <option>Option A</option>
+                <option>Option B</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Semantic Colors</h3>
+            <div class="alert alert-success">Success — saved.</div>
+            <div class="alert alert-warning">Warning — double-check.</div>
+            <div class="alert alert-error">Error — try again.</div>
+            <div class="alert alert-info">Info — <a href="#">learn more</a>.</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── The CSS that powers it ── */}
+      <section class="section">
+        <h2 class="section-title">The CSS behind it</h2>
+        <p class="section-desc">
+          Three separate stylesheets, imported once in the layout. This is the
+          whole theming system — plain, inspectable CSS.
+        </p>
+
+        <div class="code-grid">
+          <div class="code-block">
+            <h3>src/styles/tokens.css</h3>
+            <pre><code>{tokensSnippet}</code></pre>
+            <p class="code-desc">
+              Baseline palette keyed on the <code>data-theme-scheme</code>
+              companion, so every theme is covered.
+            </p>
+          </div>
+
+          <div class="code-block">
+            <h3>src/styles/advanced.css</h3>
+            <pre><code>{advancedSnippet}</code></pre>
+            <p class="code-desc">
+              Category, family, and exact-id overrides layered on top — the
+              flexibility inline styles can't express.
+            </p>
+          </div>
+
+          <div class="code-block">
+            <h3>astro.config.mjs</h3>
+            <pre><code>{configSnippet}</code></pre>
+            <p class="code-desc">
+              <code>applyMode: "attribute"</code> tells the component to set the
+              attributes only. <code>injectScript</code> prevents FOUC.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <strong>@sjohansson/astro-theme-toggle</strong> — data-attribute theming
+        with your own CSS. Compare with the inline-tokens
+        <code>theming-showcase</code> example.
+      </p>
+    </footer>
+  </div>
+</Layout>
+
+<script>
+  import {
+    registerThemeController,
+    registerThemeToggle,
+  } from "@sjohansson/astro-theme-toggle";
+
+  registerThemeController();
+  registerThemeToggle();
+
+  // Reflect the live <html> data attributes into the readout panel.
+  const root = document.documentElement;
+  const cells = document.querySelectorAll<HTMLElement>("[data-readout]");
+
+  function updateReadout(): void {
+    for (const cell of cells) {
+      const attr = cell.dataset.readout;
+      if (attr) {
+        cell.textContent = root.getAttribute(attr) ?? "—";
+      }
+    }
+  }
+
+  updateReadout();
+  // The component mutates attributes on <html> when the theme changes.
+  new MutationObserver(updateReadout).observe(root, {
+    attributes: true,
+    attributeFilter: [
+      "data-theme",
+      "data-theme-family",
+      "data-theme-scheme",
+      "data-theme-category",
+    ],
+  });
+  // Re-sync after Astro view transitions, if used.
+  document.addEventListener("astro:after-swap", updateReadout);
+</script>

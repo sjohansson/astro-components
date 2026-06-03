@@ -1,0 +1,74 @@
+/*
+ * tokens.css — Theme tokens driven by DATA ATTRIBUTES.
+ * ----------------------------------------------------
+ * The <theme-controller apply-mode="attribute"> sets these on <html>:
+ *
+ *   data-theme            the resolved theme id      (e.g. "high-contrast-dark")
+ *   data-theme-family     the family                 (e.g. "default", "kawaii")
+ *   data-theme-scheme     the base scheme            ("light" | "dark")
+ *   data-theme-category   the variant category       ("base" | "high-contrast" | ...)
+ *
+ * Because we key the BASELINE tokens on `data-theme-scheme`, EVERY theme the
+ * controller can produce — including bundled families we never enumerate — gets
+ * a sensible default palette for free. advanced.css then layers category- and
+ * family-specific overrides on top. This is what the "clean slate" attribute
+ * mode unlocks: theming is plain CSS you own, not inline styles from the library.
+ *
+ * These `--app-*` custom properties are OURS (authored here), not the library's
+ * `--theme-*` variables — in attribute mode the library injects nothing.
+ */
+
+/* Pre-hydration / attribute-missing fallback (keeps the very first paint sane). */
+:root {
+  --app-bg: #ffffff;
+  --app-surface: #f5f6f8;
+  --app-surface-2: #e9ebef;
+  --app-fg: #1a1d21;
+  --app-muted: #5b6470;
+  --app-border: #d7dbe0;
+  --app-border-width: 1px;
+  --app-accent: #2563eb;
+  --app-accent-contrast: #ffffff;
+  --app-success: #1a7f4b;
+  --app-warning: #b8860b;
+  --app-error: #c0392b;
+  --app-info: #1c7ed6;
+  --app-radius: 0.5rem;
+  --app-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Baseline: LIGHT scheme (any family) ── */
+[data-theme-scheme="light"] {
+  --app-bg: #ffffff;
+  --app-surface: #f5f6f8;
+  --app-surface-2: #e9ebef;
+  --app-fg: #1a1d21;
+  --app-muted: #5b6470;
+  --app-border: #d7dbe0;
+  --app-border-width: 1px;
+  --app-accent: #2563eb;
+  --app-accent-contrast: #ffffff;
+  --app-success: #1a7f4b;
+  --app-warning: #b8860b;
+  --app-error: #c0392b;
+  --app-info: #1c7ed6;
+  --app-shadow: 0 4px 16px rgba(20, 25, 35, 0.08), 0 1px 3px rgba(20, 25, 35, 0.06);
+}
+
+/* ── Baseline: DARK scheme (any family) ── */
+[data-theme-scheme="dark"] {
+  --app-bg: #0e1116;
+  --app-surface: #171b22;
+  --app-surface-2: #222834;
+  --app-fg: #eef1f5;
+  --app-muted: #a3acba;
+  --app-border: #2b313c;
+  --app-border-width: 1px;
+  --app-accent: #5b9dff;
+  --app-accent-contrast: #0b1220;
+  --app-success: #3fbf7f;
+  --app-warning: #e3b341;
+  --app-error: #ff6b5e;
+  --app-info: #4dabf7;
+  --app-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
