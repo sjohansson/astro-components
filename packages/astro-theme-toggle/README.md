@@ -64,7 +64,7 @@ The component starts as a single icon button showing the current theme. On click
 | `expandSide` | `"auto" \| "start" \| "end"` | Which side of the trigger the panel opens toward | `"auto"` |
 | `showLabels` | `boolean` | Show theme labels next to icons | `false` |
 | `labelPosition` | `"auto" \| "below" \| "above" \| "right" \| "left"` | Where labels sit relative to icons | `"auto"` |
-| `preset` | `"basic" \| "accessible" \| "full" \| ThemeCategory[]` | Which variant categories to offer | `"basic"` |
+| `preset` | `"basic" \| "accessible" \| "full" \| ThemeAxis[]` | Which axis controls to offer (scheme/contrast/variation; legacy `ThemeCategory[]` values are mapped) | `"basic"` |
 | `family` | `string` | Restrict to a single family by id (variant-only UI) | — |
 | `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
 | `applyMode` | `"inline" \| "attribute" \| "both"` | How the active theme is reflected on `<html>` | `"inline"` |
