@@ -45,7 +45,7 @@ interface ThemeAttrState {
  *   (default: 'auto'). Where the label sits relative to the icon when
  *   `show-labels` is enabled. 'auto' = 'below' in horizontal expand, 'right'
  *   in vertical expand.
- * @attr {string} themes - JSON string of ThemeConfig[] (filtered by preset)
+ * @attr {string} themes - JSON string of ThemeConfig[]
  * @attr {string} family - Restrict to a single family by id (variant-only UI)
  * @attr {string} apply-mode - 'inline' | 'attribute' | 'both' (default: 'inline').
  *   How the active theme is reflected on <html>: inline CSS custom properties,
