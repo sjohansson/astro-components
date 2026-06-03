@@ -247,8 +247,8 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       this.currentFamily = this.families[0]?.id || "default";
     }
     // Axes — validate against allow-lists; any stale legacy value resets.
-    this.currentScheme = oneOf(localStorage.getItem("theme-scheme"), ["system", "light", "dark"], "system");
-    this.currentContrast = oneOf(localStorage.getItem("theme-contrast"), ["system", "normal", "more"], "system");
+    const schemeRaw = localStorage.getItem("theme-scheme") ?? localStorage.getItem("theme-mode");
+    this.currentScheme = oneOf(schemeRaw, ["system", "light", "dark"], "system");
     const v = localStorage.getItem("theme-variation") || "normal";
     this.currentVariation = v === "normal" || this.variations.includes(v) ? v : "normal";
   }
