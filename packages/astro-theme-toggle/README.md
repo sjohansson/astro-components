@@ -60,12 +60,106 @@ The component starts as a single icon button showing the current theme. On click
 |------|------|-------------|---------|
 | `class` | `string` | Optional CSS classes | `""` |
 | `expandDirection` | `"horizontal" \| "vertical" \| "auto"` | Direction the options panel expands | `"auto"` |
+| `sectionsDirection` | `"horizontal" \| "vertical" \| "auto"` | How the Theme/Mode sections are arranged | `"auto"` |
+| `expandSide` | `"auto" \| "start" \| "end"` | Which side of the trigger the panel opens toward | `"auto"` |
 | `showLabels` | `boolean` | Show theme labels next to icons | `false` |
+| `labelPosition` | `"auto" \| "below" \| "above" \| "right" \| "left"` | Where labels sit relative to icons | `"auto"` |
+| `preset` | `"basic" \| "accessible" \| "full" \| ThemeCategory[]` | Which variant categories to offer | `"basic"` |
+| `family` | `string` | Restrict to a single family by id (variant-only UI) | — |
 | `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
+| `applyMode` | `"inline" \| "attribute" \| "both"` | How the active theme is reflected on `<html>` | `"inline"` |
+| `attributeName` | `string` | Base data-attribute name (coerced to `data-…`) | `"data-theme"` |
+| `attributeCompanions` | `boolean` | Also set `-family`/`-scheme`/`-category` companions | `true` |
+
+### Data-attribute theming
+
+By default the controller applies the active theme as **inline CSS custom
+properties** on `<html>` (`applyMode="inline"`). Set `applyMode="attribute"` (or
+`"both"`) to instead/also reflect the theme as **data attributes**, so you can
+drive all styling from your own CSS:
+
+```astro
+<ThemeController applyMode="attribute" />
+```
+
+This sets, on `<html>`:
+
+```html
+<html
+  data-theme="high-contrast-dark"
+  data-theme-family="default"
+  data-theme-scheme="dark"
+  data-theme-category="high-contrast"
+>
+```
+
+Then style with whatever granularity you need:
+
+```css
+/* exact theme */
+[data-theme="high-contrast-dark"] { --my-bg: #000; }
+
+/* any dark scheme, regardless of family/category */
+[data-theme-scheme="dark"] { color-scheme: dark; }
+
+/* a whole family */
+[data-theme-family="kawaii"] { --accent: hotpink; }
+```
+
+> **Clean slate:** in `attribute` mode the component sets *only* the attributes —
+> it does **not** inject any colors. You author the `[data-theme=…]` rules. (In
+> `both` mode the inline `--theme-*` variables are also set and take precedence.)
+
+The `theme-*` / `scheme-*` / `family-*` **classes are always set** regardless of
+mode, so existing class-based CSS keeps working.
+
+#### Customizing the attribute
+
+```astro
+<!-- Custom base name; companions derive from it (data-color-mode-scheme, …) -->
+<ThemeController applyMode="attribute" attributeName="data-color-mode" />
+
+<!-- Single combined attribute only, no companions -->
+<ThemeController applyMode="attribute" attributeCompanions={false} />
+```
+
+A name not starting with `data-` is coerced (`mode` → `data-mode`).
+
+#### Generating a starter stylesheet
+
+If you'd rather not hand-write every rule, `generateThemeStylesheet` turns a set
+of theme configs into `[data-theme="id"] { …vars… }` blocks (it is **not**
+injected automatically):
+
+```ts
+import { defaultThemes, generateThemeStylesheet } from '@sjohansson/astro-theme-toggle';
+
+const css = generateThemeStylesheet(defaultThemes);            // base name 'data-theme'
+const custom = generateThemeStylesheet(defaultThemes, 'data-color-mode');
+```
 
 ### ThemeToggle (Simple)
 
-The original simple light/dark toggle for basic use cases.
+The original simple light/dark toggle for basic use cases. By default it toggles
+the `.dark` class on `<html>`. It supports the same data-attribute opt-in via
+`apply-mode`:
+
+```astro
+<!-- Default: toggles `.dark` -->
+<ThemeToggle />
+
+<!-- Sets data-theme="light|dark" (+ data-theme-scheme), no `.dark` class -->
+<theme-toggle apply-mode="attribute"></theme-toggle>
+
+<!-- Both: `.dark` class AND data attribute -->
+<theme-toggle apply-mode="both" attribute-name="data-mode"></theme-toggle>
+```
+
+| Attribute | Values | Default |
+|------|------|---------|
+| `apply-mode` | `class` \| `attribute` \| `both` | `class` |
+| `attribute-name` | string (coerced to `data-…`) | `data-theme` |
+| `attribute-companions` | `true` \| `false` (sets `-scheme`) | `true` |
 
 ### As an Astro Integration (Recommended)
 
@@ -81,6 +175,12 @@ export default defineConfig({
     themeToggle({
       // Optional: inject theme initialization script globally
       injectScript: true,
+      // Optional: when using data-attribute theming, make the injected FOUC
+      // script replay the attribute(s) before first paint. Match these to the
+      // component's `applyMode` / `attributeName` / `attributeCompanions`.
+      applyMode: 'attribute',
+      attributeName: 'data-theme',
+      attributeCompanions: true,
     })
   ],
 });
@@ -150,9 +250,45 @@ import { ThemePreview } from '@sjohansson/astro-theme-toggle';
 
 ### Integration Options
 
-| Option         | Type      | Description                               | Default |
-| -------------- | --------- | ----------------------------------------- | ------- |
-| `injectScript` | `boolean` | Inject theme initialization script in head | `false` |
+| Option                | Type                                  | Description                                                    | Default       |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------- | ------------- |
+| `injectScript`        | `boolean`                             | Inject theme initialization script in head                    | `false`       |
+| `applyMode`           | `"inline" \| "attribute" \| "both"`   | When `attribute`/`both`, the injected script replays the theme data attribute(s) before paint | `"inline"` |
+| `attributeName`       | `string`                              | Base data-attribute name the script replays (match the component) | `"data-theme"` |
+| `attributeCompanions` | `boolean`                             | Whether the script sets companion attributes on first visit   | `true`        |
+
+### Preventing FOUC with data attributes
+
+The integration's `injectScript` injects a tiny inline `<head>` script. With
+`applyMode: 'attribute'` (or `'both'`) it replays the data attribute(s) before
+the page paints. The same script is available directly:
+
+```ts
+import { generateThemeInitScript, themeInitScript } from '@sjohansson/astro-theme-toggle';
+
+// scheme-class only (default, backwards compatible)
+const basic = themeInitScript;
+
+// also replay data attributes (attribute / both apply modes)
+const withAttrs = generateThemeInitScript({
+  applyAttribute: true,
+  attributeName: 'data-theme',
+  companions: true,
+});
+```
+
+The components persist the last resolved selection to `localStorage` so the
+script can replay it without bundling the theme list. Keys written in
+attribute/both mode: `theme-attr-name`, `theme-resolved-id`,
+`theme-resolved-family`, `theme-resolved-scheme`, `theme-resolved-category`,
+`theme-attr-companions` (the existing `theme-family` / `theme-variant` /
+`theme-mode` keys are unchanged).
+
+> **System-mode caveat:** when the selection is `system`, the script recomputes
+> `-scheme`/`-category` live from `matchMedia`, so scheme-based CSS is always
+> correct on first paint. The combined `data-theme` id may be one frame stale
+> across an OS color-scheme change made while the page was closed; the component
+> corrects it as soon as it hydrates.
 
 ### Component Props
 

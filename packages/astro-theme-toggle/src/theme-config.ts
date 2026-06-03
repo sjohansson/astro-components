@@ -262,51 +262,75 @@ export function resolveVariant(
 // ─── CSS helpers ───
 
 /**
- * Generate CSS custom properties string from a theme configuration.
+ * The CSS custom property names exposed by a theme, paired with a function
+ * that reads the matching value from a {@link ThemeColors} object. Single
+ * source of truth for `generateThemeCSS`, `applyThemeColors`, and
+ * `clearThemeColors` so the list never drifts.
  */
-export function generateThemeCSS(theme: ThemeConfig): string {
+const themeColorVars: ReadonlyArray<[name: string, get: (c: ThemeColors) => string]> = [
+  ["--theme-bg-primary", (c) => c.background.primary],
+  ["--theme-bg-secondary", (c) => c.background.secondary],
+  ["--theme-bg-tertiary", (c) => c.background.tertiary],
+  ["--theme-fg-primary", (c) => c.foreground.primary],
+  ["--theme-fg-secondary", (c) => c.foreground.secondary],
+  ["--theme-fg-tertiary", (c) => c.foreground.tertiary],
+  ["--theme-border-default", (c) => c.border.default],
+  ["--theme-border-hover", (c) => c.border.hover],
+  ["--theme-border-focus", (c) => c.border.focus],
+  ["--theme-interactive-default", (c) => c.interactive.default],
+  ["--theme-interactive-hover", (c) => c.interactive.hover],
+  ["--theme-interactive-active", (c) => c.interactive.active],
+  ["--theme-interactive-disabled", (c) => c.interactive.disabled],
+  ["--theme-success", (c) => c.semantic.success],
+  ["--theme-warning", (c) => c.semantic.warning],
+  ["--theme-error", (c) => c.semantic.error],
+  ["--theme-info", (c) => c.semantic.info],
+];
+
+/**
+ * Generate CSS custom properties from a theme configuration.
+ *
+ * @param theme - The theme to emit variables for.
+ * @param selector - Optional CSS selector. When provided, the variables are
+ *   wrapped in a rule (e.g. `[data-theme="dark"] { ... }`). When omitted, the
+ *   bare indented declarations are returned (suitable for inlining inside an
+ *   existing rule such as `:root`).
+ */
+export function generateThemeCSS(theme: ThemeConfig, selector?: string): string {
   const { colors } = theme;
-  const vars: string[] = [
-    `  --theme-bg-primary: ${colors.background.primary};`,
-    `  --theme-bg-secondary: ${colors.background.secondary};`,
-    `  --theme-bg-tertiary: ${colors.background.tertiary};`,
-    `  --theme-fg-primary: ${colors.foreground.primary};`,
-    `  --theme-fg-secondary: ${colors.foreground.secondary};`,
-    `  --theme-fg-tertiary: ${colors.foreground.tertiary};`,
-    `  --theme-border-default: ${colors.border.default};`,
-    `  --theme-border-hover: ${colors.border.hover};`,
-    `  --theme-border-focus: ${colors.border.focus};`,
-    `  --theme-interactive-default: ${colors.interactive.default};`,
-    `  --theme-interactive-hover: ${colors.interactive.hover};`,
-    `  --theme-interactive-active: ${colors.interactive.active};`,
-    `  --theme-interactive-disabled: ${colors.interactive.disabled};`,
-    `  --theme-success: ${colors.semantic.success};`,
-    `  --theme-warning: ${colors.semantic.warning};`,
-    `  --theme-error: ${colors.semantic.error};`,
-    `  --theme-info: ${colors.semantic.info};`,
-  ];
-  return vars.join("\n");
+  const body = themeColorVars.map(([name, get]) => `  ${name}: ${get(colors)};`).join("\n");
+  return selector ? `${selector} {\n${body}\n}` : body;
+}
+
+/**
+ * Generate a full stylesheet of `[attribute="id"] { ...vars... }` rules for a
+ * set of themes. Useful with the `attribute` apply mode when you want a
+ * ready-made default stylesheet instead of authoring every rule yourself.
+ * The component does NOT inject this automatically.
+ *
+ * @param themes - Themes to emit rules for.
+ * @param attributeName - Base data attribute used by the controller (default 'data-theme').
+ */
+export function generateThemeStylesheet(themes: ThemeConfig[], attributeName = "data-theme"): string {
+  return themes.map((t) => generateThemeCSS(t, `[${attributeName}="${t.id}"]`)).join("\n");
 }
 
 /**
  * Apply a theme's color tokens as CSS custom properties on an element.
  */
 export function applyThemeColors(colors: ThemeColors, element: HTMLElement): void {
-  element.style.setProperty("--theme-bg-primary", colors.background.primary);
-  element.style.setProperty("--theme-bg-secondary", colors.background.secondary);
-  element.style.setProperty("--theme-bg-tertiary", colors.background.tertiary);
-  element.style.setProperty("--theme-fg-primary", colors.foreground.primary);
-  element.style.setProperty("--theme-fg-secondary", colors.foreground.secondary);
-  element.style.setProperty("--theme-fg-tertiary", colors.foreground.tertiary);
-  element.style.setProperty("--theme-border-default", colors.border.default);
-  element.style.setProperty("--theme-border-hover", colors.border.hover);
-  element.style.setProperty("--theme-border-focus", colors.border.focus);
-  element.style.setProperty("--theme-interactive-default", colors.interactive.default);
-  element.style.setProperty("--theme-interactive-hover", colors.interactive.hover);
-  element.style.setProperty("--theme-interactive-active", colors.interactive.active);
-  element.style.setProperty("--theme-interactive-disabled", colors.interactive.disabled);
-  element.style.setProperty("--theme-success", colors.semantic.success);
-  element.style.setProperty("--theme-warning", colors.semantic.warning);
-  element.style.setProperty("--theme-error", colors.semantic.error);
-  element.style.setProperty("--theme-info", colors.semantic.info);
+  for (const [name, get] of themeColorVars) {
+    element.style.setProperty(name, get(colors));
+  }
+}
+
+/**
+ * Remove the theme color custom properties previously set by {@link applyThemeColors}.
+ * Used when switching to `attribute` apply mode so stale inline variables don't
+ * win over attribute-driven CSS.
+ */
+export function clearThemeColors(element: HTMLElement): void {
+  for (const [name] of themeColorVars) {
+    element.style.removeProperty(name);
+  }
 }

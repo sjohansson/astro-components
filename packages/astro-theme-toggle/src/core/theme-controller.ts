@@ -1,5 +1,5 @@
-import { defaultThemes, filterThemesByPreset, groupByFamily } from "../theme-config";
-import type { ThemeConfig, ThemeFamily, ThemePreset } from "../types";
+import { clearThemeColors, defaultThemes, filterThemesByPreset, groupByFamily } from "../theme-config";
+import type { ThemeApplyMode, ThemeConfig, ThemeFamily, ThemePreset } from "../types";
 import { SSRSafeHTMLElement } from "./ssr-base";
 
 /**
@@ -31,6 +31,14 @@ import { SSRSafeHTMLElement } from "./ssr-base";
  *   in vertical expand.
  * @attr {string} themes - JSON string of ThemeConfig[] (filtered by preset)
  * @attr {string} family - Restrict to a single family by id (variant-only UI)
+ * @attr {string} apply-mode - 'inline' | 'attribute' | 'both' (default: 'inline').
+ *   How the active theme is reflected on <html>: inline CSS custom properties,
+ *   data attribute(s), or both. Classes are always set regardless.
+ * @attr {string} attribute-name - Base data attribute name (default: 'data-theme').
+ *   Coerced to start with 'data-'. Used when apply-mode is 'attribute' or 'both'.
+ * @attr {string} attribute-companions - 'false' to disable the derived
+ *   data-*-family / data-*-scheme / data-*-category companion attributes
+ *   (default: enabled).
  *
  * @cssprop --theme-controller-label-font-size - Label text size (default 0.75rem)
  * @cssprop --theme-controller-label-font-family - Label font family (default inherit)
@@ -47,6 +55,8 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   private currentFamily = "";
   private currentVariant = "system";
   private resizeTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Last data-attribute base name applied, so we can clean it up if it changes. */
+  private lastAttributeName: string | undefined;
 
   static get observedAttributes(): string[] {
     return [
@@ -58,6 +68,9 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       "label-position",
       "themes",
       "family",
+      "apply-mode",
+      "attribute-name",
+      "attribute-companions",
     ];
   }
 
@@ -135,6 +148,22 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
 
   private get showLabels(): boolean {
     return this.hasAttribute("show-labels");
+  }
+
+  private get applyMode(): ThemeApplyMode {
+    const mode = this.getAttribute("apply-mode");
+    return mode === "attribute" || mode === "both" ? mode : "inline";
+  }
+
+  /** Base data-attribute name, coerced to start with `data-`. */
+  private get attributeName(): string {
+    const raw = this.getAttribute("attribute-name") || "data-theme";
+    return raw.startsWith("data-") ? raw : `data-${raw}`;
+  }
+
+  /** Companions default ON — opt out with `attribute-companions="false"`. */
+  private get attributeCompanions(): boolean {
+    return this.getAttribute("attribute-companions") !== "false";
   }
 
   // ── Preferences ──
@@ -233,8 +262,22 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       }
       root.classList.add(`family-${themeConfig.family ?? themeConfig.id}`);
 
-      // CSS custom properties
-      this.applyColors(themeConfig);
+      const mode = this.applyMode;
+
+      // CSS custom properties (inline). Cleared in pure attribute mode so stale
+      // inline vars don't beat attribute-driven CSS.
+      if (mode === "inline" || mode === "both") {
+        this.applyColors(themeConfig);
+      } else {
+        clearThemeColors(root);
+      }
+
+      // Data attributes
+      if (mode === "attribute" || mode === "both") {
+        this.applyDataAttributes(themeConfig, resolvedId);
+      } else {
+        this.removeDataAttributes();
+      }
     }
 
     // Update trigger icon
@@ -277,6 +320,74 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     root.style.setProperty("--theme-warning", colors.semantic.warning);
     root.style.setProperty("--theme-error", colors.semantic.error);
     root.style.setProperty("--theme-info", colors.semantic.info);
+  }
+
+  /**
+   * Reflect the active theme as data attribute(s) on <html>. Sets the base
+   * attribute to the resolved theme id, plus optional companions for family,
+   * scheme, and category. Cleans up a previously-used base name if it changed.
+   */
+  private applyDataAttributes(config: ThemeConfig, resolvedId: string): void {
+    const root = document.documentElement;
+    const base = this.attributeName;
+
+    // If the configured name changed at runtime, remove the old attributes first.
+    if (this.lastAttributeName && this.lastAttributeName !== base) {
+      this.removeAttributeSet(this.lastAttributeName);
+    }
+
+    root.setAttribute(base, resolvedId);
+    if (this.attributeCompanions) {
+      root.setAttribute(`${base}-family`, config.family ?? config.id);
+      root.setAttribute(`${base}-scheme`, config.scheme);
+      root.setAttribute(`${base}-category`, config.category);
+    } else {
+      root.removeAttribute(`${base}-family`);
+      root.removeAttribute(`${base}-scheme`);
+      root.removeAttribute(`${base}-category`);
+    }
+
+    this.lastAttributeName = base;
+    this.storeAttributeState(base, resolvedId, config);
+  }
+
+  /**
+   * Remove data attribute(s) this component previously set. No-ops when the
+   * component never set any (so default `inline` mode never touches a
+   * `data-theme` a consumer may own for unrelated reasons).
+   */
+  private removeDataAttributes(): void {
+    if (!this.lastAttributeName) {
+      return;
+    }
+    this.removeAttributeSet(this.lastAttributeName);
+    this.lastAttributeName = undefined;
+  }
+
+  /** Remove a base attribute and its three companions. */
+  private removeAttributeSet(base: string): void {
+    const root = document.documentElement;
+    root.removeAttribute(base);
+    root.removeAttribute(`${base}-family`);
+    root.removeAttribute(`${base}-scheme`);
+    root.removeAttribute(`${base}-category`);
+  }
+
+  /**
+   * Persist the resolved attribute state so the FOUC init script can replay it
+   * before paint without needing the theme list. Generic keys, shared with
+   * <theme-toggle>.
+   */
+  private storeAttributeState(base: string, resolvedId: string, config: ThemeConfig): void {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+    localStorage.setItem("theme-attr-name", base);
+    localStorage.setItem("theme-resolved-id", resolvedId);
+    localStorage.setItem("theme-resolved-family", config.family ?? config.id);
+    localStorage.setItem("theme-resolved-scheme", config.scheme);
+    localStorage.setItem("theme-resolved-category", config.category);
+    localStorage.setItem("theme-attr-companions", this.attributeCompanions ? "1" : "0");
   }
 
   // ── Panel ──

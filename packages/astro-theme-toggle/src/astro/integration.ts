@@ -1,5 +1,5 @@
 import type { AstroIntegration } from "astro";
-import { themeInitScript } from "../core/theme-init";
+import { generateThemeInitScript, themeInitScript } from "../core/theme-init";
 
 export interface ThemeToggleOptions {
   /**
@@ -8,6 +8,26 @@ export interface ThemeToggleOptions {
    * @default false
    */
   injectScript?: boolean;
+  /**
+   * Apply mode the injected FOUC script should support. When 'attribute' or
+   * 'both', the script also replays the persisted theme data attribute(s)
+   * before paint.
+   * @default 'inline'
+   */
+  applyMode?: "inline" | "attribute" | "both";
+  /**
+   * Base data attribute name used by your components (must match the
+   * component's `attributeName`). Only relevant when `applyMode` is
+   * 'attribute' or 'both'.
+   * @default 'data-theme'
+   */
+  attributeName?: string;
+  /**
+   * Whether the injected script sets companion attributes (`-family`/`-scheme`/
+   * `-category`) on a first visit, before any preference is persisted.
+   * @default true
+   */
+  attributeCompanions?: boolean;
 }
 
 /**
@@ -31,7 +51,15 @@ export default function themeToggleIntegration(options: ThemeToggleOptions = {})
         logger.info("Setting up Theme Toggle integration");
 
         if (options.injectScript) {
-          injectScript("head-inline", themeInitScript);
+          const applyAttribute = options.applyMode === "attribute" || options.applyMode === "both";
+          const script = applyAttribute
+            ? generateThemeInitScript({
+                applyAttribute: true,
+                attributeName: options.attributeName ?? "data-theme",
+                companions: options.attributeCompanions !== false,
+              })
+            : themeInitScript;
+          injectScript("head-inline", script);
         }
       },
       "astro:config:done": ({ config, logger }) => {

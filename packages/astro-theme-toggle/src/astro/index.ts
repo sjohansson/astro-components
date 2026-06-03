@@ -4,9 +4,12 @@
 export {
   allBundledThemes,
   applyThemeColors,
+  clearThemeColors,
   defaultThemes,
   filterThemesByPreset,
   generateThemeCSS,
+  generateThemeInitScript,
+  generateThemeStylesheet,
   getFamilyIds,
   groupByFamily,
   initTheme,
@@ -20,6 +23,7 @@ export {
   resolveVariant,
   seventiesThemes,
   ThemeControllerElement,
+  type ThemeInitScriptOptions,
   ThemePreviewElement,
   ThemeToggleElement,
   themeInitScript,
@@ -28,6 +32,7 @@ export {
 // Deprecated aliases
 export type {
   ColorToken,
+  ThemeApplyMode,
   ThemeCategory,
   ThemeColors,
   ThemeConfig,
@@ -37,4 +42,5 @@ export type {
   ThemeMode,
   ThemePreset,
   ThemeScheme,
+  ToggleApplyMode,
 } from "../types";

@@ -19,6 +19,24 @@ export type ThemeScheme = "light" | "dark";
 export type ThemePreset = "basic" | "accessible" | "full";
 
 /**
+ * How `<theme-controller>` reflects the active theme on `<html>`.
+ * - 'inline': set CSS custom properties inline (current/default behavior)
+ * - 'attribute': set data attribute(s) only — no inline custom properties
+ * - 'both': set inline custom properties AND data attribute(s)
+ *
+ * The `theme-*` / `scheme-*` / `family-*` classes are always set regardless of mode.
+ */
+export type ThemeApplyMode = "inline" | "attribute" | "both";
+
+/**
+ * How `<theme-toggle>` reflects the active light/dark theme on `<html>`.
+ * - 'class': toggle the `.dark` class (current/default behavior)
+ * - 'attribute': set data attribute(s) only — no `.dark` class
+ * - 'both': toggle the `.dark` class AND set data attribute(s)
+ */
+export type ToggleApplyMode = "class" | "attribute" | "both";
+
+/**
  * SVG icon definition for a theme option.
  * Allows custom themes to provide their own icons.
  */
@@ -168,6 +186,29 @@ export interface ThemeControllerProps {
   preset?: ThemePreset | ThemeCategory[];
   /** Custom theme configurations (replaces defaults when provided) */
   themes?: ThemeConfig[];
+  /**
+   * How to reflect the active theme on `<html>`.
+   * - 'inline': set CSS custom properties inline (current behavior)
+   * - 'attribute': set data attribute(s) only; colors come from your own CSS
+   * - 'both': set inline custom properties AND data attribute(s)
+   *
+   * The `theme-*` / `scheme-*` / `family-*` classes are always set regardless of mode.
+   * @default 'inline'
+   */
+  applyMode?: ThemeApplyMode;
+  /**
+   * Base data-attribute name reflecting the active theme id (e.g. 'data-theme').
+   * If it does not start with 'data-', it is prefixed automatically.
+   * Only used when `applyMode` is 'attribute' or 'both'.
+   * @default 'data-theme'
+   */
+  attributeName?: string;
+  /**
+   * Also set derived companion attributes for family/scheme/category
+   * (e.g. `data-theme-family`, `data-theme-scheme`, `data-theme-category`).
+   * @default true
+   */
+  attributeCompanions?: boolean;
 }
 
 // ─── Deprecated / backwards-compat type aliases ───

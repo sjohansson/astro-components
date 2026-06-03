@@ -19,10 +19,17 @@ describe("Core exports", () => {
   });
 
   it("should export FOUC prevention utilities", async () => {
-    const { initTheme, themeInitScript } = await import("../src/core/index");
+    const { initTheme, themeInitScript, generateThemeInitScript } = await import("../src/core/index");
     expect(typeof initTheme).toBe("function");
     expect(typeof themeInitScript).toBe("string");
     expect(themeInitScript).toContain("theme-mode");
+    expect(typeof generateThemeInitScript).toBe("function");
+  });
+
+  it("should export attribute-theming helpers", async () => {
+    const { generateThemeStylesheet, clearThemeColors } = await import("../src/core/index");
+    expect(typeof generateThemeStylesheet).toBe("function");
+    expect(typeof clearThemeColors).toBe("function");
   });
 });
 
@@ -100,6 +107,58 @@ describe("Default themes", () => {
     expect(css).toContain("--theme-bg-primary");
     expect(css).toContain("--theme-fg-primary");
     expect(css).toContain("--theme-interactive-default");
+  });
+});
+
+describe("Attribute theming helpers", () => {
+  it("generateThemeCSS without a selector returns bare declarations (regression)", async () => {
+    const { defaultThemes, generateThemeCSS } = await import("../src/theme-config");
+    const css = generateThemeCSS(defaultThemes[0]);
+    expect(css).not.toContain("{");
+    expect(css.trim().startsWith("--theme-bg-primary")).toBe(true);
+  });
+
+  it("generateThemeCSS with a selector wraps the declarations in a rule", async () => {
+    const { defaultThemes, generateThemeCSS } = await import("../src/theme-config");
+    const css = generateThemeCSS(defaultThemes[0], '[data-theme="light"]');
+    expect(css.startsWith('[data-theme="light"] {')).toBe(true);
+    expect(css).toContain("--theme-bg-primary");
+    expect(css.trimEnd().endsWith("}")).toBe(true);
+  });
+
+  it("generateThemeStylesheet emits one rule per theme keyed by id", async () => {
+    const { defaultThemes, generateThemeStylesheet } = await import("../src/theme-config");
+    const sheet = generateThemeStylesheet(defaultThemes);
+    expect(sheet).toContain('[data-theme="light"]');
+    expect(sheet).toContain('[data-theme="high-contrast-dark"]');
+  });
+
+  it("generateThemeStylesheet honors a custom attribute name", async () => {
+    const { defaultThemes, generateThemeStylesheet } = await import("../src/theme-config");
+    const sheet = generateThemeStylesheet(defaultThemes, "data-color-mode");
+    expect(sheet).toContain('[data-color-mode="light"]');
+    expect(sheet).not.toContain('[data-theme="light"]');
+  });
+
+  it("generateThemeInitScript() keeps the scheme-class contract", async () => {
+    const { generateThemeInitScript } = await import("../src/core/theme-init");
+    const script = generateThemeInitScript();
+    expect(script).toContain("theme-mode");
+    expect(script).not.toContain("theme-attr-name");
+  });
+
+  it("generateThemeInitScript({ applyAttribute }) replays the data attribute", async () => {
+    const { generateThemeInitScript } = await import("../src/core/theme-init");
+    const script = generateThemeInitScript({ applyAttribute: true, attributeName: "data-theme" });
+    expect(script).toContain("setAttribute");
+    expect(script).toContain("data-theme");
+    expect(script).toContain("theme-attr-name");
+  });
+
+  it("generateThemeInitScript coerces a non-data attribute name", async () => {
+    const { generateThemeInitScript } = await import("../src/core/theme-init");
+    const script = generateThemeInitScript({ applyAttribute: true, attributeName: "mode" });
+    expect(script).toContain('"data-mode"');
   });
 });
 
