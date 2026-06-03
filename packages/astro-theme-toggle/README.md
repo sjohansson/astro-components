@@ -60,7 +60,7 @@ The component starts as a single icon button showing the current theme. On click
 |------|------|-------------|---------|
 | `class` | `string` | Optional CSS classes | `""` |
 | `expandDirection` | `"horizontal" \| "vertical" \| "auto"` | Direction the options panel expands | `"auto"` |
-| `sectionsDirection` | `"horizontal" \| "vertical" \| "auto"` | How the Theme/Mode sections are arranged | `"auto"` |
+| `sectionsDirection` | `"horizontal" \| "vertical" \| "auto"` | How the Theme/Scheme/Contrast/Color vision sections are arranged | `"auto"` |
 | `expandSide` | `"auto" \| "start" \| "end"` | Which side of the trigger the panel opens toward | `"auto"` |
 | `showLabels` | `boolean` | Show theme labels next to icons | `false` |
 | `labelPosition` | `"auto" \| "below" \| "above" \| "right" \| "left"` | Where labels sit relative to icons | `"auto"` |
