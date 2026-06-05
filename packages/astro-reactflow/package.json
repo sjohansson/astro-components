@@ -56,10 +56,10 @@
   ],
   "devDependencies": {
     "@astrojs/react": "^5.0.7",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "@xyflow/react": "^12.10.2",
-    "react": "^19.2.5",
+    "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "dependencies": {
