@@ -12,7 +12,7 @@
     "@sjohansson/astro-reactflow": "workspace:*",
     "@sjohansson/astro-theme-toggle": "workspace:*",
     "@sjohansson/astro-version-note": "workspace:*",
-    "@astrojs/react": "^5.0.0",
+    "@astrojs/react": "^5.0.7",
     "@xyflow/react": "^12.3.5",
     "astro": "^6.1.0",
     "react": "^19.0.0",

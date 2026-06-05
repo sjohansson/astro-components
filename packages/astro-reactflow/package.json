@@ -45,7 +45,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@astrojs/react": "^5.0.0",
+    "@astrojs/react": "^5.0.7",
     "@xyflow/react": "^12.3.5",
     "astro": "^6.0.0",
     "react": "^19.0.0",
@@ -55,7 +55,7 @@
     "./dist/**/*.css"
   ],
   "devDependencies": {
-    "@astrojs/react": "^5.0.0",
+    "@astrojs/react": "^5.0.7",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@xyflow/react": "^12.10.2",
