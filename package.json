@@ -29,16 +29,16 @@
     "@astrojs/check": "^0.9.9",
     "@biomejs/biome": "^2.4.16",
     "@changesets/cli": "^2.31.0",
-    "@types/node": "^25.9.1",
-    "@vitest/coverage-v8": "^4.1.7",
-    "@vitest/ui": "^4.1.7",
-    "astro": "^6.4.2",
+    "@types/node": "^25.9.2",
+    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/ui": "^4.1.8",
+    "astro": "^6.4.4",
     "happy-dom": "^20.10.1",
     "markdownlint-cli2": "^0.22.1",
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
-    "vite": "^7.3.3",
-    "vitest": "^4.1.7"
+    "vite": "^7.3.5",
+    "vitest": "^4.1.8"
   },
   "pnpm": {}
 }
