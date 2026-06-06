@@ -1,5 +1,11 @@
 # @sjohansson/astro-theme-toggle
 
+## 0.3.0
+
+### Minor Changes
+
+- 1c33403: Update Theme toggle trigger icon size approach to better support consumer size controls
+
 ## 0.2.0
 
 ### Minor Changes

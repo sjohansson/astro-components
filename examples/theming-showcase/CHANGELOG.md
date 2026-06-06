@@ -1,5 +1,12 @@
 # theming-showcase-example
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [1c33403]
+  - @sjohansson/astro-theme-toggle@0.3.0
+
 ## 0.1.1
 
 ### Patch Changes
