@@ -925,8 +925,8 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: var(--theme-trigger-size, 2.5rem);
+      height: var(--theme-trigger-size, 2.5rem);
       padding: 0;
       border: 1px solid var(--theme-border-default, #dee2e6);
       border-radius: 0.5rem;
@@ -949,6 +949,17 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
       display: none;
       flex-shrink: 0;
       line-height: 0;
+    }
+    .trigger-icon svg {
+      /*
+      Scale the icon with the trigger instead of leaning on the SVG's intrinsic
+      20px attributes, so consumers who resize the trigger keep a centred,
+      proportional icon. Defaults to half the trigger (1.25rem / 20px at the
+      2.5rem default — unchanged). --theme-trigger-icon-size overrides the icon
+      size independently of the trigger.
+      */
+      width: var(--theme-trigger-icon-size, calc(var(--theme-trigger-size, 2.5rem) * 0.5));
+      height: var(--theme-trigger-icon-size, calc(var(--theme-trigger-size, 2.5rem) * 0.5));
     }
     .theme-panel {
       display: flex;

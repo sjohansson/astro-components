@@ -403,6 +403,17 @@ The theme system exposes CSS custom properties that you can use in your styles:
 - `--theme-error` - Error messages
 - `--theme-info` - Info messages
 
+#### Sizing
+- `--theme-trigger-size` - Width/height of the trigger button (default `2.5rem`)
+- `--theme-trigger-icon-size` - Trigger icon size (default: half of `--theme-trigger-size`, i.e. `1.25rem`). Set the trigger size alone and the icon scales with it, staying centred; override this to tune the icon independently.
+
+```css
+/* Shrink the whole trigger — the icon scales and stays centred automatically */
+.theme-trigger {
+  --theme-trigger-size: 1.75rem;
+}
+```
+
 ## Custom Theme Configuration
 
 You can define your own themes by creating a custom configuration:
