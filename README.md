@@ -11,7 +11,7 @@ This monorepo contains the following Astro components:
 
 - **[@sjohansson/astro-reactflow](./packages/astro-reactflow)** - React Flow integration for Astro
 - **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
-- **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for documentation sites
+- **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for site checks/documentation
 
 Each component can be used as either a standalone component or as an Astro integration for enhanced functionality and automatic configuration.
 
@@ -45,13 +45,15 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 <ThemeToggle />
 ```
 
-**See the [Integration Guide](./INTEGRATION_GUIDE.md) for detailed usage instructions and best practices.**
+**See the [Integration Guide](./docs/INTEGRATION_GUIDE.md) for detailed usage instructions and best practices.**
 
 ## 📁 Examples
 
 Check out the [examples directory](./examples) for complete working examples:
 
 - **[Basic Usage](./examples/basic-usage)** - All three integrations working together
+- **[Theming Showcase](./examples/theming-showcase)** - Theme toggle with inline theming
+- **[Theming Showcase with Attributes](./examples/theming-showcase-attributes)** - Theme toggle using HTML attributes for CSS theming
 
 Each example is a fully functional Astro project you can run and explore.
 
@@ -164,9 +166,10 @@ pnpm changeset
 ```
 
 This will:
+
 1. Prompt you to select affected packages
-2. Ask for the version bump type (major/minor/patch)
-3. Request a description of your changes
+1. Ask for the version bump type (major/minor/patch)
+1. Request a description of your changes
 
 ## 🤝 Contributing
 
@@ -174,10 +177,10 @@ Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.m
 
 ## 📚 Documentation
 
-- **[Integration Guide](./INTEGRATION_GUIDE.md)** - Learn how to use components as integrations vs standalone
-- **[Packaging Guide](./PACKAGING_GUIDE.md)** - Architecture and best practices for the monorepo
-- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute to this project
-- **[Getting Started](./GETTING_STARTED.md)** - Detailed setup and workflow guide
+- **[Integration Guide](./docs/INTEGRATION_GUIDE.md)** - Learn how to use components as integrations vs standalone
+- **[Packaging Guide](./docs/PACKAGING_GUIDE.md)** - Architecture and best practices for the monorepo
+- **[Contributing Guide](.CONTRIBUTING.md)** - How to contribute to this project
+- **[Getting Started](./docs/GETTING_STARTED.md)** - Detailed setup and workflow guide
 
 ## 📄 License
 
