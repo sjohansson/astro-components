@@ -1,5 +1,11 @@
 # @sjohansson/astro-version-note
 
+## 0.2.0
+
+### Minor Changes
+
+- 3a9b74d: Bump dependencies
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @sjohansson/astro-theme-toggle
 
+## 0.2.0
+
+### Minor Changes
+
+- 3a9b74d: Fix missing color-blind adjusted theme options
+- 3a9b74d: Add Theming showcase with attribute configuration and separate css files
+- 3a9b74d: Add data-attribute theming for css use
+
 ## 0.1.1
 
 ### Patch Changes

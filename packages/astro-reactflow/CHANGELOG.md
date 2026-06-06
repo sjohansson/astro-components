@@ -1,5 +1,11 @@
 # @sjohansson/astro-reactflow
 
+## 0.2.0
+
+### Minor Changes
+
+- 3a9b74d: Add export feature
+
 ## 0.1.1
 
 ### Patch Changes
