@@ -1,37 +1,218 @@
+/* ===========================================================================
+   @sjohansson/astro-reactflow — diagram wrapper styles
+
+   The wrapper is self-contained: it ships sensible light/dark defaults via
+   `--arf-*` custom properties. Override any of them on `.reactflow-wrapper`
+   (or an ancestor) to match your site, e.g.
+
+     .reactflow-wrapper { --arf-surface: var(--my-surface-color); }
+   =========================================================================== */
+
 .reactflow-wrapper {
-  position: relative;
-  min-width: 200px;
-  min-height: 200px;
-}
+  /* Overridable design tokens (light defaults). */
+  --arf-surface: #ffffff;
+  --arf-chrome-surface: #f8f9fa;
+  --arf-text: #1f2937;
+  --arf-heading: #111827;
+  --arf-border: #e5e7eb;
+  --arf-button-hover-bg: #eef0f2;
+  --arf-input-accent: #3b82f6;
+  --arf-output-accent: #10b981;
 
-.export-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 5;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  width: 100%;
+  min-width: 200px;
+  border: 1px solid var(--arf-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(--arf-surface);
 }
 
-.export-button {
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+.reactflow-wrapper[data-color-mode="dark"] {
+  --arf-surface: #1a1a1a;
+  --arf-chrome-surface: #242424;
+  --arf-text: #e5e7eb;
+  --arf-heading: #f3f4f6;
+  --arf-border: #374151;
+  --arf-button-hover-bg: #303030;
+}
+
+/* Focus / fullscreen mode. The compound selector outspecifies the base
+   `.reactflow-wrapper` rule, and focus mode carries no inline sizing, so no
+   `!important` is needed to win the cascade. */
+.reactflow-wrapper.reactflow-focus-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background-color: var(--arf-surface);
+  animation: arf-focus-mode-in 0.25s ease-out;
+}
+
+@keyframes arf-focus-mode-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* The diagram pane fills the space between the title and description bars. */
+.reactflow-pane {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.reactflow-pane .react-flow {
+  width: 100%;
+  height: 100%;
+}
+
+.reactflow-title {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--arf-heading);
+  background-color: var(--arf-chrome-surface);
+  border-bottom: 1px solid var(--arf-border);
+}
+
+.reactflow-description {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--arf-text);
+  background-color: var(--arf-chrome-surface);
+  border-top: 1px solid var(--arf-border);
+}
+
+.reactflow-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reactflow-focus-title {
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--arf-heading);
+}
+
+.reactflow-focus-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--arf-border);
+  border-radius: 0.375rem;
+  color: var(--arf-text);
+  background-color: var(--arf-chrome-surface);
   cursor: pointer;
-  font-size: 12px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.reactflow-focus-button:hover {
+  background-color: var(--arf-button-hover-bg);
+}
+
+/* Export buttons. */
+.reactflow-export-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.reactflow-export-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: var(--arf-text);
+  background-color: var(--arf-chrome-surface);
+  border: 1px solid var(--arf-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.export-button:hover {
-  background: #f5f5f5;
-  border-color: #999;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+.reactflow-export-button:hover {
+  background-color: var(--arf-button-hover-bg);
 }
 
-.export-button:active {
+.reactflow-export-button:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------------------------------------------------------------------------
+   React Flow theme overrides — drive React Flow's own `--xy-*` variables from
+   the wrapper tokens so nodes, edges, controls, and minimap follow the theme.
+   --------------------------------------------------------------------------- */
+.reactflow-wrapper .react-flow {
+  --xy-background-color: var(--arf-surface);
+  --xy-node-background-color: var(--arf-chrome-surface);
+  --xy-node-border-color: var(--arf-border);
+  --xy-node-color: var(--arf-text);
+  --xy-edge-stroke: var(--arf-text);
+  --xy-edge-label-background-color: var(--arf-surface);
+  --xy-edge-label-color: var(--arf-text);
+  --xy-connectionline-stroke: var(--arf-input-accent);
+  --xy-controls-button-background-color: var(--arf-chrome-surface);
+  --xy-controls-button-background-color-hover: var(--arf-button-hover-bg);
+  --xy-controls-button-color: var(--arf-text);
+  --xy-controls-button-border-color: var(--arf-border);
+  --xy-minimap-background-color: var(--arf-chrome-surface);
+  --xy-minimap-mask-background-color: rgba(128, 128, 128, 0.3);
+}
+
+.reactflow-wrapper .react-flow__node {
+  border-width: 1px;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.reactflow-wrapper .react-flow__node-default,
+.reactflow-wrapper .react-flow__node-input,
+.reactflow-wrapper .react-flow__node-output {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.reactflow-wrapper .react-flow__node-input {
+  border-color: var(--arf-input-accent);
+}
+
+.reactflow-wrapper .react-flow__node-output {
+  border-color: var(--arf-output-accent);
+}
+
+.reactflow-wrapper .react-flow__controls {
+  border: 1px solid var(--arf-border);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.reactflow-wrapper .react-flow__minimap {
+  border: 1px solid var(--arf-border);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.reactflow-wrapper .react-flow__minimap-node {
+  fill-opacity: 1;
+  stroke-opacity: 1;
 }

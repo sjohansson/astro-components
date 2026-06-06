@@ -1,6 +1,6 @@
 # Astro React Flow
 
-Drop-in React Flow support for Astro 6+. The integration auto-registers `@astrojs/react` and configures the Vite SSR settings React Flow needs, so consumers only have to add a single line to `astro.config.mjs`.
+Drop-in React Flow diagrams for Astro 6+. Ships a feature-complete `ReactFlowWrapper` component — integrated title/description, fullscreen **focus mode**, minimap, background variants, automatic light/dark theming, and optional PNG/SVG export — plus an integration that auto-registers `@astrojs/react` and configures the Vite SSR settings React Flow needs.
 
 ## Installation
 
@@ -31,31 +31,27 @@ That's it — no need to manually add `react()` to your integrations. The React 
 ```astro
 ---
 import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
-
-const nodes = [
-  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Start' } },
-  { id: '2', position: { x: 100, y: 100 }, data: { label: 'End' } },
-];
-const edges = [{ id: 'e1-2', source: '1', target: '2' }];
 ---
 
 <ReactFlowWrapper
   client:only="react"
-  nodes={nodes}
-  edges={edges}
-  className="h-96 rounded-xl bg-surface-1"
+  title="Basic Process Flow"
+  nodes={[
+    { id: '1', type: 'input', label: 'Start', position: { x: 250, y: 0 } },
+    { id: '2', label: 'Process Data', position: { x: 250, y: 100 } },
+    { id: '3', type: 'output', label: 'Complete', position: { x: 250, y: 200 } },
+  ]}
+  edges={[
+    { id: 'e1-2', source: '1', target: '2', animated: true },
+    { id: 'e2-3', source: '2', target: '3' },
+  ]}
+  description="A simple linear process flow from start to completion."
+  showMiniMap={true}
+  height={450}
 />
 ```
 
 `client:only="react"` is required because React Flow renders to the DOM and has no SSR output.
-
-### Export buttons (optional)
-
-```astro
-<ReactFlowWrapper client:only="react" nodes={nodes} edges={edges} enableExport={true} />
-```
-
-PNG / SVG download buttons appear in the top-right when `enableExport` is enabled.
 
 ## API
 
@@ -70,17 +66,85 @@ If `autoRegisterReact` is disabled and `@astrojs/react` is not present, the inte
 
 ### Component props
 
-| Prop           | Type                  | Description                                                       |
-| -------------- | --------------------- | ----------------------------------------------------------------- |
-| `nodes`        | `Node[]`              | Nodes to render.                                                  |
-| `edges`        | `Edge[]`              | Edges to render.                                                  |
-| `className`    | `string` (optional)   | Additional classes applied to the outer wrapper.                  |
-| `enableExport` | `boolean` (optional)  | Enable PNG / SVG export buttons (default: `false`).               |
+| Prop                 | Type                                       | Default  | Description                                                                 |
+| -------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------------- |
+| `nodes`              | `DiagramNode[]`                            | —        | Nodes to render (see shape below).                                          |
+| `edges`              | `DiagramEdge[]`                            | —        | Edges to render (see shape below).                                          |
+| `title`              | `string`                                   | —        | Title rendered in a header bar above the diagram.                           |
+| `description`        | `string`                                   | —        | Description rendered in a footer bar below the diagram.                     |
+| `width`              | `number \| string`                         | `"100%"` | Container width. Numbers are px; strings pass through.                       |
+| `height`             | `number \| string`                         | `400`    | Container height. Numbers are px; strings pass through.                      |
+| `showMiniMap`        | `boolean`                                  | `false`  | Show the minimap (input/output nodes are color-coded).                       |
+| `showControls`       | `boolean`                                  | `true`   | Show the zoom/pan controls.                                                 |
+| `backgroundVariant`  | `"dots" \| "lines" \| "cross"`             | `"dots"` | Background pattern.                                                          |
+| `allowFocusMode`     | `boolean`                                  | `true`   | Show the expand button that opens fullscreen focus mode (Esc to exit).      |
+| `interactive`        | `boolean`                                  | `false`  | Allow dragging, connecting, and selecting nodes/edges.                       |
+| `fitView`            | `boolean`                                  | `true`   | Fit the diagram to the viewport on load.                                    |
+| `defaultMarkerEnd`   | `"arrow" \| "arrowclosed" \| boolean`      | `false`  | Default arrowhead for all edges.                                            |
+| `defaultStrokeWidth` | `number`                                   | `2`      | Default edge stroke width.                                                  |
+| `colorMode`          | `"auto" \| "light" \| "dark"`              | `"auto"` | `"auto"` follows the host page's theme; pass `"light"`/`"dark"` to pin it.   |
+| `className`          | `string`                                   | —        | Extra classes on the outer wrapper.                                        |
+| `style`              | `CSSProperties`                            | —        | Extra inline styles on the outer wrapper.                                  |
+| `enableExport`       | `boolean`                                  | `false`  | Show PNG / SVG export buttons.                                             |
 
-## Styling
+#### `DiagramNode`
 
-- Base styles ship with the package (`styles.css`) and load with the component.
-- Upstream React Flow styles are imported automatically from `@xyflow/react/dist/style.css`.
+```ts
+interface DiagramNode {
+  id: string;
+  type?: 'default' | 'input' | 'output' | 'group' | string;
+  label: string;                       // hoisted to React Flow's data.label
+  position: { x: number; y: number };
+  style?: CSSProperties;
+  className?: string;
+  parentId?: string;
+  extent?: 'parent';
+}
+```
+
+#### `DiagramEdge`
+
+```ts
+interface DiagramEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  type?: 'default' | 'straight' | 'step' | 'smoothstep' | 'bezier';   // default: smoothstep
+  animated?: boolean;
+  style?: CSSProperties;
+  markerEnd?: 'arrow' | 'arrowclosed' | boolean;   // overrides defaultMarkerEnd
+  strokeWidth?: number;                            // overrides defaultStrokeWidth
+}
+```
+
+## Theming
+
+`colorMode="auto"` (the default) resolves light/dark from the host page and re-evaluates when the theme changes. It checks `<html>` for any of: a `dark` or `scheme-dark` class, `data-theme-scheme="dark"`, or a `data-theme` value containing `"dark"` — falling back to the OS `prefers-color-scheme`. This works out of the box with [`@sjohansson/astro-theme-toggle`](https://www.npmjs.com/package/@sjohansson/astro-theme-toggle), Tailwind's `.dark`, and most attribute-based theme systems. Pass `colorMode="light"` or `colorMode="dark"` to pin it.
+
+The component ships self-contained light/dark styles via overridable CSS custom properties on `.reactflow-wrapper`. Override them to match your site:
+
+| Variable                | Purpose                                  |
+| ----------------------- | ---------------------------------------- |
+| `--arf-surface`         | Diagram canvas background                |
+| `--arf-chrome-surface`  | Title/description/control surfaces       |
+| `--arf-text`            | Body text / node text / edge stroke      |
+| `--arf-heading`         | Title text                               |
+| `--arf-border`          | Borders and node outlines                |
+| `--arf-button-hover-bg` | Button hover background                  |
+| `--arf-input-accent`    | `input` node border + connection line    |
+| `--arf-output-accent`   | `output` node border                     |
+
+```css
+/* Map the wrapper onto your own design tokens */
+.reactflow-wrapper {
+  --arf-surface: var(--my-surface-color);
+  --arf-chrome-surface: var(--my-chrome-color);
+  --arf-border: var(--my-border-color);
+}
+```
+
+The resolved mode is also reflected as `data-color-mode="light" | "dark"` on `.reactflow-wrapper`, so you can target it from your own CSS.
 
 ## Development
 

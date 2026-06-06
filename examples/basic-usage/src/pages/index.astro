@@ -3,14 +3,14 @@ import { ReactFlowWrapper } from "@sjohansson/astro-reactflow";
 import Layout from "../layouts/Layout.astro";
 
 const nodes = [
-  { id: "1", position: { x: 50, y: 50 }, data: { label: "Start" } },
-  { id: "2", position: { x: 50, y: 150 }, data: { label: "Process Data" } },
-  { id: "3", position: { x: 50, y: 250 }, data: { label: "End" } },
+  { id: "1", type: "input", label: "Start", position: { x: 50, y: 0 } },
+  { id: "2", label: "Process Data", position: { x: 50, y: 100 } },
+  { id: "3", type: "output", label: "End", position: { x: 50, y: 200 } },
 ];
 
 const edges = [
   { id: "e1-2", source: "1", target: "2", animated: true },
-  { id: "e2-3", source: "2", target: "3", animated: true },
+  { id: "e2-3", source: "2", target: "3" },
 ];
 ---
 
@@ -46,12 +46,15 @@ const edges = [
 
     <section>
       <h2>React Flow Diagram</h2>
-      <p>Interactive flowchart rendered with React Flow:</p>
+      <p>Flowchart rendered with React Flow — click the expand button to enter focus mode:</p>
       <ReactFlowWrapper
         client:only="react"
+        title="Basic Process Flow"
         nodes={nodes}
         edges={edges}
-        className="h-96 border rounded"
+        description="A simple linear process flow from start to completion."
+        showMiniMap={true}
+        height={400}
       />
     </section>
 
