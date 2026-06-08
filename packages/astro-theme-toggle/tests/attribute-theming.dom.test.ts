@@ -172,6 +172,58 @@ describe("<theme-controller> apply modes", () => {
     expect(root().dataset.themeVariation).toBeUndefined();
     expect(localStorage.getItem("theme-resolved-variation")).toBeNull();
   });
+
+  it("keeps an explicit contrast choice across an astro:after-swap reinit", () => {
+    // Regression: restorePreferences() used to restore family/scheme/variation but
+    // not contrast, so reinit() (fired on each view transition) reset the axis to
+    // 'system' and re-read the OS prefers-contrast — flipping to high-contrast on
+    // devices that report increased contrast, on every navigation.
+    const el = mount("theme-controller", {
+      "apply-mode": "attribute",
+      preset: "accessible",
+    }) as HTMLElement & { setContrast(v: string): void };
+
+    el.setContrast("more");
+    expect(root().dataset.themeContrast).toBe("more");
+    expect(root().dataset.theme).toBe("high-contrast-light");
+
+    // A view transition swap re-inits the controller from storage.
+    document.dispatchEvent(new Event("astro:after-swap"));
+
+    expect(root().dataset.themeContrast).toBe("more");
+    expect(root().dataset.theme).toBe("high-contrast-light");
+  });
+
+  it("keeps an explicit normal-contrast choice across reinit even when the OS reports more", () => {
+    // The mirror case: user opts OUT of high contrast. Before the fix the axis
+    // reverted to 'system' on reinit and followed the OS preference.
+    const original = Object.getOwnPropertyDescriptor(window, "matchMedia");
+    const setMatchMedia = (fn: unknown) =>
+      Object.defineProperty(window, "matchMedia", { value: fn, configurable: true, writable: true });
+    setMatchMedia((query: string) => ({
+      matches: query.includes("prefers-contrast"),
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    try {
+      const el = mount("theme-controller", {
+        "apply-mode": "attribute",
+        preset: "accessible",
+      }) as HTMLElement & { setContrast(v: string): void };
+
+      el.setContrast("normal");
+      expect(root().dataset.themeContrast).toBe("normal");
+      expect(root().dataset.theme).toBe("light");
+
+      document.dispatchEvent(new Event("astro:after-swap"));
+
+      expect(root().dataset.themeContrast).toBe("normal");
+      expect(root().dataset.theme).toBe("light");
+    } finally {
+      if (original) Object.defineProperty(window, "matchMedia", original);
+    }
+  });
 });
 
 describe("<theme-toggle> apply modes", () => {

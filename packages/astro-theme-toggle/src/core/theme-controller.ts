@@ -249,6 +249,10 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     // Axes — validate against allow-lists; any stale legacy value resets.
     const schemeRaw = localStorage.getItem("theme-scheme") ?? localStorage.getItem("theme-mode");
     this.currentScheme = oneOf(schemeRaw, ["system", "light", "dark"], "system");
+    // Contrast was persisted by storePreferences() but never restored here, so it
+    // fell back to the OS prefers-contrast on every reinit / view transition —
+    // flipping to high-contrast on devices that report increased contrast.
+    this.currentContrast = oneOf(localStorage.getItem("theme-contrast"), ["system", "normal", "more"], "system");
     const v = localStorage.getItem("theme-variation") || "normal";
     this.currentVariation = v === "normal" || this.variations.includes(v) ? v : "normal";
   }
