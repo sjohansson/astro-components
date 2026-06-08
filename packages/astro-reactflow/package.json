@@ -1,7 +1,7 @@
 {
   "name": "@sjohansson/astro-reactflow",
   "version": "0.3.0",
-  "description": "React Flow integration for Astro sites",
+  "description": "React Flow diagram integration for Astro sites",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
