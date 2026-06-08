@@ -1,5 +1,11 @@
 # @sjohansson/astro-theme-toggle
 
+## 0.3.1
+
+### Patch Changes
+
+- 3a98a97: Fix missing contrast persistence management in theme controller, leading to contrast issues on devices
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@sjohansson/astro-theme-toggle",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Framework-agnostic theme toggle with Web Components, optional Astro wrappers",
   "type": "module",
   "main": "./dist/core/index.js",
