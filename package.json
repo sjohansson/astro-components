@@ -8,7 +8,7 @@
     "node": ">=24",
     "pnpm": ">=10.0.0"
   },
-  "packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7",
+  "packageManager": "pnpm@11.6.0+sha512.9a36518224080c6fe5165afdcfe79bfa118c29be703f3f462b1e32efe1e98e47e8750b148e08286250aad4113cc7993ca413c4e2cd447752708c2ee5751bc95f",
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" run build",
     "test": "vitest",
@@ -27,13 +27,13 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "@biomejs/biome": "^2.4.16",
+    "@biomejs/biome": "^2.5.0",
     "@changesets/cli": "^2.31.0",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "@vitest/coverage-v8": "^4.1.8",
     "@vitest/ui": "^4.1.8",
-    "astro": "^6.4.4",
-    "happy-dom": "^20.10.1",
+    "astro": "^6.4.6",
+    "happy-dom": "^20.10.3",
     "markdownlint-cli2": "^0.22.1",
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
