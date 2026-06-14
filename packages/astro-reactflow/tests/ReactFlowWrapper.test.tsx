@@ -20,7 +20,8 @@ vi.mock("@xyflow/react", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
     Background: ({ id }: any) => <div data-testid={`background-${id}`} />,
     Controls: () => <div data-testid="controls" />,
-    MiniMap: () => <div data-testid="minimap" />,
+    // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
+    MiniMap: ({ style }: any) => <div data-testid="minimap" data-minimap-style={JSON.stringify(style ?? null)} />,
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
     Panel: ({ children, position }: any) => (
       <div data-testid="panel" data-position={position}>
@@ -55,6 +56,9 @@ const edges: DiagramEdge[] = [
 
 // biome-ignore lint/suspicious/noExplicitAny: parsed JSON from the mock
 const flowProps = (): any => JSON.parse(screen.getByTestId("react-flow").getAttribute("data-props") || "{}");
+
+// biome-ignore lint/suspicious/noExplicitAny: parsed JSON from the mock
+const miniMapStyle = (): any => JSON.parse(screen.getByTestId("minimap").getAttribute("data-minimap-style") || "null");
 
 beforeEach(() => {
   document.body.style.overflow = "";
@@ -283,6 +287,48 @@ describe("ReactFlowWrapper", () => {
     it.each(["dots", "lines", "cross"] as const)("renders the %s variant", (variant) => {
       render(<ReactFlowWrapper nodes={nodes} edges={edges} backgroundVariant={variant} />);
       expect(screen.getByTestId(/background-/)).toBeInTheDocument();
+    });
+  });
+
+  describe("minimap size", () => {
+    it("passes no style when miniMapSize is omitted (keeps the React Flow default)", () => {
+      render(<ReactFlowWrapper nodes={nodes} edges={edges} showMiniMap />);
+      expect(miniMapStyle()).toBeNull();
+    });
+
+    it.each([
+      ["sm", { width: 120, height: 90 }],
+      ["md", { width: 200, height: 150 }],
+      ["lg", { width: 320, height: 240 }],
+    ] as const)("applies the %s preset", (preset, expected) => {
+      render(<ReactFlowWrapper nodes={nodes} edges={edges} showMiniMap miniMapSize={preset} />);
+      expect(miniMapStyle()).toEqual(expected);
+    });
+
+    it("treats a single number as width with a 4:3 height", () => {
+      render(<ReactFlowWrapper nodes={nodes} edges={edges} showMiniMap miniMapSize={160} />);
+      expect(miniMapStyle()).toEqual({ width: 160, height: 120 });
+    });
+
+    it("applies explicit pixel dimensions", () => {
+      render(<ReactFlowWrapper nodes={nodes} edges={edges} showMiniMap miniMapSize={{ width: 240, height: 180 }} />);
+      expect(miniMapStyle()).toEqual({ width: 240, height: 180 });
+    });
+
+    it("resolves percentage dimensions against the pane size", () => {
+      const originalWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth");
+      const originalHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetHeight");
+      Object.defineProperty(HTMLElement.prototype, "offsetWidth", { configurable: true, get: () => 400 });
+      Object.defineProperty(HTMLElement.prototype, "offsetHeight", { configurable: true, get: () => 300 });
+      try {
+        render(
+          <ReactFlowWrapper nodes={nodes} edges={edges} showMiniMap miniMapSize={{ width: "25%", height: "50%" }} />,
+        );
+        expect(miniMapStyle()).toEqual({ width: 100, height: 150 });
+      } finally {
+        if (originalWidth) Object.defineProperty(HTMLElement.prototype, "offsetWidth", originalWidth);
+        if (originalHeight) Object.defineProperty(HTMLElement.prototype, "offsetHeight", originalHeight);
+      }
     });
   });
 });

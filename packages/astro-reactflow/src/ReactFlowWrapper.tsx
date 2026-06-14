@@ -18,7 +18,17 @@ import {
   type Viewport,
 } from "@xyflow/react";
 import { toPng, toSvg } from "html-to-image";
-import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "@xyflow/react/dist/style.css";
 import "./styles.css";
 
@@ -54,6 +64,24 @@ export interface DiagramEdge {
   strokeWidth?: number;
 }
 
+/** Named mini-map size presets (width × height in px, 4:3 like React Flow's default). */
+export type MiniMapPreset = "sm" | "md" | "lg";
+
+/**
+ * A single mini-map dimension. A `number` is treated as px; a string ending in
+ * `%` is relative to the diagram pane (e.g. `"25%"`).
+ */
+export type MiniMapDimension = number | string;
+
+/**
+ * Mini-map size. One of:
+ * - a named preset: `"sm"` (120×90), `"md"` (200×150 — the default), `"lg"` (320×240);
+ * - a single number — width in px, with height derived from the default 4:3 ratio;
+ * - an explicit `{ width, height }` where each value is px (`number`) or a
+ *   percentage of the diagram pane (`string`, e.g. `"25%"`).
+ */
+export type MiniMapSize = MiniMapPreset | number | { width: MiniMapDimension; height: MiniMapDimension };
+
 export interface ReactFlowWrapperProps {
   /** Nodes to render (friendly shape — `label` is hoisted to `data.label`). */
   nodes: DiagramNode[];
@@ -76,6 +104,13 @@ export interface ReactFlowWrapperProps {
   height?: number | string;
   /** Whether to show the mini map (default: false). */
   showMiniMap?: boolean;
+  /**
+   * Mini-map size. A preset (`"sm"` | `"md"` | `"lg"`), a single number (width
+   * in px; height follows the default 4:3 ratio), or an explicit
+   * `{ width, height }` in px (`number`) or as a percentage of the diagram pane
+   * (`string`, e.g. `"25%"`). Defaults to React Flow's 200×150 when omitted.
+   */
+  miniMapSize?: MiniMapSize;
   /** Whether to show the zoom/pan controls (default: true). */
   showControls?: boolean;
   /** Background variant: 'dots', 'lines', or 'cross' (default: 'dots'). */
@@ -106,6 +141,95 @@ export interface ReactFlowWrapperProps {
 }
 
 const toCssDimension = (value: number | string): string => (typeof value === "number" ? `${value}px` : value);
+
+/** React Flow's intrinsic mini-map size — kept identical when no size is set. */
+const MINIMAP_DEFAULT = { width: 200, height: 150 } as const;
+
+/** Named presets, sized 4:3 to match React Flow's default proportions. */
+const MINIMAP_PRESETS: Record<MiniMapPreset, { width: number; height: number }> = {
+  sm: { width: 120, height: 90 },
+  md: { width: MINIMAP_DEFAULT.width, height: MINIMAP_DEFAULT.height },
+  lg: { width: 320, height: 240 },
+};
+
+/** Aspect ratio applied when a single number is given (height = width × this). */
+const MINIMAP_ASPECT = MINIMAP_DEFAULT.height / MINIMAP_DEFAULT.width;
+
+/** A `%` dimension must be measured against the pane before React Flow can use it. */
+const isRelativeDimension = (dimension: MiniMapDimension): boolean =>
+  typeof dimension === "string" && dimension.trim().endsWith("%");
+
+/** Reduce a {@link MiniMapSize} to a width/height pair (each may still be relative). */
+const resolveMiniMapSpec = (size: MiniMapSize): { width: MiniMapDimension; height: MiniMapDimension } => {
+  if (typeof size === "string") {
+    return MINIMAP_PRESETS[size] ?? MINIMAP_DEFAULT;
+  }
+  if (typeof size === "number") {
+    return { width: size, height: Math.round(size * MINIMAP_ASPECT) };
+  }
+  return size;
+};
+
+/** Resolve one dimension to px. `%` strings are taken against `basis` (the pane). */
+const toMiniMapPx = (dimension: MiniMapDimension, basis: number): number => {
+  if (typeof dimension === "number") {
+    return dimension;
+  }
+  const trimmed = dimension.trim();
+  const value = Number.parseFloat(trimmed);
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return trimmed.endsWith("%") ? (value / 100) * basis : value;
+};
+
+/**
+ * Resolve a {@link MiniMapSize} to concrete pixel dimensions for React Flow's
+ * `<MiniMap>`, which needs numeric width/height for its viewport math. Returns
+ * `null` when no size is configured so the mini-map keeps React Flow's defaults.
+ * Percentage dimensions are measured against the diagram pane and tracked with a
+ * `ResizeObserver` so they follow focus-mode and container resizes.
+ */
+const useMiniMapDimensions = (
+  size: MiniMapSize | undefined,
+  paneRef: RefObject<HTMLDivElement | null>,
+): { width: number; height: number } | null => {
+  const spec = useMemo(() => (size === undefined ? null : resolveMiniMapSpec(size)), [size]);
+  const relative = spec !== null && (isRelativeDimension(spec.width) || isRelativeDimension(spec.height));
+
+  const measure = useCallback((): { width: number; height: number } | null => {
+    if (spec === null) {
+      return null;
+    }
+    const pane = paneRef.current;
+    return {
+      width: toMiniMapPx(spec.width, pane?.offsetWidth ?? 0),
+      height: toMiniMapPx(spec.height, pane?.offsetHeight ?? 0),
+    };
+  }, [spec, paneRef]);
+
+  // Non-relative sizes resolve synchronously; relative sizes start from the
+  // default until the pane can be measured in the layout effect below.
+  const [dims, setDims] = useState<{ width: number; height: number } | null>(() =>
+    spec === null ? null : relative ? MINIMAP_DEFAULT : measure(),
+  );
+
+  useLayoutEffect(() => {
+    setDims(measure());
+    if (!relative || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const pane = paneRef.current;
+    if (!pane) {
+      return;
+    }
+    const observer = new ResizeObserver(() => setDims(measure()));
+    observer.observe(pane);
+    return () => observer.disconnect();
+  }, [relative, measure, paneRef]);
+
+  return dims;
+};
 
 /** Resolve the effective dark/light mode from the host page's theme signals. */
 const detectAutoColorMode = (): ColorMode => {
@@ -177,6 +301,7 @@ function ReactFlowWrapperInner({
   width = "100%",
   height = 400,
   showMiniMap = false,
+  miniMapSize,
   showControls = true,
   backgroundVariant = "dots",
   allowFocusMode = true,
@@ -194,6 +319,7 @@ function ReactFlowWrapperInner({
   const [savedViewport, setSavedViewport] = useState<Viewport | null>(null);
 
   const resolvedColorMode = useResolvedColorMode(colorMode);
+  const miniMapDimensions = useMiniMapDimensions(miniMapSize, paneRef);
   const { fitView: fitViewFn, getViewport, setViewport } = useReactFlow();
 
   // Unique id so multiple diagrams on one page don't share a <Background> pattern.
@@ -400,6 +526,9 @@ function ReactFlowWrapperInner({
           {showControls && <Controls showInteractive={false} />}
           {showMiniMap && (
             <MiniMap
+              {...(miniMapDimensions
+                ? { style: { width: miniMapDimensions.width, height: miniMapDimensions.height } }
+                : {})}
               nodeStrokeWidth={1}
               nodeBorderRadius={3}
               zoomable

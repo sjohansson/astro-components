@@ -75,6 +75,7 @@ If `autoRegisterReact` is disabled and `@astrojs/react` is not present, the inte
 | `width`              | `number \| string`                         | `"100%"` | Container width. Numbers are px; strings pass through.                       |
 | `height`             | `number \| string`                         | `400`    | Container height. Numbers are px; strings pass through.                      |
 | `showMiniMap`        | `boolean`                                  | `false`  | Show the minimap (input/output nodes are color-coded).                       |
+| `miniMapSize`        | `MiniMapSize`                              | `"md"` (200×150) | Minimap dimensions (see [`MiniMapSize`](#minimapsize) below).        |
 | `showControls`       | `boolean`                                  | `true`   | Show the zoom/pan controls.                                                 |
 | `backgroundVariant`  | `"dots" \| "lines" \| "cross"`             | `"dots"` | Background pattern.                                                          |
 | `allowFocusMode`     | `boolean`                                  | `true`   | Show the expand button that opens fullscreen focus mode (Esc to exit).      |
@@ -117,6 +118,26 @@ interface DiagramEdge {
   strokeWidth?: number;                            // overrides defaultStrokeWidth
 }
 ```
+
+#### `MiniMapSize`
+
+```ts
+type MiniMapPreset    = 'sm' | 'md' | 'lg';            // 120×90, 200×150, 320×240 (4:3)
+type MiniMapDimension = number | string;               // px number, or a "%" of the pane
+type MiniMapSize      = MiniMapPreset | number | { width: MiniMapDimension; height: MiniMapDimension };
+```
+
+Pass `miniMapSize` to resize the minimap. Omitting it keeps React Flow's default 200×150, so existing usage is unchanged.
+
+```astro
+<ReactFlowWrapper client:only="react" showMiniMap miniMapSize="lg" {...} />          <!-- preset -->
+<ReactFlowWrapper client:only="react" showMiniMap miniMapSize={160} {...} />          <!-- width px, 4:3 height -->
+<ReactFlowWrapper client:only="react" showMiniMap miniMapSize={{ width: 240, height: 180 }} {...} />  <!-- px -->
+<ReactFlowWrapper client:only="react" showMiniMap miniMapSize={{ width: '25%', height: '20%' }} {...} /> <!-- % of pane -->
+```
+
+- A **number** sets the width in px; the height follows the default 4:3 ratio.
+- A **`"%"` string** is measured against the diagram pane and tracked with a `ResizeObserver`, so the minimap rescales with the container and in focus mode. (React Flow needs numeric dimensions internally, so percentages are converted to px for you.)
 
 ## Theming
 

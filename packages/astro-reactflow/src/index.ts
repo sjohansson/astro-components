@@ -1,2 +1,9 @@
-export type { DiagramEdge, DiagramNode, ReactFlowWrapperProps } from "./ReactFlowWrapper";
+export type {
+  DiagramEdge,
+  DiagramNode,
+  MiniMapDimension,
+  MiniMapPreset,
+  MiniMapSize,
+  ReactFlowWrapperProps,
+} from "./ReactFlowWrapper";
 export { default as ReactFlowWrapper } from "./ReactFlowWrapper";
