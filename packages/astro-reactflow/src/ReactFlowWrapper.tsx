@@ -442,16 +442,20 @@ function ReactFlowWrapperInner({
   }, [isFocusMode, toggleFocusMode]);
 
   // Dev-only nudge when the diagram has no size (a common React Flow footgun).
+  // Skipped under test runners: jsdom/happy-dom never lay out, so offset sizes
+  // are always 0 and this would fire a false positive on every mount. Vitest
+  // sets `import.meta.env.MODE` to "test".
   useEffect(() => {
-    if (import.meta.env?.DEV && paneRef.current) {
-      const { offsetWidth, offsetHeight } = paneRef.current;
-      if (offsetWidth === 0 || offsetHeight === 0) {
-        console.warn(
-          `[@sjohansson/astro-reactflow] ReactFlowWrapper rendered with zero size (${offsetWidth}×${offsetHeight}px). ` +
-            "Pass the `height`/`width` props or set a size on the parent container. " +
-            "See https://reactflow.dev/error#004",
-        );
-      }
+    if (!import.meta.env?.DEV || import.meta.env?.MODE === "test") {
+      return;
+    }
+    const pane = paneRef.current;
+    if (pane && (pane.offsetWidth === 0 || pane.offsetHeight === 0)) {
+      console.warn(
+        `[@sjohansson/astro-reactflow] ReactFlowWrapper rendered with zero size (${pane.offsetWidth}×${pane.offsetHeight}px). ` +
+          "Pass the `height`/`width` props or set a size on the parent container. " +
+          "See https://reactflow.dev/error#004",
+      );
     }
   }, []);
 
