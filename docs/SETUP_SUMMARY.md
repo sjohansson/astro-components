@@ -9,19 +9,22 @@ A fully configured, production-ready monorepo for publishing Astro components wi
 ## 📦 Tech Stack
 
 ### Core Technologies
+
 - **Node.js 24**: Latest LTS with enhanced performance
-- **pnpm 9**: Fast, efficient package manager with workspace support
-- **TypeScript 5.7**: Strict type checking with latest features
-- **Astro 5, 6, or 7**: Modern web framework (peer dependency; dev-pinned to 6)
+- **pnpm 11**: Fast, efficient package manager with workspace support
+- **TypeScript 6**: Strict type checking with latest features
+- **Astro 5, 6, or 7**: Modern web framework (peer dependency; dev-pinned to 7)
 - **Tailwind CSS 4**: Utility-first CSS framework (for theme-toggle component)
 
 ### Development Tools
+
 - **Biome 1.9**: Ultra-fast linter and formatter (replaces ESLint + Prettier)
 - **Vitest 2**: Modern test framework with native ESM support
 - **tsdown 0.22**: Rolldown-based TypeScript bundler for component libraries
 - **happy-dom**: Lightweight DOM implementation for testing
 
 ### Automation & Publishing
+
 - **Changesets**: Automated versioning and changelog generation
 - **GitHub Actions**: CI/CD pipelines for testing and publishing
 - **Renovate**: Automated dependency updates
@@ -29,7 +32,7 @@ A fully configured, production-ready monorepo for publishing Astro components wi
 
 ## 📁 Project Structure
 
-```
+```text
 astro-components/
 ├── .changeset/              # Changesets configuration
 │   ├── config.json
@@ -88,15 +91,18 @@ astro-components/
 ## 🔧 Configuration Files
 
 ### Package Management
+
 - **pnpm-workspace.yaml**: Defines workspace packages
 - **.npmrc**: npm registry configuration
 - **package.json**: Root package with scripts and devDependencies
 
 ### TypeScript
+
 - **tsconfig.json**: Base TypeScript config with strict settings
 - **packages/*/tsconfig.json**: Per-package TypeScript configs
 
 ### Linting & Formatting
+
 - **biome.json**: Comprehensive Biome configuration
   - Strict linting rules
   - Consistent code formatting
@@ -104,12 +110,14 @@ astro-components/
   - Language-specific overrides
 
 ### Testing
+
 - **vitest.config.ts**: Vitest configuration
   - happy-dom environment
   - Coverage reporting (text, json, html)
   - Test file patterns
 
 ### Build
+
 - **packages/*/tsdown.config.ts**: Build configuration per package
   - ESM output
   - TypeScript declarations
@@ -117,14 +125,17 @@ astro-components/
   - Tree shaking
 
 ### Documentation
+
 - **.markdownlint-cli2.yaml**: Markdown linting rules
 
 ### Git Hooks
+
 - **package.json** (simple-git-hooks + lint-staged):
   - Pre-commit: Biome linting/formatting
   - Pre-commit: Markdown linting
 
 ### CI/CD
+
 - **.github/workflows/ci.yml**: Continuous Integration
   - Lint with Biome
   - Type check with TypeScript
@@ -137,6 +148,7 @@ astro-components/
   - Publish to npm automatically
 
 ### Dependency Management
+
 - **renovate.json**: Automated dependency updates
   - Scheduled updates (weekly)
   - Grouped by type (major/minor/patch)
@@ -147,6 +159,7 @@ astro-components/
 ## 🚀 Available Scripts
 
 ### Development
+
 ```bash
 pnpm dev            # Run all packages in dev/watch mode
 pnpm build          # Build all packages
@@ -154,6 +167,7 @@ pnpm clean          # Clean all build outputs and node_modules
 ```
 
 ### Testing
+
 ```bash
 pnpm test           # Run tests in watch mode
 pnpm test:ui        # Run tests with UI
@@ -161,6 +175,7 @@ pnpm test:coverage  # Generate coverage report
 ```
 
 ### Code Quality
+
 ```bash
 pnpm lint           # Lint code with Biome
 pnpm lint:fix       # Lint and auto-fix
@@ -170,6 +185,7 @@ pnpm check          # Run all checks (lint + typecheck + test)
 ```
 
 ### Versioning & Publishing
+
 ```bash
 pnpm changeset           # Create a changeset
 pnpm changeset:version   # Update versions from changesets
@@ -185,6 +201,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 ## 🎨 VS Code Setup
 
 ### Recommended Extensions
+
 1. **Biome** (biomejs.biome) - Linting and formatting
 2. **Astro** (astro-build.astro-vscode) - Astro language support
 3. **Tailwind CSS IntelliSense** (bradlc.vscode-tailwindcss) - Tailwind support
@@ -193,6 +210,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 6. **TypeScript** (ms-vscode.vscode-typescript-next) - Latest TypeScript features
 
 ### Workspace Settings
+
 - Auto-format on save with Biome
 - Organize imports on save
 - Astro file support
@@ -201,24 +219,28 @@ For GitHub Actions to work properly, add these secrets to your repository:
 ## 🎯 Key Features
 
 ### Automated Workflows
+
 1. **Pull Request Checks**: Every PR runs linting, type checking, tests, and builds
 2. **Automated Releases**: Changesets creates version PRs automatically
 3. **Dependency Updates**: Renovate keeps dependencies up-to-date
 4. **Pre-commit Hooks**: Code quality checks before every commit
 
 ### Code Quality
+
 - Strict TypeScript configuration
 - Comprehensive Biome linting rules
 - 100% type coverage enforcement
 - Automated code formatting
 
 ### Testing
+
 - Modern test framework (Vitest)
 - Coverage reporting
 - UI mode for debugging
 - Fast test execution
 
 ### Developer Experience
+
 - Fast package manager (pnpm)
 - Hot reload in dev mode
 - Clear error messages
@@ -235,6 +257,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 ## 🔄 Workflow Examples
 
 ### Adding a New Component
+
 1. Create new folder in `packages/`
 2. Add package.json, tsconfig.json, tsdown.config.ts
 3. Implement component in `src/`
@@ -244,6 +267,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 7. Commit and create PR
 
 ### Making Changes
+
 1. Create feature branch
 2. Make changes
 3. Run `pnpm check` to verify
@@ -252,6 +276,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 6. Create PR
 
 ### Publishing
+
 1. Merge PR to main
 2. Changesets creates version PR
 3. Review and merge version PR
@@ -260,6 +285,7 @@ For GitHub Actions to work properly, add these secrets to your repository:
 ## 🆘 Troubleshooting
 
 ### Build Issues
+
 ```bash
 pnpm clean
 pnpm install
@@ -267,16 +293,19 @@ pnpm build
 ```
 
 ### Type Errors
+
 ```bash
 pnpm typecheck
 ```
 
 ### Lint Issues
+
 ```bash
 pnpm lint:fix
 ```
 
 ### Test Failures
+
 ```bash
 pnpm test:ui  # Debug with UI
 ```
