@@ -1,5 +1,16 @@
 # basic-usage-example
 
+## 0.1.5
+
+### Patch Changes
+
+- d626f72: bump dependencies, update examples to Astro 7
+- Updated dependencies [d626f72]
+- Updated dependencies [624201f]
+  - @sjohansson/astro-reactflow@0.4.1
+  - @sjohansson/astro-theme-toggle@0.3.2
+  - @sjohansson/astro-version-note@0.2.1
+
 ## 0.1.4
 
 ### Patch Changes
