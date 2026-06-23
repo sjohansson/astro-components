@@ -111,9 +111,10 @@ Each package must:
     "src"
   ],
   
-  // Define peer dependencies (what consumers must have)
+  // Define peer dependencies (what consumers must have).
+  // Span whole majors so the package installs across Astro releases.
   "peerDependencies": {
-    "astro": "^6.0.0"
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
   },
 
   // NPM publishing configuration
@@ -367,7 +368,7 @@ Define what consumers **must** have:
 ```json
 {
   "peerDependencies": {
-    "astro": "^6.0.0",
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0",
     "react": "^19.0.0"
   },
   "peerDependenciesMeta": {

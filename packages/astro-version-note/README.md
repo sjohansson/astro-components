@@ -1,6 +1,6 @@
 # Astro Version Note
 
-A small, framework-agnostic version note component for Astro 6+ documentation sites. Ships minimal styles and no runtime dependencies so it can be published and consumed independently.
+A small, framework-agnostic version note component for Astro 5, 6, and 7 documentation sites. Ships minimal styles and no runtime dependencies so it can be published and consumed independently.
 
 ## Installation
 

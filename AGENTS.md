@@ -4,7 +4,7 @@
 > Copilot Workspace, and GitHub agent session runners.
 
 A pnpm monorepo of framework-agnostic Web Component libraries designed for use in
-Astro v6 sites. Each package builds to pure ESM JavaScript — no `.astro` files are
+Astro 5, 6, or 7 sites. Each package builds to pure ESM JavaScript — no `.astro` files are
 distributed.
 
 ## Project Layout
@@ -33,7 +33,7 @@ biome.json               # Linter & formatter config
 | Node.js (dev)   | 24        | Local development (pinned in `.node-version`) |
 | pnpm            | 10.x      | Package manager (corepack-managed)    |
 | TypeScript      | 6.x       | Type checking & declaration emit      |
-| Astro           | 6.x       | Peer dependency for integrations      |
+| Astro           | 5, 6, or 7 | Peer dependency for integrations (dev-pinned to 6) |
 | tsdown          | 0.22.x    | Build (ESM bundles + .d.ts, Rolldown) |
 | Vite            | 8.x       | Dev server & test infrastructure      |
 | Vitest          | 4.x       | Test runner (happy-dom environment)   |
@@ -48,7 +48,7 @@ React Flow diagram wrapper for Astro. Ships a React component (`ReactFlowWrapper
 and an optional Astro integration for SSR configuration.
 
 - **Component type:** React (requires `@astrojs/react`, used with `client:only="react"`)
-- **Peer deps:** `astro ^6`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
+- **Peer deps:** `astro ^5 || ^6 || ^7`, `@astrojs/react ^4 || ^5`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
 - **Exports:** `.` (component), `./integration` (Astro integration)
 
 ### `@sjohansson/astro-theme-toggle`
@@ -57,7 +57,7 @@ Framework-agnostic theme system built on Web Components. Provides a toggle butto
 a multi-theme controller, and a preview palette — all as custom elements.
 
 - **Component type:** Web Components (custom elements, Light DOM)
-- **Peer deps:** `astro ^6` (optional)
+- **Peer deps:** `astro ^5 || ^6 || ^7` (optional)
 - **Exports:** `.` (all), `./core` (Web Components only), `./astro` (re-exports + integration), `./integration`, `./themes`, `./themes/*`
 - **SPA nav:** `astro:after-swap` listeners with proper cleanup in `disconnectedCallback`
 
@@ -66,7 +66,7 @@ a multi-theme controller, and a preview palette — all as custom elements.
 Simple version callout badge for documentation sites. Renders as `<version-note>` custom element.
 
 - **Component type:** Web Component (custom element, Light DOM)
-- **Peer deps:** `astro ^6`
+- **Peer deps:** `astro ^5 || ^6 || ^7`
 - **Exports:** `.` (component + register fn), `./integration` (Astro integration)
 - **Attributes:** `version`, `type` (`info` | `warning` | `success` | `error`)
 

@@ -1,6 +1,6 @@
 # Astro Theme Toggle
 
-A comprehensive, SSR-friendly theme system built for Astro 6+. Supports multiple theme modes including light, dark, high-contrast variants, and system preference detection. Works with Tailwind CSS 4 or plain CSS and persists user preferences using `localStorage`.
+A comprehensive, SSR-friendly theme system built for Astro 5, 6, and 7. Supports multiple theme modes including light, dark, high-contrast variants, and system preference detection. Works with Tailwind CSS 4 or plain CSS and persists user preferences using `localStorage`.
 
 ## Features
 

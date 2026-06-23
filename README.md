@@ -1,6 +1,6 @@
 # Astro Components
 
-A collection of modern, well-tested Astro components built with TypeScript, designed for Astro 6+ projects.
+A collection of modern, well-tested Astro components built with TypeScript, designed for Astro 5, 6, and 7 projects.
 
 [![CI](https://github.com/sjohansson/astro-components/workflows/CI/badge.svg)](https://github.com/sjohansson/astro-components/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

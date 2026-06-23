@@ -1,6 +1,6 @@
 # Astro React Flow
 
-Drop-in React Flow diagrams for Astro 6+. Ships a feature-complete `ReactFlowWrapper` component — integrated title/description, fullscreen **focus mode**, minimap, background variants, automatic light/dark theming, and optional PNG/SVG export — plus an integration that auto-registers `@astrojs/react` and configures the Vite SSR settings React Flow needs.
+Drop-in React Flow diagrams for Astro 5, 6, and 7. Ships a feature-complete `ReactFlowWrapper` component — integrated title/description, fullscreen **focus mode**, minimap, background variants, automatic light/dark theming, and optional PNG/SVG export — plus an integration that auto-registers `@astrojs/react` and configures the Vite SSR settings React Flow needs.
 
 ## Installation
 

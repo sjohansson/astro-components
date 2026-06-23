@@ -191,9 +191,9 @@ Each package is versioned independently. Always check the version compatibility:
 ### 2. Peer Dependencies
 Check each package's peer dependencies:
 
-- **astro-theme-toggle**: `astro@^6.0.0`, optional `tailwindcss@^4.0.0`
-- **astro-version-note**: `astro@^6.0.0`
-- **astro-reactflow**: `astro@^6.0.0`, `@astrojs/react@^5.0.0`, `react@^19.0.0`, `react-dom@^19.0.0`, `@xyflow/react`
+- **astro-theme-toggle**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0` (optional), optional `tailwindcss@^4.0.0`
+- **astro-version-note**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`
+- **astro-reactflow**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`, `@astrojs/react@^4.0.0 || ^5.0.0`, `react@^19.0.0`, `react-dom@^19.0.0`, `@xyflow/react`
 
 ### 3. Type Safety
 All integrations are fully typed. Use TypeScript for the best development experience:

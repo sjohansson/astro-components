@@ -12,7 +12,7 @@ A fully configured, production-ready monorepo for publishing Astro components wi
 - **Node.js 24**: Latest LTS with enhanced performance
 - **pnpm 9**: Fast, efficient package manager with workspace support
 - **TypeScript 5.7**: Strict type checking with latest features
-- **Astro 6**: Modern web framework
+- **Astro 5, 6, or 7**: Modern web framework (peer dependency; dev-pinned to 6)
 - **Tailwind CSS 4**: Utility-first CSS framework (for theme-toggle component)
 
 ### Development Tools

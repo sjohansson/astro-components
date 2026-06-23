@@ -45,9 +45,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@astrojs/react": "^5.0.7",
+    "@astrojs/react": "^4.0.0 || ^5.0.0",
     "@xyflow/react": "^12.3.5",
-    "astro": "^6.0.0",
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
