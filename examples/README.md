@@ -7,6 +7,7 @@ This directory contains example projects demonstrating how to use the Astro comp
 ### [Basic Usage](./basic-usage)
 
 Demonstrates all three integrations working together in a single Astro project:
+
 - Theme Toggle for dark/light mode
 - Version Note for documentation callouts
 - React Flow for interactive diagrams
@@ -53,11 +54,12 @@ Visit `http://localhost:4321` to see the example in action.
 }
 ```
 
-4. Add your example to the workspace by including it in the root `pnpm-workspace.yaml`
+1. Add your example to the workspace by including it in the root `pnpm-workspace.yaml`
 
 ## Testing Examples
 
 Examples serve multiple purposes:
+
 - **Documentation**: Show real-world usage
 - **Testing**: Verify integrations work correctly
 - **Development**: Test changes during development

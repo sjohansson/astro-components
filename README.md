@@ -112,7 +112,7 @@ pnpm dev            # Run dev mode for all packages
 
 ### Project Structure
 
-```
+```text
 astro-components/
 ├── .changeset/              # Changesets configuration
 ├── .github/

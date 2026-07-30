@@ -3,6 +3,7 @@
 This guide explains how to use the components in this repository as Astro integrations or as standalone components.
 
 ## Table of Contents
+
 - [What's the Difference?](#whats-the-difference)
 - [Integration Usage](#integration-usage)
 - [Component Usage](#component-usage)
@@ -12,7 +13,9 @@ This guide explains how to use the components in this repository as Astro integr
 ## What's the Difference?
 
 ### Astro Integration
+
 An **Astro integration** is a plugin that extends Astro's functionality through its Integration API. Integrations can:
+
 - Run setup code during build/dev time
 - Modify Astro configuration
 - Inject scripts and styles globally
@@ -20,11 +23,13 @@ An **Astro integration** is a plugin that extends Astro's functionality through 
 - Provide automatic configuration for components
 
 ### Standalone Component
+
 A **standalone component** is simply imported and used directly in your `.astro` files without any special setup.
 
 ## Integration Usage
 
 Each package provides both an integration and a component. Using the integration gives you:
+
 - Automatic setup and configuration
 - Global scripts/styles when needed
 - Better defaults and automatic optimizations
@@ -58,6 +63,7 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 ```
 
 **Benefits of using the integration:**
+
 - Automatic theme persistence script injection (if enabled)
 - Better SSR handling
 - Fewer flash-of-unstyled-content issues
@@ -93,6 +99,7 @@ import { VersionNote } from '@sjohansson/astro-version-note';
 ```
 
 **Benefits of using the integration:**
+
 - Global configuration for consistent styling
 - Default values applied automatically
 
@@ -136,6 +143,7 @@ const edges = [];
 ```
 
 **Benefits of using the integration:**
+
 - Automatic detection of missing dependencies
 - Proper SSR configuration for React Flow
 - Optimized Vite configuration
@@ -162,13 +170,15 @@ This works fine for simple use cases, but you lose the benefits of automatic con
 
 ## When to Use Which?
 
-### Use the Integration when:
+### Use the Integration when
+
 - You want automatic setup and best practices
 - You need global configuration
 - You're using the component extensively throughout your site
 - You want helpful warnings and validation
 
-### Use Components Directly when:
+### Use Components Directly when
+
 - You need minimal setup
 - You're only using the component in one or two places
 - You want full manual control over configuration
@@ -177,6 +187,7 @@ This works fine for simple use cases, but you lose the benefits of automatic con
 ## Best Practices
 
 ### 1. Independent Versioning
+
 Each package is versioned independently. Always check the version compatibility:
 
 ```json
@@ -189,6 +200,7 @@ Each package is versioned independently. Always check the version compatibility:
 ```
 
 ### 2. Peer Dependencies
+
 Check each package's peer dependencies:
 
 - **astro-theme-toggle**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0` (optional), optional `tailwindcss@^4.0.0`
@@ -196,6 +208,7 @@ Check each package's peer dependencies:
 - **astro-reactflow**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`, `@astrojs/react@^4.0.0 || ^5.0.0`, `react@^19.0.0`, `react-dom@^19.0.0`, `@xyflow/react`
 
 ### 3. Type Safety
+
 All integrations are fully typed. Use TypeScript for the best development experience:
 
 ```ts
@@ -213,12 +226,15 @@ export default defineConfig({
 ```
 
 ### 4. Progressive Enhancement
+
 Integrations are designed for progressive enhancement:
+
 - They work without JavaScript when possible
 - They enhance the experience when JavaScript is available
 - They respect user preferences (like prefers-color-scheme)
 
 ### 5. Testing
+
 Test your integration setup:
 
 ```bash
@@ -233,6 +249,7 @@ pnpm build
 If you're already using a component directly, migrating to the integration is easy:
 
 **Before:**
+
 ```astro
 ---
 import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
@@ -241,7 +258,9 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 ```
 
 **After:**
+
 1. Add the integration to your config:
+
 ```js
 // astro.config.mjs
 import themeToggle from '@sjohansson/astro-theme-toggle/integration';
@@ -251,7 +270,8 @@ export default defineConfig({
 });
 ```
 
-2. Keep using the component as before (no changes needed):
+1. Keep using the component as before (no changes needed):
+
 ```astro
 ---
 import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
@@ -264,16 +284,19 @@ The component works the same way, but now benefits from the integration's automa
 ## Troubleshooting
 
 ### Integration not loading
+
 - Ensure the integration is listed in `astro.config.mjs`
 - Check that you're importing from the `/integration` subpath
 - Restart your dev server after adding an integration
 
 ### Type errors
+
 - Ensure you're using compatible versions of Astro (5.0.0+)
 - Check that peer dependencies are installed
 - Restart your TypeScript server in your editor
 
 ### Build errors
+
 - Check the build output for integration warnings
 - Verify that all peer dependencies are satisfied
 - Ensure your configuration options match the expected types

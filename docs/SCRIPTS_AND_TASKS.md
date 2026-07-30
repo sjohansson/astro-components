@@ -5,6 +5,7 @@ This project uses **manual PowerShell scripts and VS Code tasks** for quality ch
 ## Why Not Git Hooks?
 
 Git hooks on Windows have notorious issues:
+
 - ❌ VS Code's git integration bypasses shell hooks
 - ❌ Unreliable execution from VS Code's Source Control UI
 - ❌ Path resolution issues with pnpm on Windows
@@ -17,10 +18,13 @@ Git hooks on Windows have notorious issues:
 All scripts are in the `scripts/` directory. Run them before committing.
 
 ### `scripts\fix.ps1` - Auto-Fix Issues
+
 ```powershell
 .\scripts\fix.ps1
 ```
+
 **What it does:**
+
 - Formats code with Biome
 - Auto-fixes linting issues
 - Handles all fixable code problems
@@ -30,10 +34,13 @@ All scripts are in the `scripts/` directory. Run them before committing.
 **Time:** ~10 seconds
 
 ### `scripts\pre-commit.ps1` - Pre-Commit Checks
+
 ```powershell
 .\scripts\pre-commit.ps1
 ```
+
 **What it does:**
+
 - Lints code with Biome
 - Type checks with TypeScript
 - Runs all tests
@@ -44,14 +51,18 @@ All scripts are in the `scripts/` directory. Run them before committing.
 **Time:** ~30-60 seconds
 
 **Exit codes:**
+
 - `0` = All checks passed ✅
 - `1` = Checks failed ❌
 
 ### `scripts\full-check.ps1` - Full Verification
+
 ```powershell
 .\scripts\full-check.ps1
 ```
+
 **What it does:**
+
 - Clean previous builds
 - Install dependencies
 - Build all packages
@@ -69,9 +80,11 @@ All scripts are in the `scripts/` directory. Run them before committing.
 Instead of opening PowerShell separately, run scripts directly from VS Code.
 
 ### Open Task Menu
+
 Press `Ctrl+Shift+B` (Windows) or `Cmd+Shift+B` (Mac)
 
 ### Available Tasks
+
 1. **Pre-commit checks** - Run before every commit
 2. **Auto-fix issues** - Format and fix code
 3. **Full verification** - Comprehensive check
@@ -116,6 +129,7 @@ pnpm dev                # Dev mode with watch
 ## Best Practices
 
 ### Before Every Commit
+
 1. Run `.\scripts\pre-commit.ps1` (or use VS Code task)
 2. Review any failures
 3. Fix issues (use `.\scripts\fix.ps1` for auto-fixes)
@@ -123,12 +137,14 @@ pnpm dev                # Dev mode with watch
 5. Commit
 
 ### Before Creating a PR
+
 1. Run `.\scripts\pre-commit.ps1`
 2. Ensure all checks pass
 3. Push your branch
 4. Create PR on GitHub
 
 ### Before Releasing
+
 1. Run `.\scripts\full-check.ps1`
 2. Ensure everything passes
 3. Create changeset: `pnpm changeset`
@@ -138,34 +154,42 @@ pnpm dev                # Dev mode with watch
 ## Troubleshooting
 
 ### Script Won't Run
+
 **Issue:** "cannot be loaded because running scripts is disabled"
 
 **Fix:** Enable script execution
+
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ### Task Won't Execute
+
 **Issue:** Task shows error when run from VS Code
 
-**Fix:** 
+**Fix:**
+
 1. Open PowerShell manually
 2. Navigate to project root
 3. Run script directly: `.\scripts\pre-commit.ps1`
 4. Check for error messages
 
 ### Slow Performance
+
 **Issue:** Tasks take too long
 
 **Solution:**
+
 - First run is slow (builds dependencies) - subsequent runs are fast
 - Use `pnpm test` instead of `pnpm test run` for watch mode
 - Use specific tasks instead of `full-check.ps1` for quick checks
 
 ### Linting Fails But VS Code Shows No Errors
+
 **Issue:** Biome CLI fails but VS Code extension doesn't show errors
 
 **Solution:**
+
 1. Install Biome extension: `biomejs.biome`
 2. Reload VS Code
 3. Check extension output for detailed errors
@@ -174,6 +198,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ## Integration with GitHub Actions
 
 Local scripts match the CI pipeline:
+
 - **CI workflow** (`.github/workflows/ci.yml`) runs the same checks on every PR
 - **Pre-commit script** = GitHub CI checks
 - If your code passes locally, it should pass CI
@@ -181,22 +206,28 @@ Local scripts match the CI pipeline:
 ## Tips for Windows Development
 
 ### Enable Format on Save
+
 Add to `.vscode/settings.json`:
+
 ```json
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "biomejs.biome"
 }
 ```
+
 This auto-fixes formatting issues as you type.
 
 ### Keyboard Shortcuts
+
 Create custom shortcuts in VS Code:
+
 1. Press `Ctrl+K Ctrl+S` (keyboard shortcuts)
 2. Search for "Tasks: Run Task"
 3. Add shortcut like `Ctrl+Alt+C` for quick access
 
 ### Performance Tips
+
 - Keep VS Code integrated terminal open
 - Run `pnpm test` in background terminal (watch mode)
 - Use `pnpm test:ui` for interactive debugging

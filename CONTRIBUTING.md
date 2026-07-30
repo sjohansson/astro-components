@@ -54,6 +54,7 @@ pnpm changeset
 ```
 
 Follow the prompts to:
+
 - Select which packages are affected
 - Choose the version bump type (major, minor, patch)
 - Describe your changes
@@ -98,6 +99,7 @@ Before every commit, run:
 ```
 
 Or use VS Code tasks (press `Ctrl+Shift+B`):
+
 - **Pre-commit checks** - Run before committing
 - **Auto-fix issues** - Format and fix code
 
@@ -135,7 +137,7 @@ pnpm --filter @sjohansson/astro-theme-toggle build
 
 ## Project Structure
 
-```
+```text
 astro-components/
 ├── packages/
 │   ├── astro-reactflow/      # React Flow integration

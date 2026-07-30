@@ -5,16 +5,19 @@ This guide will help you get started with developing, building, and publishing A
 ## Initial Setup
 
 1. **Install pnpm** (if not already installed):
+
    ```bash
    npm install -g pnpm
    ```
 
 2. **Install dependencies**:
+
    ```bash
    pnpm install
    ```
 
 3. **Install Git hooks**:
+
    ```bash
    pnpm prepare
    ```
@@ -24,6 +27,7 @@ This guide will help you get started with developing, building, and publishing A
 ### Making Changes
 
 1. **Create a new branch**:
+
    ```bash
    git checkout -b feature/my-new-feature
    ```
@@ -31,16 +35,19 @@ This guide will help you get started with developing, building, and publishing A
 2. **Make your changes** in the appropriate package under `packages/`
 
 3. **Build your changes**:
+
    ```bash
    pnpm build
    ```
 
 4. **Run tests**:
+
    ```bash
    pnpm test
    ```
 
 5. **Check code quality**:
+
    ```bash
    pnpm check
    ```
@@ -54,6 +61,7 @@ pnpm changeset
 ```
 
 Follow the prompts:
+
 - Select the packages affected by your changes
 - Choose the version bump type:
   - **major**: Breaking changes (e.g., API changes)
@@ -70,6 +78,7 @@ git push origin feature/my-new-feature
 ```
 
 The pre-commit hook will:
+
 - Run Biome to lint and format your code
 - Check markdown files with markdownlint
 
@@ -85,6 +94,7 @@ The pre-commit hook will:
 ### Automated Publishing (Recommended)
 
 When changes are merged to `main`, the release workflow will:
+
 1. Create a "Version Packages" PR with updated versions and changelogs
 2. When that PR is merged, automatically publish to npm
 
@@ -93,21 +103,25 @@ When changes are merged to `main`, the release workflow will:
 If you need to publish manually:
 
 1. **Version packages**:
+
    ```bash
    pnpm changeset:version
    ```
 
 2. **Build packages**:
+
    ```bash
    pnpm build
    ```
 
 3. **Publish to npm**:
+
    ```bash
    pnpm changeset:publish
    ```
 
    Note: You need to be logged in to npm with publishing rights:
+
    ```bash
    npm login
    ```
@@ -117,7 +131,7 @@ If you need to publish manually:
 ### Publishing for the First Time
 
 1. **Set up npm authentication**:
-   - Create an npm account at https://www.npmjs.com
+   - Create an npm account at <https://www.npmjs.com>
    - Run `npm login` locally
    - For GitHub Actions, add `NPM_TOKEN` secret to your repository
 
@@ -126,6 +140,7 @@ If you need to publish manually:
    - Change `@sjohansson` to your npm organization/username
 
 3. **Verify package access**:
+
    ```bash
    npm access public @sjohansson/astro-theme-toggle
    ```
@@ -135,11 +150,13 @@ If you need to publish manually:
 To test a component in another project before publishing:
 
 1. **Build the package**:
+
    ```bash
    pnpm --filter @sjohansson/astro-theme-toggle build
    ```
 
 2. **Link the package** in your test project:
+
    ```bash
    cd /path/to/test-project
    pnpm link /path/to/astro-components/packages/astro-theme-toggle
@@ -152,6 +169,7 @@ To test a component in another project before publishing:
 ### Build Errors
 
 If you encounter build errors:
+
 ```bash
 pnpm clean
 pnpm install
@@ -161,6 +179,7 @@ pnpm build
 ### Type Errors
 
 Check TypeScript errors:
+
 ```bash
 pnpm typecheck
 ```
@@ -168,6 +187,7 @@ pnpm typecheck
 ### Lint Errors
 
 Auto-fix lint issues:
+
 ```bash
 pnpm lint:fix
 ```
@@ -175,11 +195,13 @@ pnpm lint:fix
 ### Test Failures
 
 Run tests in watch mode for debugging:
+
 ```bash
 pnpm test
 ```
 
 Or with UI:
+
 ```bash
 pnpm test:ui
 ```
@@ -210,6 +232,7 @@ Recommended extensions are listed in `.vscode/extensions.json`. Install them for
 ### Required Secrets
 
 Add these secrets to your GitHub repository:
+
 - `NPM_TOKEN`: Your npm authentication token
 
 ## Need Help?
