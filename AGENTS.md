@@ -48,7 +48,7 @@ React Flow diagram wrapper for Astro. Ships a React component (`ReactFlowWrapper
 and an optional Astro integration for SSR configuration.
 
 - **Component type:** React (requires `@astrojs/react`, used with `client:only="react"`)
-- **Peer deps:** `astro ^5 || ^6 || ^7`, `@astrojs/react ^4 || ^5`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
+- **Peer deps:** `astro ^5 || ^6 || ^7`, `@astrojs/react ^4 || ^5 || ^6`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
 - **Exports:** `.` (component), `./integration` (Astro integration)
 
 ### `@sjohansson/astro-theme-toggle`

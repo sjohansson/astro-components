@@ -205,7 +205,7 @@ Check each package's peer dependencies:
 
 - **astro-theme-toggle**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0` (optional), optional `tailwindcss@^4.0.0`
 - **astro-version-note**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`
-- **astro-reactflow**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`, `@astrojs/react@^4.0.0 || ^5.0.0`, `react@^19.0.0`, `react-dom@^19.0.0`, `@xyflow/react`
+- **astro-reactflow**: `astro@^5.0.0 || ^6.0.0 || ^7.0.0`, `@astrojs/react@^4.0.0 || ^5.0.0 || ^6.0.0`, `react@^19.0.0`, `react-dom@^19.0.0`, `@xyflow/react`
 
 ### 3. Type Safety
 
