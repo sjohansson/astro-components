@@ -9,7 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/react": "^6.0.0",
+    "@astrojs/react": "^6.0.2",
     "@sjohansson/astro-reactflow": "workspace:*",
     "@sjohansson/astro-theme-toggle": "workspace:*",
     "@sjohansson/astro-version-note": "workspace:*",
