@@ -14,7 +14,7 @@
     "@sjohansson/astro-theme-toggle": "workspace:*",
     "@sjohansson/astro-version-note": "workspace:*",
     "@xyflow/react": "^12.11.0",
-    "astro": "^7.0.0",
+    "astro": "^7.1.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
