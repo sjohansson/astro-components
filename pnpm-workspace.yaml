@@ -6,6 +6,9 @@ allowBuilds:
   sharp: true
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
+  - baseline-browser-mapping@2.11.16
+  - devalue@5.9.1
+  - electron-to-chromium@1.5.412
   - '@astrojs/markdown-satteri@0.3.1'
   - '@astrojs/react@6.0.0'
   - astro@7.0.0
