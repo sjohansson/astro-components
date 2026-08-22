@@ -19,6 +19,7 @@ examples/
   theming-showcase/      # Theme toggle showcase
 .changeset/              # Changesets config (versioning & publishing)
 .github/workflows/       # CI/CD (GitHub Actions)
+.github/social-preview.png # GitHub social preview image (see Repository Metadata)
 tsdown.package.config.ts # Shared tsdown build factory
 vitest.config.ts         # Shared test config
 tsconfig.json            # Root TypeScript config (all packages extend this)
@@ -169,6 +170,15 @@ GitHub Actions (`.github/workflows/`):
 
 All CI jobs use `pnpm/action-setup@v4` + `actions/setup-node@v4` with
 `pnpm install --frozen-lockfile`.
+
+## Repository Metadata
+
+- `.github/social-preview.png` is the **source of truth** for the GitHub social
+  preview (Open Graph) image shown when the repo is shared.
+- GitHub has no API or in-repo config for this — the image is uploaded manually at
+  **Settings → Social preview**. Whenever the file changes, it must be re-uploaded
+  there to stay in sync.
+- Constraints: 1280×640 (2:1 ratio), under 1 MB (GitHub upload limit).
 
 ## Do Not
 
