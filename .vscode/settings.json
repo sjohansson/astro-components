@@ -9,6 +9,11 @@
       "file": ".github/copilot-commit-message-instructions.md"
     }
   ],
+  // Workaround for 422 promptFiltered on commit message generation
+  // (custom instructions trip the RAI filter on gpt-4o-mini):
+  // https://github.com/microsoft/vscode/issues/327959
+  // The "Value is not accepted" warning on this setting is expected; it still works.
+  "chat.utilitySmallModel": "copilot/gpt-5.4-mini",
   "files.associations": {
     "*.astro": "astro"
   },
