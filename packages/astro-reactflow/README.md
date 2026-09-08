@@ -24,7 +24,19 @@ export default defineConfig({
 });
 ```
 
-That's it — no need to manually add `react()` to your integrations. The React renderer is auto-registered.
+That's it — no need to manually add `react()` to your integrations. The React renderer is auto-registered, and the diagram stylesheets are injected for you.
+
+> [!IMPORTANT]
+> Registering the integration is what gets the CSS onto the page. `<ReactFlowWrapper>` is rendered with `client:only="react"`, so Astro never imports it on the server — and Astro collects each page's CSS from the *server* module graph. The stylesheet the component imports therefore never reaches the build on its own. Without the integration (or the manual import below), the diagram pane collapses to `0px` and the canvas renders empty.
+
+If you'd rather keep the CSS off pages that have no diagrams, set `injectStyles: false` and import it yourself in the relevant page or layout:
+
+```astro
+---
+import '@xyflow/react/dist/style.css';
+import '@sjohansson/astro-reactflow/styles.css';
+---
+```
 
 ### 2. Use the component
 
@@ -61,6 +73,7 @@ import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
 | ------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------- |
 | `configureSsr`      | `boolean` | `true`  | Add `@xyflow/react` to Vite's `ssr.noExternal` so React Flow bundles correctly during SSR builds. |
 | `autoRegisterReact` | `boolean` | `true`  | Auto-add `@astrojs/react` if it isn't in the consumer's `integrations` array.                     |
+| `injectStyles`      | `boolean` | `true`  | Inject the React Flow and wrapper stylesheets into every page. Required for `client:only` islands — see above. |
 
 If `autoRegisterReact` is disabled and `@astrojs/react` is not present, the integration throws a clear error at config-load time instead of failing later with `NoMatchingRenderer`.
 
@@ -143,7 +156,7 @@ Pass `miniMapSize` to resize the minimap. Omitting it keeps React Flow's default
 
 `colorMode="auto"` (the default) resolves light/dark from the host page and re-evaluates when the theme changes. It checks `<html>` for any of: a `dark` or `scheme-dark` class, `data-theme-scheme="dark"`, or a `data-theme` value containing `"dark"` — falling back to the OS `prefers-color-scheme`. This works out of the box with [`@sjohansson/astro-theme-toggle`](https://www.npmjs.com/package/@sjohansson/astro-theme-toggle), Tailwind's `.dark`, and most attribute-based theme systems. Pass `colorMode="light"` or `colorMode="dark"` to pin it.
 
-The component ships self-contained light/dark styles via overridable CSS custom properties on `.reactflow-wrapper`. Override them to match your site:
+The component ships self-contained light/dark styles via overridable CSS custom properties on `.reactflow-wrapper` (delivered by the integration, or via the `@sjohansson/astro-reactflow/styles.css` export). Override them to match your site:
 
 | Variable                | Purpose                                  |
 | ----------------------- | ---------------------------------------- |
