@@ -1,5 +1,14 @@
 # basic-usage-example
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [5d72a3b]
+- Updated dependencies [e90566d]
+  - @sjohansson/astro-theme-toggle@0.3.3
+  - @sjohansson/astro-reactflow@0.5.0
+
 ## 0.1.6
 
 ### Patch Changes
