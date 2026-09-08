@@ -122,6 +122,20 @@ describe("<theme-controller> apply modes", () => {
     expect(root().style.getPropertyValue("--theme-bg-primary")).not.toBe("");
   });
 
+  it("cleans up the previous attribute set when attribute-name changes at runtime", () => {
+    const el = mount("theme-controller", { "apply-mode": "attribute" });
+    expect(root().dataset.theme).toBe("light");
+    expect(root().dataset.themeScheme).toBe("light");
+
+    el.setAttribute("attribute-name", "palette");
+    expect(root().dataset.theme).toBeUndefined();
+    expect(root().dataset.themeScheme).toBeUndefined();
+    expect(root().dataset.themeFamily).toBeUndefined();
+    expect(root().dataset.palette).toBe("light");
+    expect(root().dataset.paletteScheme).toBe("light");
+    expect(localStorage.getItem("theme-attr-name")).toBe("data-palette");
+  });
+
   it("persists FOUC replay keys in attribute mode", () => {
     mount("theme-controller", { "apply-mode": "attribute" });
     expect(localStorage.getItem("theme-attr-name")).toBe("data-theme");
