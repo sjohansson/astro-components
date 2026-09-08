@@ -15,6 +15,31 @@ export interface ReactFlowOptions {
    * @default true
    */
   autoRegisterReact?: boolean;
+  /**
+   * Inject the diagram stylesheets into every page.
+   *
+   * `<ReactFlowWrapper>` must be rendered with `client:only="react"`, which
+   * means Astro never imports it on the server — and Astro collects a page's
+   * CSS from the server module graph. The component's own `import` of its
+   * stylesheet therefore never reaches the build, and the diagram renders
+   * unstyled: the pane collapses to `0px` and the canvas looks empty.
+   *
+   * Injecting the CSS at `page-ssr` puts it in the server graph, so Astro
+   * emits and links it as it would any other stylesheet.
+   *
+   * Disable this to keep the CSS off pages that have no diagrams, then import
+   * it yourself in the relevant page or layout:
+   *
+   * ```astro
+   * ---
+   * import "@xyflow/react/dist/style.css";
+   * import "@sjohansson/astro-reactflow/styles.css";
+   * ---
+   * ```
+   *
+   * @default true
+   */
+  injectStyles?: boolean;
 }
 
 /**
@@ -36,12 +61,12 @@ export interface ReactFlowOptions {
  * ```
  */
 export default function reactFlowIntegration(options: ReactFlowOptions = {}): AstroIntegration {
-  const { configureSsr = true, autoRegisterReact = true } = options;
+  const { configureSsr = true, autoRegisterReact = true, injectStyles = true } = options;
 
   return {
     name: "@sjohansson/astro-reactflow",
     hooks: {
-      "astro:config:setup": async ({ config, updateConfig, logger }) => {
+      "astro:config:setup": async ({ config, updateConfig, injectScript, logger }) => {
         const hasReact = config.integrations.some((i) => i.name === "@astrojs/react");
 
         if (!hasReact) {
@@ -71,6 +96,17 @@ export default function reactFlowIntegration(options: ReactFlowOptions = {}): As
           };
           updateConfig({ integrations: [reactModule.default()] });
           logger.info("Auto-registered @astrojs/react");
+        }
+
+        if (injectStyles) {
+          // Bare specifiers, so they resolve from the consumer's project:
+          // `@xyflow/react` is a peer dependency there, and `styles.css` is a
+          // public export of this package.
+          injectScript(
+            "page-ssr",
+            `import "@xyflow/react/dist/style.css";
+import "@sjohansson/astro-reactflow/styles.css";`,
+          );
         }
 
         if (configureSsr) {

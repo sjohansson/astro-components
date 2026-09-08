@@ -34,6 +34,8 @@ describe("ReactFlow Integration", () => {
       // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
       updateConfig: ((cfg: unknown) => updates.push(cfg)) as any,
       // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      injectScript: (() => {}) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
       logger: { info: (m: string) => logs.push(m), warn: () => {}, debug: () => {}, error: () => {} } as any,
     } as never);
 
@@ -61,6 +63,8 @@ describe("ReactFlow Integration", () => {
       // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
       updateConfig: ((cfg: unknown) => updates.push(cfg)) as any,
       // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      injectScript: (() => {}) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
       logger: { info: () => {}, warn: () => {}, debug: () => {}, error: () => {} } as any,
     } as never);
 
@@ -86,8 +90,57 @@ describe("ReactFlow Integration", () => {
         // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
         updateConfig: (() => {}) as any,
         // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+        injectScript: (() => {}) as any,
+        // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
         logger: { info: () => {}, warn: () => {}, debug: () => {}, error: () => {} } as any,
       } as never),
     ).rejects.toThrow(/@astrojs\/react/);
+  });
+
+  it("injects the diagram stylesheets at page-ssr by default", async () => {
+    const integration = reactFlowIntegration();
+    const setup = integration.hooks["astro:config:setup"];
+    if (!setup) throw new Error("setup hook missing");
+
+    const injected: { stage: string; content: string }[] = [];
+
+    await setup({
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      config: { integrations: [{ name: "@astrojs/react" }] } as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      updateConfig: (() => {}) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      injectScript: ((stage: string, content: string) => injected.push({ stage, content })) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      logger: { info: () => {}, warn: () => {}, debug: () => {}, error: () => {} } as any,
+    } as never);
+
+    expect(injected).toHaveLength(1);
+    expect(injected[0]?.stage).toBe("page-ssr");
+    // `client:only` keeps the component out of the server graph, so these two
+    // imports are the only thing that gets the CSS into the build.
+    expect(injected[0]?.content).toContain('import "@xyflow/react/dist/style.css";');
+    expect(injected[0]?.content).toContain('import "@sjohansson/astro-reactflow/styles.css";');
+  });
+
+  it("skips style injection when injectStyles is false", async () => {
+    const integration = reactFlowIntegration({ injectStyles: false });
+    const setup = integration.hooks["astro:config:setup"];
+    if (!setup) throw new Error("setup hook missing");
+
+    const injected: unknown[] = [];
+
+    await setup({
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      config: { integrations: [{ name: "@astrojs/react" }] } as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      updateConfig: (() => {}) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      injectScript: ((...args: unknown[]) => injected.push(args)) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      logger: { info: () => {}, warn: () => {}, debug: () => {}, error: () => {} } as any,
+    } as never);
+
+    expect(injected).toHaveLength(0);
   });
 });
