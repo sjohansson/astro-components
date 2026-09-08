@@ -483,6 +483,45 @@ describe("<theme-controller> setVariant (deprecated)", () => {
 });
 
 describe("<theme-controller> lifecycle", () => {
+  /**
+   * matchMedia stub that honours removeEventListener, so we can observe whether
+   * a disconnected controller actually let go of its `change` subscriptions.
+   * Each call returns a fresh object, as the real API does.
+   */
+  function trackedMatchMedia(): {
+    listenerCount: () => number;
+    setDark: (value: boolean) => void;
+    restore: () => void;
+  } {
+    let dark = false;
+    const listeners = new Set<() => void>();
+    const original = Object.getOwnPropertyDescriptor(window, "matchMedia");
+    Object.defineProperty(window, "matchMedia", {
+      value: (query: string) => ({
+        matches: query.includes("prefers-color-scheme: dark") ? dark : false,
+        media: query,
+        addEventListener: (_: string, fn: () => void) => listeners.add(fn),
+        removeEventListener: (_: string, fn: () => void) => listeners.delete(fn),
+      }),
+      configurable: true,
+      writable: true,
+    });
+    return {
+      listenerCount: () => listeners.size,
+      setDark: (value: boolean) => {
+        dark = value;
+        for (const fn of [...listeners]) {
+          fn();
+        }
+      },
+      restore: () => {
+        if (original) {
+          Object.defineProperty(window, "matchMedia", original);
+        }
+      },
+    };
+  }
+
   it("stops responding to astro:after-swap once disconnected", () => {
     const el = mount();
     el.setScheme("dark");
@@ -504,17 +543,54 @@ describe("<theme-controller> lifecycle", () => {
     expect(detached.classList.contains("open")).toBe(true);
   });
 
-  it("clears a pending resize timer on disconnect", () => {
+  it("drops a pending resize callback on disconnect", () => {
     vi.useFakeTimers();
     try {
-      const el = mount();
+      const el = mount({ "expand-direction": "auto" });
       window.dispatchEvent(new Event("resize"));
+      const detached = inner(el);
       el.remove();
-      expect(() => {
-        vi.advanceTimersByTime(200);
-      }).not.toThrow();
+
+      // A sentinel the debounced applyDirection() would overwrite if it ran.
+      detached.setAttribute("data-direction", "sentinel");
+      vi.advanceTimersByTime(200);
+      expect(detached.getAttribute("data-direction")).toBe("sentinel");
     } finally {
       vi.useRealTimers();
+    }
+  });
+
+  it("stops responding to resize once disconnected", () => {
+    vi.useFakeTimers();
+    try {
+      const el = mount({ "expand-direction": "auto" });
+      const detached = inner(el);
+      el.remove();
+
+      detached.setAttribute("data-direction", "sentinel");
+      window.dispatchEvent(new Event("resize"));
+      vi.advanceTimersByTime(200);
+      expect(detached.getAttribute("data-direction")).toBe("sentinel");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("releases its system preference listeners on disconnect", () => {
+    const media = trackedMatchMedia();
+    try {
+      const el = mount();
+      expect(media.listenerCount()).toBeGreaterThan(0);
+
+      el.remove();
+      expect(media.listenerCount()).toBe(0);
+
+      // Nothing left to write the removed controller's selection back onto <html>.
+      root().className = "";
+      media.setDark(true);
+      expect(root().className).toBe("");
+    } finally {
+      media.restore();
     }
   });
 

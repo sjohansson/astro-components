@@ -75,6 +75,8 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   private currentContrast: "system" | "normal" | "more" = "system";
   private currentVariation = "normal";
   private resizeTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Media queries we hold `change` listeners on, kept so they can be released. */
+  private mediaQueries: MediaQueryList[] = [];
   /** Last data-attribute base name applied, so we can clean it up if it changes. */
   private lastAttributeName: string | undefined;
 
@@ -107,6 +109,11 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
   disconnectedCallback(): void {
     document.removeEventListener("astro:after-swap", this.reinit);
     document.removeEventListener("click", this.handleOutsideClick);
+    window.removeEventListener("resize", this.handleResize);
+    for (const mq of this.mediaQueries) {
+      mq.removeEventListener("change", this.handleSystemChange);
+    }
+    this.mediaQueries = [];
     if (this.resizeTimer) {
       clearTimeout(this.resizeTimer);
     }
@@ -649,15 +656,23 @@ export class ThemeControllerElement extends SSRSafeHTMLElement {
     // Outside click
     document.addEventListener("click", this.handleOutsideClick);
 
-    // Resize for auto direction and/or auto side detection
+    // Resize for auto direction and/or auto side detection. bindEvents() also
+    // runs on attribute changes, so drop any previous registration first —
+    // the axes may no longer be 'auto'.
+    window.removeEventListener("resize", this.handleResize);
     if (this.expandDirection === "auto" || this.expandSide === "auto") {
       window.addEventListener("resize", this.handleResize);
     }
 
-    // System theme changes
-    if (window.matchMedia) {
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", this.handleSystemChange);
-      window.matchMedia("(prefers-contrast: more)").addEventListener("change", this.handleSystemChange);
+    // System theme changes. matchMedia() hands back a fresh MediaQueryList each
+    // call, so keep the ones we subscribe to — removeEventListener on a
+    // different instance would not detach us.
+    if (window.matchMedia && this.mediaQueries.length === 0) {
+      for (const query of ["(prefers-color-scheme: dark)", "(prefers-contrast: more)"]) {
+        const mq = window.matchMedia(query);
+        mq.addEventListener("change", this.handleSystemChange);
+        this.mediaQueries.push(mq);
+      }
     }
 
     // Init direction
