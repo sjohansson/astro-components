@@ -123,6 +123,30 @@ describe("ReactFlow Integration", () => {
     expect(injected[0]?.content).toContain('import "@sjohansson/astro-reactflow/styles.css";');
   });
 
+  it("pre-bundles only @xyflow/react, not its transitive CJS deps", async () => {
+    const integration = reactFlowIntegration();
+    const setup = integration.hooks["astro:config:setup"];
+    if (!setup) throw new Error("setup hook missing");
+
+    const updates: { vite?: { optimizeDeps?: { include?: string[] } } }[] = [];
+
+    await setup({
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      config: { integrations: [{ name: "@astrojs/react" }] } as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      updateConfig: ((cfg: (typeof updates)[number]) => updates.push(cfg)) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      injectScript: (() => {}) as any,
+      // biome-ignore lint/suspicious/noExplicitAny: minimal mock for hook param
+      logger: { info: () => {}, warn: () => {}, debug: () => {}, error: () => {} } as any,
+    } as never);
+
+    // Transitive deps are not resolvable from a pnpm consumer's root, so listing
+    // them makes Vite warn. Pre-bundling React Flow already covers them.
+    const include = updates.find((u) => u.vite)?.vite?.optimizeDeps?.include;
+    expect(include).toEqual(["@xyflow/react"]);
+  });
+
   it("skips style injection when injectStyles is false", async () => {
     const integration = reactFlowIntegration({ injectStyles: false });
     const setup = integration.hooks["astro:config:setup"];
