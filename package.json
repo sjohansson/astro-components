@@ -32,7 +32,7 @@
     "@types/node": "^26.4.1",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
-    "astro": "^7.3.1",
+    "astro": "^7.2.8",
     "happy-dom": "^20.14.0",
     "markdownlint-cli2": "^0.23.2",
     "tsdown": "^0.22.14",
