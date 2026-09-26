@@ -1,5 +1,12 @@
 # basic-usage-example
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [1f29e51]
+  - @sjohansson/astro-reactflow@0.5.1
+
 ## 0.1.7
 
 ### Patch Changes

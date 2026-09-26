@@ -1,5 +1,11 @@
 # @sjohansson/astro-reactflow
 
+## 0.5.1
+
+### Patch Changes
+
+- 1f29e51: Stop Vite warning `Failed to resolve dependency: use-sync-external-store/shim/with-selector` on dev start in pnpm projects. The integration no longer lists the shim in `optimizeDeps.include`; pre-bundling `@xyflow/react` already bundles it.
+
 ## 0.5.0
 
 ### Minor Changes
