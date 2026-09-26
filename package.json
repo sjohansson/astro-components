@@ -8,7 +8,7 @@
     "node": ">=24",
     "pnpm": ">=10.0.0"
   },
-  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "packageManager": "pnpm@11.28.0+sha512.8ed239371de82244b6cccf9e2023c18ea8439961f2ec3fe898913b9f7ee2e76ca0a45717580aca3c7997c135f6d4f5de4524cbeee1a2ccac430c03d134e2a48c",
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" run build",
     "test": "vitest",
@@ -27,17 +27,17 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@biomejs/biome": "^2.5.12",
+    "@biomejs/biome": "^2.5.14",
     "@changesets/cli": "^2.31.1",
-    "@types/node": "^26.4.1",
+    "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
-    "astro": "^7.3.1",
-    "happy-dom": "^20.14.0",
-    "markdownlint-cli2": "^0.23.2",
+    "astro": "^7.3.4",
+    "happy-dom": "^20.14.5",
+    "markdownlint-cli2": "^0.23.3",
     "tsdown": "^0.22.14",
     "typescript": "^6.0.3",
-    "vite": "^8.2.2",
+    "vite": "^8.3.0",
     "vitest": "^4.1.11"
   },
   "pnpm": {}
