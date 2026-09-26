@@ -116,9 +116,12 @@ import "@sjohansson/astro-reactflow/styles.css";`,
                 noExternal: ["@xyflow/react"],
               },
               optimizeDeps: {
-                // Pre-bundle CJS deps that React Flow / Zustand pull in, so
-                // the browser doesn't choke on `import x from 'cjs-module'`.
-                include: ["@xyflow/react", "use-sync-external-store/shim/with-selector"],
+                // Pre-bundling React Flow also bundles what it imports, including
+                // Zustand's CJS `use-sync-external-store` shim, so the browser never
+                // sees a CJS module. Do not list the shim separately: under pnpm it
+                // is not resolvable from the consumer root and Vite warns on every
+                // dev start.
+                include: ["@xyflow/react"],
               },
             },
           });
