@@ -29,7 +29,7 @@
     "@astrojs/check": "^0.9.10",
     "@biomejs/biome": "^2.5.14",
     "@changesets/cli": "^3.0.3",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.3",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "astro": "^7.3.4",
