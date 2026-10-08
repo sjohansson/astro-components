@@ -1,6 +1,6 @@
 {
   "name": "@sjohansson/astro-votes",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Like and dislike buttons for static Astro sites. Votes go to your analytics tool as events, a CI job writes the totals to a JSON file, and the site shows them at build time. No database.",
   "type": "module",
   "main": "./dist/index.js",
