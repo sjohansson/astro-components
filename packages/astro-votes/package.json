@@ -1,0 +1,66 @@
+{
+  "name": "@sjohansson/astro-votes",
+  "version": "0.0.0",
+  "description": "Like and dislike buttons for static Astro sites. Votes go to your analytics tool as events, a CI job writes the totals to a JSON file, and the site shows them at build time. No database.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "import": "./dist/integration.js"
+    },
+    "./sync": {
+      "types": "./dist/sync.d.ts",
+      "import": "./dist/sync.js"
+    }
+  },
+  "bin": {
+    "astro-votes-sync": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "clean": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\"",
+    "test": "vitest"
+  },
+  "keywords": [
+    "astro",
+    "astro-component",
+    "astro-integration",
+    "likes",
+    "votes",
+    "umami",
+    "static-site",
+    "web-components"
+  ],
+  "author": "sjohansson",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjohansson/astro-components.git",
+    "directory": "packages/astro-votes"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "astro": {
+      "optional": true
+    }
+  },
+  "sideEffects": false
+}

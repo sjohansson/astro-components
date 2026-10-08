@@ -4,11 +4,14 @@ This guide will help you get started with developing, building, and publishing A
 
 ## Initial Setup
 
-1. **Install pnpm** (if not already installed):
+1. **Install pnpm 11** (if not already installed):
 
    ```bash
-   npm install -g pnpm
+   npm install -g pnpm@11
    ```
+
+   The exact version is pinned in the `packageManager` field of the root `package.json`, and pnpm switches to it
+   automatically inside the repo.
 
 2. **Install dependencies**:
 
@@ -133,7 +136,8 @@ If you need to publish manually:
 1. **Set up npm authentication**:
    - Create an npm account at <https://www.npmjs.com>
    - Run `npm login` locally
-   - For GitHub Actions, add `NPM_TOKEN` secret to your repository
+   - For GitHub Actions, no token is needed. The release workflow publishes through npm trusted publishing (OIDC).
+     See [Trusted publishing](#trusted-publishing)
 
 2. **Update package names** (if needed):
    - Each package.json has `"name": "@sjohansson/package-name"`
@@ -229,11 +233,20 @@ Recommended extensions are listed in `.vscode/extensions.json`. Install them for
   - Creates version PRs with Changesets
   - Publishes to npm when version PR is merged
 
-### Required Secrets
+### Trusted publishing
 
-Add these secrets to your GitHub repository:
+No `NPM_TOKEN` secret is used. The release workflow has `id-token: write` and updates npm to the latest
+version, and npm exchanges GitHub's OIDC token for a short-lived publish credential.
 
-- `NPM_TOKEN`: Your npm authentication token
+To set it up for a package:
+
+1. Publish the first version by hand (`npm login`, then `npm publish --access public`). npm only lets you attach a
+   trusted publisher to a package that already exists.
+2. On npmjs.com, open the package's settings and add a trusted publisher for GitHub Actions: the organisation or user,
+   the repository, and the workflow filename `release.yml`. Tick "npm publish".
+3. Optionally set publishing access to "Require two-factor authentication and disallow tokens".
+
+The `repository.url` in each `package.json` must match the GitHub repository exactly, or provenance is rejected.
 
 ## Need Help?
 

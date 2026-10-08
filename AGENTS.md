@@ -14,6 +14,7 @@ packages/
   astro-reactflow/       # React Flow diagram integration (@sjohansson/astro-reactflow)
   astro-theme-toggle/    # Theme toggle Web Components    (@sjohansson/astro-theme-toggle)
   astro-version-note/    # Version note Web Component     (@sjohansson/astro-version-note)
+  astro-votes/           # Like/dislike Web Component     (@sjohansson/astro-votes)
 examples/
   basic-usage/           # Example Astro site using all packages
   theming-showcase/      # Theme toggle showcase
@@ -32,14 +33,14 @@ biome.json               # Linter & formatter config
 | --------------- | --------- | ------------------------------------- |
 | Node.js         | >=22      | Consumer support (22, 24, 25)         |
 | Node.js (dev)   | 24        | Local development (pinned in `.node-version`) |
-| pnpm            | 10.x      | Package manager (corepack-managed)    |
+| pnpm            | 11.x      | Package manager (pinned via `packageManager`) |
 | TypeScript      | 6.x       | Type checking & declaration emit      |
-| Astro           | 5, 6, or 7 | Peer dependency for integrations (dev-pinned to 6) |
-| tsdown          | 0.22.x    | Build (ESM bundles + .d.ts, Rolldown) |
+| Astro           | 5, 6, or 7 | Peer dependency for integrations (dev-pinned to 7) |
+| tsdown          | 0.23.x    | Build (ESM bundles + .d.ts, Rolldown) |
 | Vite            | 8.x       | Dev server & test infrastructure      |
 | Vitest          | 4.x       | Test runner (happy-dom environment)   |
 | Biome           | 2.x       | Linting & formatting (no eslint/prettier) |
-| Changesets      | 2.x       | Versioning & npm publishing           |
+| Changesets      | 3.x       | Versioning & npm publishing           |
 
 ## Packages
 
@@ -49,7 +50,7 @@ React Flow diagram wrapper for Astro. Ships a React component (`ReactFlowWrapper
 and an optional Astro integration for SSR configuration.
 
 - **Component type:** React (requires `@astrojs/react`, used with `client:only="react"`)
-- **Peer deps:** `astro ^5 || ^6 || ^7`, `@astrojs/react ^4 || ^5 || ^6`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
+- **Peer deps:** `astro ^5 || ^6 || ^7`, `@astrojs/react ^4 || ^5 || ^6 || ^7`, `react ^19`, `react-dom ^19`, `@xyflow/react ^12`
 - **Exports:** `.` (component), `./integration` (Astro integration)
 
 ### `@sjohansson/astro-theme-toggle`
@@ -70,6 +71,20 @@ Simple version callout badge for documentation sites. Renders as `<version-note>
 - **Peer deps:** `astro ^5 || ^6 || ^7`
 - **Exports:** `.` (component + register fn), `./integration` (Astro integration)
 - **Attributes:** `version`, `type` (`info` | `warning` | `success` | `error`)
+
+### `@sjohansson/astro-votes`
+
+Like and dislike buttons for static sites. Renders as `<vote-buttons>`. Votes go to an analytics tool as events
+(Umami built in), the `astro-votes-sync` CLI writes totals to a JSON file in CI, and the site reads it at build time.
+
+- **Component type:** Web Component (custom element, Light DOM) plus a Node CLI
+- **Peer deps:** `astro ^5 || ^6 || ^7` (optional)
+- **Exports:** `.` (element, register fn, data and markup helpers, wire format), `./integration`, `./sync` (Node only)
+- **Bin:** `astro-votes-sync`
+- **Wire format:** event `vote`, property `vote` = `<item>:<op>`, ops `up`, `up-undo`, `down`, `down-undo`. Changing
+  it breaks every consumer's existing counts.
+- **Umami limit:** the values endpoint returns at most 100 rows, so the sync splits the time window until each part
+  fits. Keep that when touching `fetchUmamiValues`.
 
 ## Build & Test Commands
 
@@ -168,7 +183,7 @@ GitHub Actions (`.github/workflows/`):
 - **release.yml** — runs on push to `main`:
   - Changesets action: creates release PRs or publishes to npm (Node 24)
 
-All CI jobs use `pnpm/action-setup@v4` + `actions/setup-node@v4` with
+All CI jobs use `pnpm/action-setup@v6` (reads the pnpm version from `packageManager`) + `actions/setup-node@v6` with
 `pnpm install --frozen-lockfile`.
 
 ## Repository Metadata
@@ -187,4 +202,4 @@ All CI jobs use `pnpm/action-setup@v4` + `actions/setup-node@v4` with
 - Do **not** use npm, yarn, eslint, prettier, jest, webpack, or tsup.
 - Do **not** add dependencies without necessity — these are lightweight packages.
 - Do **not** bypass Biome rules or skip CI checks.
-- Do **not** target or require pnpm 11 until a stable release ships.
+- Do **not** use or require a pnpm major other than the one pinned in `packageManager` (currently 11). Upgrade by changing that field.

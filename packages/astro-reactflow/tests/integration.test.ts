@@ -1,3 +1,5 @@
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import reactFlowIntegration from "../src/integration";
@@ -5,6 +7,20 @@ import reactFlowIntegration from "../src/integration";
 describe("ReactFlow Integration", () => {
   it("exports a function", () => {
     expect(typeof reactFlowIntegration).toBe("function");
+  });
+
+  it("declares a peer range covering the @astrojs/react major it is tested against", () => {
+    // Guards against the devDependency moving past the published peer range,
+    // which leaves consumers on the new major with an unmet peer warning.
+    // A path, not `new URL(..., import.meta.url)`: happy-dom's global URL
+    // resolves against http://localhost, which createRequire rejects.
+    const pkgRequire = createRequire(resolve(import.meta.dirname, "../package.json"));
+    const manifest = pkgRequire("./package.json") as { peerDependencies: Record<string, string> };
+    const installed = pkgRequire("@astrojs/react/package.json") as { version: string };
+
+    const major = installed.version.split(".")[0];
+    const peerRanges = (manifest.peerDependencies["@astrojs/react"] ?? "").split("||").map((r) => r.trim());
+    expect(peerRanges).toContain(`^${major}.0.0`);
   });
 
   it("returns a valid Astro integration with the config:setup hook", () => {

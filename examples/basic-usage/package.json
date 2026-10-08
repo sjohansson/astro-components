@@ -9,10 +9,11 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/react": "^6.0.0",
+    "@astrojs/react": "^7.0.0",
     "@sjohansson/astro-reactflow": "workspace:*",
     "@sjohansson/astro-theme-toggle": "workspace:*",
     "@sjohansson/astro-version-note": "workspace:*",
+    "@sjohansson/astro-votes": "workspace:*",
     "@xyflow/react": "^12.11.0",
     "astro": "^7.3.4",
     "react": "^19.2.7",

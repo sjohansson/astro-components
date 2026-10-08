@@ -12,6 +12,7 @@ This monorepo contains the following Astro components:
 - **[@sjohansson/astro-reactflow](./packages/astro-reactflow)** - React Flow integration for Astro
 - **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
 - **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for site checks/documentation
+- **[@sjohansson/astro-votes](./packages/astro-votes)** - Like and dislike buttons for static sites, counted through your analytics tool
 
 Each component can be used as either a standalone component or as an Astro integration for enhanced functionality and automatic configuration.
 
@@ -72,7 +73,7 @@ This monorepo uses modern tooling for 2026:
 ### Prerequisites
 
 - Node.js >= 22.12.0
-- pnpm >= 9.0.0
+- pnpm 11 (the exact version is pinned in `packageManager` in `package.json`)
 
 ### Setup
 
@@ -120,7 +121,8 @@ astro-components/
 ├── packages/
 │   ├── astro-reactflow/     # React Flow integration
 │   ├── astro-theme-toggle/  # Theme toggle component
-│   └── astro-version-note/  # Version note component
+│   ├── astro-version-note/  # Version note component
+│   └── astro-votes/         # Like/dislike buttons
 ├── biome.json               # Biome configuration
 ├── tsconfig.json            # TypeScript configuration
 ├── vitest.config.ts         # Vitest configuration

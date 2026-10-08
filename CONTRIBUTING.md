@@ -14,7 +14,7 @@ Thank you for your interest in contributing! 🎉
 ### Prerequisites
 
 - Node.js >= 24.0.0
-- pnpm >= 9.0.0
+- pnpm 11 (the exact version is pinned in `packageManager` in `package.json`)
 
 ### Setup
 

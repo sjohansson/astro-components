@@ -192,11 +192,10 @@ pnpm changeset:version   # Update versions from changesets
 pnpm changeset:publish   # Publish packages to npm
 ```
 
-## 🔐 Required Secrets
+## 🔐 npm Authentication
 
-For GitHub Actions to work properly, add these secrets to your repository:
-
-- **NPM_TOKEN**: npm authentication token for publishing
+No secrets are needed. The release workflow publishes through npm trusted publishing (OIDC). Configure a trusted
+publisher for `release.yml` on each package. See [Trusted publishing](./GETTING_STARTED.md#trusted-publishing).
 
 ## 🎨 VS Code Setup
 
@@ -326,7 +325,7 @@ pnpm test:ui  # Debug with UI
 4. **Run tests**: `pnpm test`
 5. **Start developing**: Add your component logic
 6. **Set up npm**: Configure npm authentication
-7. **Configure GitHub**: Add NPM_TOKEN secret
+7. **Configure GitHub**: Add a trusted publisher for `release.yml` on each package
 8. **Create first release**: Follow the publishing workflow
 
 ## 🤝 Support

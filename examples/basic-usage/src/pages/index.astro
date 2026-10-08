@@ -1,6 +1,12 @@
 ---
 import { ReactFlowWrapper } from "@sjohansson/astro-reactflow";
+import { voteAttributes, voteButtonsHTML } from "@sjohansson/astro-votes";
 import Layout from "../layouts/Layout.astro";
+
+const voteAttrs = voteAttributes(
+  { updated: "2026-10-08T18:30:00.000Z", items: { "basic-usage": { up: 12, down: 3 } } },
+  "basic-usage",
+);
 
 const nodes = [
   { id: "1", type: "input", label: "Start", position: { x: 50, y: 0 } },
@@ -60,6 +66,15 @@ const edges = [
     </section>
 
     <section>
+      <h2>Votes</h2>
+      <p>
+        Like and dislike buttons. Counts come from a static data file; your own vote is remembered in localStorage.
+        Open the console to see the <code>vote-change</code> events.
+      </p>
+      <vote-buttons {...voteAttrs} set:html={voteButtonsHTML(voteAttrs)}></vote-buttons>
+    </section>
+
+    <section>
       <h2>About This Example</h2>
       <p>
         This example shows how to use all three components as Astro integrations.
@@ -82,6 +97,7 @@ const edges = [
   import { registerVersionNote } from "@sjohansson/astro-version-note";
   registerThemeToggle();
   registerVersionNote();
+  document.addEventListener("vote-change", (event) => console.log("vote-change", (event as CustomEvent).detail));
 </script>
 
 <style>

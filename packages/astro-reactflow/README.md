@@ -189,4 +189,4 @@ pnpm build  # emit ESM + .d.ts to dist/
 pnpm clean  # remove build output
 ```
 
-All React, React Flow, and `@astrojs/react` deps are peer-based — consumers bring their own versions.
+All React, React Flow, and `@astrojs/react` deps are peer-based — consumers bring their own versions. Supported ranges: `astro` 5, 6, or 7; `@astrojs/react` 4, 5, 6, or 7; `react`/`react-dom` 19; `@xyflow/react` 12.

@@ -146,10 +146,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### "pnpm: The term 'pnpm' is not recognized"
 
-Ensure pnpm is installed globally:
+Ensure pnpm 11 is installed globally:
 
 ```powershell
-npm install -g pnpm
+npm install -g pnpm@11
 ```
 
 ### Script runs but shows no output
@@ -191,10 +191,10 @@ The script may have an error. Run with error details:
 .\scripts\full-check.ps1
 ```
 
-✅ **Keep pnpm updated**
+✅ **Stay on the pinned pnpm major**
 
 ```powershell
-pnpm install -g pnpm@latest
+npm install -g pnpm@11
 ```
 
 ✅ **Use watch mode during development**
