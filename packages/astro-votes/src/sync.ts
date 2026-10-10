@@ -115,6 +115,11 @@ export async function fetchUmamiValues(options: UmamiFetchOptions): Promise<Valu
   const base = options.apiUrl.replace(/\/+$/, "");
   const eventName = options.eventName ?? DEFAULT_EVENT_NAME;
   const propertyName = options.propertyName ?? DEFAULT_PROPERTY_NAME;
+  // Umami Cloud reads the key from its own header. Self-hosted takes a bearer token.
+  const auth: Record<string, string> =
+    new URL(base).hostname === "api.umami.is"
+      ? { "x-umami-api-key": options.apiKey }
+      : { authorization: `Bearer ${options.apiKey}` };
   let first = true;
 
   const query = async (startAt: number, endAt: number): Promise<ValueRow[]> => {
@@ -128,9 +133,7 @@ export async function fetchUmamiValues(options: UmamiFetchOptions): Promise<Valu
       propertyName,
     });
     const url = `${base}/websites/${encodeURIComponent(options.websiteId)}/event-data/values?${params}`;
-    const res = await doFetch(url, {
-      headers: { accept: "application/json", authorization: `Bearer ${options.apiKey}` },
-    });
+    const res = await doFetch(url, { headers: { accept: "application/json", ...auth } });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
       throw new Error(`Umami request failed with ${res.status}: ${text.slice(0, 200)}`);

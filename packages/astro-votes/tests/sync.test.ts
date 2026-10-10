@@ -82,7 +82,18 @@ describe("fetchUmamiValues", () => {
       eventName: "vote",
       propertyName: "vote",
     });
-    expect((init.headers as Record<string, string>)["authorization"]).toBe("Bearer key");
+    const headers = init.headers as Record<string, string>;
+    expect(headers["x-umami-api-key"]).toBe("key");
+    expect(headers["authorization"]).toBeUndefined();
+  });
+
+  it("sends a bearer token to a self-hosted instance", async () => {
+    const fetch = vi.fn(async () => response([]));
+    await fetchUmamiValues({ ...base, apiUrl: "https://stats.example.com/api", fetch });
+    const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    const headers = init.headers as Record<string, string>;
+    expect(headers["authorization"]).toBe("Bearer key");
+    expect(headers["x-umami-api-key"]).toBeUndefined();
   });
 
   it("splits a window that hits the row limit", async () => {
