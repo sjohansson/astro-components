@@ -132,13 +132,17 @@ stay exact however many items you have.
 
 ## Wire format
 
-Each change is one or more events named `vote` with a single property `vote` whose value is `<item>:<op>`:
+Each change is one or more events named `vote` with a single property `vote` whose value is `<item>:<op>`. There are
+four ops, `up`, `up-undo`, `down`, and `down-undo`, and six possible changes:
 
-| Change        | Ops sent              |
-| ------------- | --------------------- |
-| none to like  | `up`                  |
-| like to none  | `up-undo`             |
-| like to dislike | `up-undo`, `down`   |
+| Change          | Ops sent          |
+| --------------- | ----------------- |
+| none to like    | `up`              |
+| none to dislike | `down`            |
+| like to none    | `up-undo`         |
+| dislike to none | `down-undo`       |
+| like to dislike | `up-undo`, `down` |
+| dislike to like | `down-undo`, `up` |
 
 Totals are `up - up-undo` and `down - down-undo`, never below zero. Every toggle sends a balanced pair over time, so
 click spam nets out.

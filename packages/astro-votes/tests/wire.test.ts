@@ -22,7 +22,9 @@ describe("wire format", () => {
 
   it.each([
     [null, "up", ["up"]],
+    [null, "down", ["down"]],
     ["up", null, ["up-undo"]],
+    ["down", null, ["down-undo"]],
     ["up", "down", ["up-undo", "down"]],
     ["down", "up", ["down-undo", "up"]],
     ["down", "down", []],
