@@ -28,7 +28,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       astro:
         specifier: ^7.3.4
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
       happy-dom:
         specifier: ^20.14.5
         version: 20.14.5
@@ -70,7 +70,7 @@ importers:
         version: 12.12.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       astro:
         specifier: ^7.3.4
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
       react:
         specifier: ^19.2.7
         version: 19.3.0
@@ -92,7 +92,7 @@ importers:
         version: link:../../packages/astro-theme-toggle
       astro:
         specifier: ^7.3.4
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
 
   examples/theming-showcase-attributes:
     dependencies:
@@ -101,13 +101,13 @@ importers:
         version: link:../../packages/astro-theme-toggle
       astro:
         specifier: ^7.3.4
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
 
   packages/astro-reactflow:
     dependencies:
       astro:
         specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
@@ -144,19 +144,19 @@ importers:
     dependencies:
       astro:
         specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
 
   packages/astro-version-note:
     dependencies:
       astro:
         specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
 
   packages/astro-votes:
     dependencies:
       astro:
         specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
-        version: 7.3.7(@types/node@26.6.4)(yaml@2.9.1)
+        version: 7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1)
 
 packages:
 
@@ -1490,8 +1490,8 @@ packages:
   ast-v8-to-istanbul@1.0.7:
     resolution: {integrity: sha512-kFL68AG6ajd8fg248zwM9GQrUWEp79gsmjum34OEXjs4yHuUMZfYKwOLW9GMmB4oNvVrj+EAGxsP7ye2UR9UlA==}
 
-  astro@7.3.7:
-    resolution: {integrity: sha512-MyxnNzy+HHkLa8iNVcGTXbmSTlkjqkXJyRcMU3EwprbsF7gh3M03DKLAGVcVTmATF8jV1Fen0rkala1JiEyMSg==}
+  astro@7.3.8:
+    resolution: {integrity: sha512-LHzDHSaV+YzZiR3EFndDYTLLeNeuMtP1qX1FLcCNUUHOCqTTIWPczy2UV3zpA5VqvJe5cWZolqM9Z8JFqR2i9w==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
     peerDependencies:
@@ -4185,7 +4185,7 @@ snapshots:
       estree-walker: 3.0.3
       js-tokens: 10.0.0
 
-  astro@7.3.7(@types/node@26.6.4)(yaml@2.9.1):
+  astro@7.3.8(@types/node@26.6.4)(esbuild@0.28.2)(yaml@2.9.1):
     dependencies:
       '@astrojs/compiler-rs': 0.5.1
       '@astrojs/internal-helpers': 0.12.0
@@ -4205,7 +4205,6 @@ snapshots:
       diff: 9.0.0
       dset: 3.1.4
       es-module-lexer: 3.0.3
-      esbuild: 0.28.2
       find-proc: 0.2.0
       flattie: 1.1.1
       fontace: 0.4.1
@@ -4261,6 +4260,7 @@ snapshots:
       - '@vitejs/devtools'
       - aws4fetch
       - db0
+      - esbuild
       - idb-keyval
       - ioredis
       - jiti
@@ -4503,6 +4503,7 @@ snapshots:
       '@esbuild/win32-arm64': 0.28.2
       '@esbuild/win32-ia32': 0.28.2
       '@esbuild/win32-x64': 0.28.2
+    optional: true
 
   escalade@3.2.0: {}
 
