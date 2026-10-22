@@ -71,6 +71,16 @@ describe("<version-note> rendering", () => {
     expect(mount().open).toBe(false);
   });
 
+  it("leaves styles alone when registered with injectStyles off", () => {
+    registerVersionNote({ injectStyles: false });
+    try {
+      mount();
+      expect(document.getElementById("version-note-styles")).toBeNull();
+    } finally {
+      registerVersionNote();
+    }
+  });
+
   it("puts the styles back after a view transition drops them", () => {
     mount();
     document.getElementById("version-note-styles")?.remove();

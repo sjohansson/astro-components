@@ -22,6 +22,8 @@ export interface VersionNoteMarkupOptions extends VersionNoteFormatOptions {
   closeLabel?: string | undefined;
   /** Visible text of the close button. */
   closeText?: string | undefined;
+  /** Close button content as HTML, for an icon. Inserted as is, so pass only trusted markup. Wins over `closeText`. */
+  closeHTML?: string | undefined;
   /** Extra classes for the close button, so it can match the site's other buttons. */
   closeClass?: string | undefined;
 }
@@ -71,7 +73,7 @@ export function versionNoteHTML(options: VersionNoteMarkupOptions): string {
     '<div class="version-note">' +
     `<button type="button" class="${escapeHtml(closeClass)}" data-version-note-close aria-label="${escapeHtml(
       options.closeLabel ?? DEFAULT_LABELS.close,
-    )}">${escapeHtml(options.closeText ?? DEFAULT_LABELS.closeText)}</button>` +
+    )}">${options.closeHTML ?? escapeHtml(options.closeText ?? DEFAULT_LABELS.closeText)}</button>` +
     `<dl class="version-note__list">${rows.join("")}</dl>` +
     "</div>"
   );

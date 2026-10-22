@@ -5,4 +5,10 @@ export {
   type VersionNoteMarkupOptions,
   versionNoteHTML,
 } from "./markup";
-export { registerVersionNote, VersionNoteElement, type VersionNoteToggleDetail } from "./version-note";
+export { VERSION_NOTE_STYLES } from "./styles";
+export {
+  type RegisterVersionNoteOptions,
+  registerVersionNote,
+  VersionNoteElement,
+  type VersionNoteToggleDetail,
+} from "./version-note";

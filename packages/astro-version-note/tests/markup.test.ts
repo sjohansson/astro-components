@@ -65,6 +65,12 @@ describe("versionNoteHTML", () => {
     expect(close?.textContent).toBe("[x]");
   });
 
+  it("takes HTML for the close button, ahead of the text", () => {
+    const host = parse(versionNoteHTML({ version: "1", closeText: "x", closeHTML: '<svg aria-hidden="true"></svg>' }));
+    expect(host.querySelector("button svg")).not.toBeNull();
+    expect(host.querySelector("button")?.textContent).toBe("");
+  });
+
   it("escapes everything it is given", () => {
     const html = versionNoteHTML({ version: "<b>x</b>", closeLabel: '"><script>', closeClass: '"onclick="x' });
     expect(html).not.toContain("<b>");
