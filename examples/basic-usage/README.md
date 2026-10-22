@@ -16,7 +16,7 @@ pnpm dev
 This example shows:
 
 1. **Theme Toggle** - Dark/light mode switching with persistence
-2. **Version Note** - Documentation version callouts
+2. **Version Note** - Collapsible panel with the commit and build time
 3. **React Flow** - Interactive diagram rendering
 
 ## Project Structure
@@ -51,7 +51,7 @@ export default defineConfig({
   integrations: [
     react(),
     themeToggle({ injectScript: true }),
-    versionNote({ defaultType: 'info' }),
+    versionNote(),
     reactFlow({ injectStyles: true }),
   ],
 });
@@ -65,7 +65,7 @@ Demonstrates using all components together:
 ---
 import Layout from '../layouts/Layout.astro';
 import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
-import { VersionNote } from '@sjohansson/astro-version-note';
+import { versionNoteHTML } from '@sjohansson/astro-version-note';
 import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
 
 const nodes = [
@@ -82,9 +82,8 @@ const edges = [{ id: 'e1-2', source: '1', target: '2' }];
   </header>
 
   <main>
-    <VersionNote version="v1.0.0" type="info">
-      This example demonstrates all three components.
-    </VersionNote>
+    <version-note id="site-version" set:html={versionNoteHTML({ version: 'f61f9f0', built: new Date() })} />
+    <button type="button" aria-controls="site-version" aria-expanded="false">Version</button>
 
     <section>
       <h2>React Flow Diagram</h2>

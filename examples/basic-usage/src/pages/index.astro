@@ -1,5 +1,6 @@
 ---
 import { ReactFlowWrapper } from "@sjohansson/astro-reactflow";
+import { versionNoteHTML } from "@sjohansson/astro-version-note";
 import { voteAttributes, voteButtonsHTML } from "@sjohansson/astro-votes";
 import Layout from "../layouts/Layout.astro";
 
@@ -27,10 +28,6 @@ const edges = [
   </header>
 
   <main>
-    <version-note version="v1.0.0" type="info">
-      This example demonstrates all three Astro integrations working together.
-    </version-note>
-
     <section>
       <h2>Theme Toggle</h2>
       <p>
@@ -40,14 +37,13 @@ const edges = [
     </section>
 
     <section>
-      <h2>Version Notes</h2>
-      <version-note version="v0.5.0" type="warning">
-        This feature requires version 0.5.0 or higher.
-      </version-note>
-
-      <version-note version="v2.0.0" type="success">
-        This feature was added in version 2.0.0.
-      </version-note>
+      <h2>Version Note</h2>
+      <p>Press the button to see which build this page came from.</p>
+      <version-note
+        id="example-version"
+        set:html={versionNoteHTML({ version: "f61f9f0", built: "2026-10-20T19:00:00.000Z", timeZone: "UTC" })}
+      />
+      <button type="button" aria-controls="example-version" aria-expanded="false">Show version info</button>
     </section>
 
     <section>
@@ -85,7 +81,7 @@ const edges = [
       <h3>Integrations Used:</h3>
       <ul>
         <li><strong>Theme Toggle</strong> - Provides dark/light mode switching</li>
-        <li><strong>Version Note</strong> - Displays version-specific documentation notes</li>
+        <li><strong>Version Note</strong> - Shows the commit and build time of the running site</li>
         <li><strong>React Flow</strong> - Renders interactive diagrams and flowcharts</li>
       </ul>
     </section>
@@ -94,9 +90,7 @@ const edges = [
 
 <script>
   import { registerThemeToggle } from "@sjohansson/astro-theme-toggle";
-  import { registerVersionNote } from "@sjohansson/astro-version-note";
   registerThemeToggle();
-  registerVersionNote();
   document.addEventListener("vote-change", (event) => console.log("vote-change", (event as CustomEvent).detail));
 </script>
 

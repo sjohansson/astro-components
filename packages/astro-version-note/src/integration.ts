@@ -1,57 +1,32 @@
 import type { AstroIntegration } from "astro";
 
-export interface VersionNoteOptions {
-  /**
-   * Default version to display if not specified per-component
-   */
-  defaultVersion?: string;
-
-  /**
-   * Default type/variant for version notes
-   * @default 'info'
-   */
-  defaultType?: "info" | "warning" | "success" | "error";
-}
+/** The client script injected on every page. Exported for tests. */
+export const CLIENT_SCRIPT = [
+  'import { registerVersionNote } from "@sjohansson/astro-version-note";',
+  "registerVersionNote();",
+].join("\n");
 
 /**
- * Astro integration for the Version Note component.
- *
- * This integration provides documentation version notes for Astro sites,
- * perfect for highlighting version-specific features or changes.
- *
- * Note: The default values configured in this integration are informational only.
- * Component props must be explicitly provided when using the VersionNote component.
+ * Astro integration for `<version-note>`. Registers the element on every page,
+ * so pages need no script of their own.
  *
  * @example
  * ```js
  * // astro.config.mjs
- * import versionNote from '@sjohansson/astro-version-note/integration';
+ * import versionNote from "@sjohansson/astro-version-note/integration";
  *
  * export default defineConfig({
- *   integrations: [
- *     versionNote({
- *       defaultVersion: 'v1.0.0',
- *       defaultType: 'info'
- *     })
- *   ],
+ *   integrations: [versionNote()],
  * });
  * ```
  */
-export default function versionNoteIntegration(options: VersionNoteOptions = {}): AstroIntegration {
+export default function versionNoteIntegration(): AstroIntegration {
   return {
     name: "@sjohansson/astro-version-note",
     hooks: {
-      "astro:config:setup": ({ logger }) => {
-        logger.info("Setting up Version Note integration");
-        if (options.defaultVersion) {
-          logger.debug(`Default version configured: ${options.defaultVersion}`);
-        }
-        if (options.defaultType) {
-          logger.debug(`Default type configured: ${options.defaultType}`);
-        }
-      },
-      "astro:config:done": ({ logger }) => {
-        logger.info("Version Note integration configured");
+      "astro:config:setup": ({ injectScript, logger }) => {
+        injectScript("page", CLIENT_SCRIPT);
+        logger.debug("Version note registered");
       },
     },
   };

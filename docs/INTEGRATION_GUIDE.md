@@ -76,26 +76,19 @@ import { defineConfig } from 'astro/config';
 import versionNote from '@sjohansson/astro-version-note/integration';
 
 export default defineConfig({
-  integrations: [
-    versionNote({
-      // Optional: set defaults for all version notes
-      defaultVersion: 'v1.0.0',
-      defaultType: 'info', // 'info' | 'warning' | 'success' | 'error'
-    })
-  ],
+  integrations: [versionNote()],
 });
 ```
 
-Then use the component:
+Then render the panel and a button that controls it:
 
 ```astro
 ---
-import { VersionNote } from '@sjohansson/astro-version-note';
+import { versionNoteHTML } from '@sjohansson/astro-version-note';
 ---
 
-<VersionNote version="v2.0.0" type="warning">
-  This feature requires version 2.0.0 or higher.
-</VersionNote>
+<version-note id="site-version" set:html={versionNoteHTML({ version: 'f61f9f0', built: new Date() })} />
+<button type="button" aria-controls="site-version" aria-expanded="false">Version</button>
 ```
 
 **Benefits of using the integration:**

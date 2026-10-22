@@ -65,12 +65,15 @@ a multi-theme controller, and a preview palette — all as custom elements.
 
 ### `@sjohansson/astro-version-note`
 
-Simple version callout badge for documentation sites. Renders as `<version-note>` custom element.
+Collapsible build info panel: version (commit hash) and build time. Renders as `<version-note>`, opened by any
+button whose `aria-controls` names its `id`.
 
 - **Component type:** Web Component (custom element, Light DOM)
 - **Peer deps:** `astro ^5 || ^6 || ^7`
-- **Exports:** `.` (component + register fn), `./integration` (Astro integration)
-- **Attributes:** `version`, `type` (`info` | `warning` | `success` | `error`)
+- **Exports:** `.` (element, register fn, `versionNoteHTML` and `formatBuildTime` for server rendering),
+  `./integration` (registers the element on every page)
+- **Attributes:** `id`, `open`, `version`, `built`, `locale`, `time-zone`, label attributes, `close-class`,
+  `scroll-to-bottom`
 
 ### `@sjohansson/astro-votes`
 

@@ -13,10 +13,8 @@ export default defineConfig({
       // Inject theme initialization script globally
       injectScript: true,
     }),
-    versionNote({
-      // Document version note conventions (informational)
-      defaultType: "info",
-    }),
+    // Registers <version-note> on every page
+    versionNote(),
     reactFlow({
       // Configure SSR handling for React Flow
       configureSsr: true,

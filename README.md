@@ -11,7 +11,7 @@ This monorepo contains the following Astro components:
 
 - **[@sjohansson/astro-reactflow](./packages/astro-reactflow)** - React Flow integration for Astro
 - **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
-- **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Version note component for site checks/documentation
+- **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Collapsible panel showing the commit and build time of the running site
 - **[@sjohansson/astro-votes](./packages/astro-votes)** - Like and dislike buttons for static sites, counted through your analytics tool
 
 Each component can be used as either a standalone component or as an Astro integration for enhanced functionality and automatic configuration.
