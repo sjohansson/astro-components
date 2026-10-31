@@ -33,7 +33,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "astro": "^7.3.4",
-    "happy-dom": "^20.14.5",
+    "happy-dom": "^21.0.0",
     "markdownlint-cli2": "^0.23.3",
     "tsdown": "^0.23.0",
     "typescript": "^6.0.3",

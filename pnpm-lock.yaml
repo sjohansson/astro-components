@@ -30,8 +30,8 @@ importers:
         specifier: ^7.3.4
         version: 7.4.1(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
       happy-dom:
-        specifier: ^20.14.5
-        version: 20.14.6
+        specifier: ^21.0.0
+        version: 21.0.4
       markdownlint-cli2:
         specifier: ^0.23.3
         version: 0.23.3(supports-color@7.2.0)
@@ -46,7 +46,7 @@ importers:
         version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
       vitest:
         specifier: ^4.1.11
-        version: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@20.14.6)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
+        version: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@21.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
 
   examples/basic-usage:
     dependencies:
@@ -1794,8 +1794,8 @@ packages:
   h3@1.15.11:
     resolution: {integrity: sha512-L3THSe2MPeBwgIZVSH5zLdBBU90TOxarvhK9d04IDY2AmVS8j2Jz2LIWtwsGOU3lu2I5jCN7FNvVfY2+XyF+mg==}
 
-  happy-dom@20.14.6:
-    resolution: {integrity: sha512-5DDsf4QmEIlRL6NkCv/fxSjYHHkZceL/IaYQdJc2h3G7DRTEai++VTjbfL0LB9geW2VrA3+vrjF3Efx+OTtX0Q==}
+  happy-dom@21.0.4:
+    resolution: {integrity: sha512-tFm+GaLBgo6o0awHnvHaNoraVo27qJ+2tZEtZ+cIa08hXbeitrxAJajLI05hsUy/2/YTKcUjQYzHe5mCcraLBw==}
     engines: {node: '>=20.0.0'}
 
   has-flag@4.0.0:
@@ -3861,7 +3861,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@20.14.6)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
+      vitest: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@21.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
 
   '@vitest/expect@4.1.12':
     dependencies:
@@ -3907,7 +3907,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@20.14.6)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
+      vitest: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@21.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
 
   '@vitest/utils@4.1.12':
     dependencies:
@@ -4503,7 +4503,7 @@ snapshots:
       ufo: 1.6.4
       uncrypto: 0.1.3
 
-  happy-dom@20.14.6:
+  happy-dom@21.0.4:
     dependencies:
       '@types/node': 26.6.5
       '@types/whatwg-mimetype': 3.0.2
@@ -5433,7 +5433,7 @@ snapshots:
     optionalDependencies:
       vite: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
 
-  vitest@4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@20.14.6)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)):
+  vitest@4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(happy-dom@21.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
       '@vitest/mocker': 4.1.12(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1))
@@ -5459,7 +5459,7 @@ snapshots:
       '@types/node': 26.6.5
       '@vitest/coverage-v8': 4.1.12(vitest@4.1.12)
       '@vitest/ui': 4.1.12(vitest@4.1.12)
-      happy-dom: 20.14.6
+      happy-dom: 21.0.4
     transitivePeerDependencies:
       - msw
 

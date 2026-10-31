@@ -21,3 +21,5 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-linux-x64@2.5.1'
   - '@biomejs/cli-win32-arm64@2.5.1'
   - '@biomejs/cli-win32-x64@2.5.1'
+  # Renovate security update: happy-dom@21.0.4
+  - happy-dom@21.0.4
