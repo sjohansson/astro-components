@@ -13,6 +13,8 @@ This monorepo contains the following Astro components:
 - **[@sjohansson/astro-theme-toggle](./packages/astro-theme-toggle)** - Modern theme toggle with Tailwind CSS 4 support
 - **[@sjohansson/astro-version-note](./packages/astro-version-note)** - Collapsible panel showing the commit and build time of the running site
 - **[@sjohansson/astro-votes](./packages/astro-votes)** - Like and dislike buttons for static sites, counted through your analytics tool
+- **[@sjohansson/astro-umami](./packages/astro-umami)** - First-party Umami analytics: bundled tracker plus a relay on your own domain
+- **[@sjohansson/astro-plausible](./packages/astro-plausible)** - First-party Plausible analytics: bundled tracker plus a relay on your own domain
 
 Each component can be used as either a standalone component or as an Astro integration for enhanced functionality and automatic configuration.
 
@@ -122,7 +124,9 @@ astro-components/
 │   ├── astro-reactflow/     # React Flow integration
 │   ├── astro-theme-toggle/  # Theme toggle component
 │   ├── astro-version-note/  # Version note component
-│   └── astro-votes/         # Like/dislike buttons
+│   ├── astro-votes/         # Like/dislike buttons
+│   ├── astro-umami/         # Umami tracker and relay
+│   └── astro-plausible/     # Plausible tracker and relay
 ├── biome.json               # Biome configuration
 ├── tsconfig.json            # TypeScript configuration
 ├── vitest.config.ts         # Vitest configuration

@@ -38,6 +38,17 @@ export function parseVote(value: string): { item: string; op: VoteOp } | null {
   return { item: value.slice(0, at), op: value.slice(at + 1) as VoteOp };
 }
 
+/**
+ * A relay rule for vote events: only the vote property is forwarded, and it must be a valid wire value. Fits the
+ * `events` option of the `@sjohansson/astro-umami` and `@sjohansson/astro-plausible` relays.
+ */
+export function voteRelayRule(
+  eventName: string = DEFAULT_EVENT_NAME,
+  propertyName: string = DEFAULT_PROPERTY_NAME,
+): Record<string, Record<string, RegExp>> {
+  return { [eventName]: { [propertyName]: VOTE_VALUE_PATTERN } };
+}
+
 /** The ops that move a visitor from one vote to another, in send order. */
 export function opsForChange(from: VoteState, to: VoteState): VoteOp[] {
   if (from === to) return [];

@@ -15,6 +15,8 @@ packages/
   astro-theme-toggle/    # Theme toggle Web Components    (@sjohansson/astro-theme-toggle)
   astro-version-note/    # Version note Web Component     (@sjohansson/astro-version-note)
   astro-votes/           # Like/dislike Web Component     (@sjohansson/astro-votes)
+  astro-umami/           # Umami tracker + event relay    (@sjohansson/astro-umami)
+  astro-plausible/       # Plausible tracker + event relay (@sjohansson/astro-plausible)
 examples/
   basic-usage/           # Example Astro site using all packages
   theming-showcase/      # Theme toggle showcase
@@ -88,6 +90,38 @@ Like and dislike buttons for static sites. Renders as `<vote-buttons>`. Votes go
   it breaks every consumer's existing counts.
 - **Umami limit:** the values endpoint returns at most 100 rows, so the sync splits the time window until each part
   fits. Keep that when touching `fetchUmamiValues`.
+- **Relay rule:** `voteRelayRule()` returns the `events` option for the astro-umami and astro-plausible relays. No
+  cross-package import, only a shared shape.
+
+### `@sjohansson/astro-umami`
+
+First-party Umami analytics. The Umami Cloud tracker is vendored (`vendor/umami.js`, byte-identical to upstream)
+and bundled into the page through `startUmami()`, which sets `window.umamiConfig` and then runs the script. Events
+go to `<hostUrl>/api/send` on the site, where a relay forwards them to Umami with the visitor IP and user agent.
+
+- **Component type:** Astro integration (page script) plus a platform-neutral relay and a Node CLI
+- **Peer deps:** `astro ^5 || ^6 || ^7` (optional)
+- **Exports:** `.` (options and config helpers), `./integration`, `./client` (`startUmami`, browser only),
+  `./relay` (`createRelay`, `swaHandler`, `clientIp`)
+- **Bin:** `astro-umami init --target swa` writes `api/send/` as one self-contained file for Static Web Apps
+  managed functions. The file comes from `dist/templates/swa.mjs`, a second tsdown config in the package.
+- **Vendored script:** `import run from "../vendor/umami.js?fn"` wraps the file in a function at build time
+  (`vendorScriptPlugin` in `tsdown.package.config.ts`, also in `vitest.config.ts`). Never edit `vendor/umami.js`;
+  `pnpm update-tracker` refreshes it and the `Update Umami tracker` workflow opens a PR when upstream changes.
+- **Relay rules:** `events: { name: { property: pattern } }` forwards an event only with the listed properties,
+  each matching its pattern. The CLI takes them as `--rule name:property=regex`.
+
+### `@sjohansson/astro-plausible`
+
+First-party Plausible analytics with the same shape as astro-umami. The tracker is the official
+`@plausible-analytics/tracker` npm package (a dependency, bundled by the consumer's Vite), so nothing is vendored
+and Renovate keeps it current. Events go to `endpoint` (default `/api/event`), where the relay forwards them to
+Plausible with the visitor IP in `X-Forwarded-For`. Plausible drops events without a real visitor IP.
+
+- **Component type:** Astro integration (page script) plus a platform-neutral relay and a Node CLI
+- **Deps:** `@plausible-analytics/tracker`; peer `astro ^5 || ^6 || ^7` (optional)
+- **Exports:** `.`, `./integration`, `./client` (`startPlausible`, `track`), `./relay`
+- **Bin:** `astro-plausible init --target swa` writes `api/event/`, same mechanics as astro-umami.
 
 ## Build & Test Commands
 
