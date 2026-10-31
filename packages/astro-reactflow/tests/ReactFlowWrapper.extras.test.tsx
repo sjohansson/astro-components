@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ReactFlowWrapper, { type DiagramEdge, type DiagramNode } from "../src/ReactFlowWrapper";
 
@@ -290,9 +290,11 @@ describe("minimap sizing edge cases", () => {
       // The pane grows; the observer callback re-measures.
       restoreOffsets();
       restoreOffsets = stubOffsets(800, 600);
-      for (const fn of observers) {
-        fn();
-      }
+      act(() => {
+        for (const fn of observers) {
+          fn();
+        }
+      });
       await waitFor(() => {
         expect(miniMapStyle()).toEqual({ width: 400, height: 300 });
       });
