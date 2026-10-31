@@ -68,6 +68,18 @@ describe("createRelay().forward", () => {
     expect(body(forward).p).toEqual({ vote: "why-test-things:up-undo" });
   });
 
+  it("drops the props aliases Plausible would read instead of the checked p", () => {
+    const smuggled = { vote: "<script>" };
+    const forward = relay.forward(
+      event({ n: "vote", p: { vote: "post:up" }, m: smuggled, meta: smuggled, props: smuggled }),
+      {},
+    );
+    expect(body(forward)).toMatchObject({ p: { vote: "post:up" } });
+    expect(body(forward)).not.toHaveProperty("m");
+    expect(body(forward)).not.toHaveProperty("meta");
+    expect(body(forward)).not.toHaveProperty("props");
+  });
+
   it("rejects events that break their rule", () => {
     for (const p of [undefined, {}, { vote: 1 }, { vote: "why-test-things" }, { vote: "x:sideways" }]) {
       expect(relay.forward(event({ n: "vote", p }), {})).toBeNull();

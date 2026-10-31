@@ -119,6 +119,8 @@ function compileRules(events: Record<string, RelayRule> = {}): Map<string, [stri
   return compiled;
 }
 
+const PROPS_ALIASES = ["m", "meta", "props"];
+
 /** Applies the rule for an event. Returns the props to forward, or null when the event is not valid. */
 function applyRule(rules: [string, RegExp][], props: unknown): Record<string, string> | null {
   const source = props && typeof props === "object" ? (props as Record<string, unknown>) : {};
@@ -190,6 +192,8 @@ export function createRelay(options: RelayOptions): Relay {
       if (rules.has(name)) {
         const kept = applyRule(rules.get(name) ?? [], event["p"]);
         if (!kept) return null;
+        // Plausible also takes props as m, meta or props, and reads m and meta before p.
+        for (const alias of PROPS_ALIASES) delete event[alias];
         event["p"] = kept;
       }
 
