@@ -22,4 +22,5 @@ export {
   VOTE_VALUE_PATTERN,
   type VoteOp,
   type VoteState,
+  voteRelayRule,
 } from "./wire";

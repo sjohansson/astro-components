@@ -53,12 +53,18 @@ importers:
       '@astrojs/react':
         specifier: ^7.0.0
         version: 7.1.0(@types/node@26.6.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(yaml@2.9.1)
+      '@sjohansson/astro-plausible':
+        specifier: workspace:*
+        version: link:../../packages/astro-plausible
       '@sjohansson/astro-reactflow':
         specifier: workspace:*
         version: link:../../packages/astro-reactflow
       '@sjohansson/astro-theme-toggle':
         specifier: workspace:*
         version: link:../../packages/astro-theme-toggle
+      '@sjohansson/astro-umami':
+        specifier: workspace:*
+        version: link:../../packages/astro-umami
       '@sjohansson/astro-version-note':
         specifier: workspace:*
         version: link:../../packages/astro-version-note
@@ -103,6 +109,15 @@ importers:
         specifier: ^7.3.4
         version: 7.4.1(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
 
+  packages/astro-plausible:
+    dependencies:
+      '@plausible-analytics/tracker':
+        specifier: ^0.4.7
+        version: 0.4.7
+      astro:
+        specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
+        version: 7.4.1(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
+
   packages/astro-reactflow:
     dependencies:
       astro:
@@ -141,6 +156,12 @@ importers:
         version: 19.3.1(react@19.3.1)
 
   packages/astro-theme-toggle:
+    dependencies:
+      astro:
+        specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
+        version: 7.4.1(@types/node@26.6.5)(esbuild@0.28.2)(yaml@2.9.1)
+
+  packages/astro-umami:
     dependencies:
       astro:
         specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
@@ -904,6 +925,9 @@ packages:
 
   '@oxc-project/types@0.153.0':
     resolution: {integrity: sha512-jSNrRIyvPVLL5E1z/tS5zLAprosGz/FuI1PWwEOz59j3E4TTTzSpqKb/RDGqJhhW0QHYISGXxq582wGx6T11Tw==}
+
+  '@plausible-analytics/tracker@0.4.7':
+    resolution: {integrity: sha512-majmq1uion4uLo88Tr0eMCMfi7TY00okp3I0Vql9egFaAz6DYCW4bJaV3t5LB3BfcvW5exJpmqzROU0a1b6nAA==}
 
   '@pnpm/deps.graph-sequencer@1100.0.1':
     resolution: {integrity: sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A==}
@@ -3604,6 +3628,8 @@ snapshots:
   '@oslojs/encoding@1.1.0': {}
 
   '@oxc-project/types@0.153.0': {}
+
+  '@plausible-analytics/tracker@0.4.7': {}
 
   '@pnpm/deps.graph-sequencer@1100.0.1': {}
 

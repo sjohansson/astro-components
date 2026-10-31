@@ -89,3 +89,6 @@ jobs:
           test -d packages/astro-reactflow/dist
           test -d packages/astro-theme-toggle/dist
           test -d packages/astro-version-note/dist
+          test -d packages/astro-votes/dist
+          test -f packages/astro-umami/dist/templates/swa.mjs
+          test -f packages/astro-plausible/dist/templates/swa.mjs

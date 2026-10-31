@@ -1,0 +1,72 @@
+{
+  "name": "@sjohansson/astro-plausible",
+  "version": "0.0.0",
+  "description": "First-party Plausible analytics for Astro sites. The official tracker is bundled into your site's own JavaScript and events go through a relay on your domain, so ad blockers do not drop them.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "import": "./dist/integration.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./relay": {
+      "types": "./dist/relay.d.ts",
+      "import": "./dist/relay.js"
+    }
+  },
+  "bin": {
+    "astro-plausible": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "clean": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\"",
+    "test": "vitest"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "plausible",
+    "analytics",
+    "privacy",
+    "proxy",
+    "static-site"
+  ],
+  "author": "sjohansson",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjohansson/astro-components.git",
+    "directory": "packages/astro-plausible"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@plausible-analytics/tracker": "^0.4.7"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "astro": {
+      "optional": true
+    }
+  },
+  "sideEffects": false
+}

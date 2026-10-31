@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { countsFor, voteAttributes } from "../src/data";
-import { encodeVote, isValidItem, opsForChange, parseVote, VOTE_VALUE_PATTERN } from "../src/wire";
+import { encodeVote, isValidItem, opsForChange, parseVote, VOTE_VALUE_PATTERN, voteRelayRule } from "../src/wire";
 
 describe("wire format", () => {
   it("round-trips item and op, including path items", () => {
@@ -50,5 +50,14 @@ describe("data helpers", () => {
   it("builds element attributes with synced-at only when known", () => {
     expect(voteAttributes(data, "a")).toEqual({ item: "a", up: 3, down: 1, "synced-at": data.updated });
     expect(voteAttributes({ updated: null, items: {} }, "a")).toEqual({ item: "a", up: 0, down: 0 });
+  });
+});
+
+describe("voteRelayRule", () => {
+  it("validates the vote property with the wire pattern", () => {
+    const rule = voteRelayRule();
+    expect(Object.keys(rule)).toEqual(["vote"]);
+    expect(rule["vote"]?.["vote"]).toBe(VOTE_VALUE_PATTERN);
+    expect(voteRelayRule("rating", "value")).toEqual({ rating: { value: VOTE_VALUE_PATTERN } });
   });
 });

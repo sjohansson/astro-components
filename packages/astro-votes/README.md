@@ -147,7 +147,23 @@ four ops, `up`, `up-undo`, `down`, and `down-undo`, and six possible changes:
 Totals are `up - up-undo` and `down - down-undo`, never below zero. Every toggle sends a balanced pair over time, so
 click spam nets out.
 
-If you relay analytics through your own endpoint, validate vote events there with the exported pattern:
+If you relay analytics through your own endpoint, validate vote events there. The relays in
+`@sjohansson/astro-umami` and `@sjohansson/astro-plausible` take the rule directly:
+
+```js
+import { createRelay } from "@sjohansson/astro-umami/relay";
+import { voteRelayRule } from "@sjohansson/astro-votes";
+
+const relay = createRelay({ websiteId: "...", events: voteRelayRule() });
+```
+
+For their `init` CLIs, pass the pattern as a rule:
+
+```sh
+astro-umami init --website-id <id> --rule "vote:vote=^[A-Za-z0-9._/-]{1,200}:(?:up|down)(?:-undo)?$"
+```
+
+Anywhere else, use the exported pattern:
 
 ```js
 import { VOTE_VALUE_PATTERN } from "@sjohansson/astro-votes";

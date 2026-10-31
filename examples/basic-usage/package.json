@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
+    "@sjohansson/astro-plausible": "workspace:*",
     "@sjohansson/astro-reactflow": "workspace:*",
     "@sjohansson/astro-theme-toggle": "workspace:*",
+    "@sjohansson/astro-umami": "workspace:*",
     "@sjohansson/astro-version-note": "workspace:*",
     "@sjohansson/astro-votes": "workspace:*",
     "@xyflow/react": "^12.11.0",
