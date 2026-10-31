@@ -184,6 +184,7 @@ describe("createRelay().handle", () => {
     } as unknown as Request;
     expect((await relay.handle(oversized)).status).toBe(413);
     expect((await relay.handle(request({ body: "nope" }))).status).toBe(400);
+    expect((await relay.handle(request({ body: undefined }))).status).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

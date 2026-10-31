@@ -120,6 +120,31 @@ describe("<version-note> toggling", () => {
     expect(el.open).toBe(true);
   });
 
+  it("ignores every button without an id to match", () => {
+    const toggle = addToggle("");
+    const el = mount({ id: "" });
+    toggle.click();
+    expect(el.open).toBe(false);
+    expect(toggle.hasAttribute("aria-expanded")).toBe(false);
+  });
+
+  it("closes again from the same button", () => {
+    const toggle = addToggle();
+    const el = mount({ "scroll-to-bottom": "" });
+    const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    toggle.click();
+    toggle.click();
+    expect(el.open).toBe(false);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(scroll).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores clicks inside it that miss the close button", () => {
+    const el = mount({ open: "" });
+    (el.querySelector(".version-note") as HTMLElement).click();
+    expect(el.open).toBe(true);
+  });
+
   it("ignores buttons that control something else", () => {
     const other = addToggle("menu");
     const el = mount();

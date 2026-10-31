@@ -128,6 +128,13 @@ describe("<vote-buttons> voting", () => {
     expect(count(mount({ "synced-at": SYNCED }), "down")).toBe("3");
   });
 
+  it("ignores a stored vote it cannot read", () => {
+    localStorage.setItem("votes:my-post", "{not json");
+    localStorage.setItem("votes:other", JSON.stringify({ v: "sideways", b: null, t: 1 }));
+    expect(mount().state).toBeNull();
+    expect(mount({ item: "other" }).state).toBeNull();
+  });
+
   it("still works when storage throws", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("blocked");
@@ -158,6 +165,19 @@ describe("<vote-buttons> voting", () => {
     expect(() => button(el, "up").click()).not.toThrow();
   });
 
+  it("sends nothing with the none transport but still fires vote-change", () => {
+    const track = vi.fn();
+    (globalThis as { umami?: unknown }).umami = { track };
+    configureVotes({ transport: "none" });
+    const el = mount();
+    const changes: VoteChangeDetail[] = [];
+    el.addEventListener("vote-change", (e) => changes.push((e as CustomEvent<VoteChangeDetail>).detail));
+    button(el, "up").click();
+    expect(track).not.toHaveBeenCalled();
+    expect(changes).toEqual([{ item: "my-post", from: null, to: "up", ops: ["up"] }]);
+    delete (globalThis as { umami?: unknown }).umami;
+  });
+
   it("calls umami.track when the tracker is present", () => {
     const track = vi.fn();
     (globalThis as { umami?: unknown }).umami = { track };
@@ -169,6 +189,31 @@ describe("<vote-buttons> voting", () => {
 });
 
 describe("<vote-buttons> lifecycle", () => {
+  it("updates counts in place when a count attribute changes", () => {
+    const el = mount();
+    const up = button(el, "up");
+    el.setAttribute("up", "42");
+    expect(count(el, "up")).toBe("42");
+    expect(button(el, "up")).toBe(up);
+  });
+
+  it("loads the stored vote when the item changes", () => {
+    button(mount({ item: "first" }), "down").click();
+    const el = mount({ item: "second" });
+    expect(el.state).toBeNull();
+    el.setAttribute("item", "first");
+    expect(el.state).toBe("down");
+    expect(button(el, "down").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("re-renders the markup when a label changes", () => {
+    const el = mount();
+    el.setAttribute("label-up", "Yes");
+    el.setAttribute("group-label", "Rate this");
+    expect(button(el, "up").textContent).toContain("Yes");
+    expect(el.querySelector(".vote-buttons")?.getAttribute("aria-label")).toBe("Rate this");
+  });
+
   it("re-adds styles after a view transition swap", () => {
     mount();
     document.getElementById("vote-buttons-styles")?.remove();

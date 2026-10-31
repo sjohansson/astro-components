@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * astro-votes-sync - pulls vote totals from Umami and writes the data file.
  *
@@ -28,7 +27,16 @@ Environment:
   UMAMI_API_KEY      Umami Cloud API key or self-hosted bearer token (required)
 `;
 
-export async function main(argv: string[], env: Record<string, string | undefined>): Promise<number> {
+export interface CliContext {
+  fetch?: typeof globalThis.fetch;
+  now?: Date;
+}
+
+export async function main(
+  argv: string[],
+  env: Record<string, string | undefined>,
+  context: CliContext = {},
+): Promise<number> {
   const { values } = parseArgs({
     args: argv,
     options: {
@@ -58,7 +66,7 @@ export async function main(argv: string[], env: Record<string, string | undefine
   if (!websiteId) return fail("No website id. Pass --website or set UMAMI_WEBSITE_ID.");
   if (Number.isNaN(startAt)) return fail(`--since is not a date: ${values.since}`);
 
-  const now = new Date();
+  const now = context.now ?? new Date();
   const rows = await fetchUmamiValues({
     apiUrl,
     apiKey,
@@ -67,6 +75,7 @@ export async function main(argv: string[], env: Record<string, string | undefine
     propertyName: values.property ?? DEFAULT_PROPERTY_NAME,
     startAt,
     endAt: now.getTime(),
+    ...(context.fetch ? { fetch: context.fetch } : {}),
   });
   const data = buildVoteData(fold(rows), now);
   const count = Object.keys(data.items).length;
@@ -88,16 +97,7 @@ export async function main(argv: string[], env: Record<string, string | undefine
   return 0;
 }
 
-function fail(message: string): number {
+export function fail(message: string): number {
   process.stderr.write(`astro-votes-sync: ${message}\n`);
   return 1;
 }
-
-main(process.argv.slice(2), process.env).then(
-  (code) => {
-    process.exitCode = code;
-  },
-  (error: unknown) => {
-    process.exitCode = fail(error instanceof Error ? error.message : String(error));
-  },
-);

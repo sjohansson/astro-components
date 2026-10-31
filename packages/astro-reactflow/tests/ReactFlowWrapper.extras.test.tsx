@@ -11,6 +11,11 @@ import ReactFlowWrapper, { type DiagramEdge, type DiagramNode } from "../src/Rea
 
 const toPng = vi.fn();
 const toSvg = vi.fn();
+const setEdges = vi.fn();
+const addEdge = vi.fn();
+// Function props do not survive the JSON in data-props, so the latest ones are kept here.
+// biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
+let flowHandlers: Record<string, any> = {};
 
 vi.mock("html-to-image", () => ({
   toPng: (...args: unknown[]) => toPng(...args),
@@ -22,11 +27,14 @@ vi.mock("@xyflow/react", async () => {
   return {
     ...actual,
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
-    ReactFlow: ({ children, ...props }: any) => (
-      <div data-testid="react-flow" data-props={JSON.stringify(props)}>
-        {children}
-      </div>
-    ),
+    ReactFlow: ({ children, ...props }: any) => {
+      flowHandlers = props;
+      return (
+        <div data-testid="react-flow" data-props={JSON.stringify(props)}>
+          {children}
+        </div>
+      );
+    },
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
     ReactFlowProvider: ({ children }: any) => <div>{children}</div>,
     Background: () => <div data-testid="background" />,
@@ -50,8 +58,8 @@ vi.mock("@xyflow/react", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
     useNodesState: (initialNodes: any) => [initialNodes, vi.fn(), vi.fn()],
     // biome-ignore lint/suspicious/noExplicitAny: minimal test doubles
-    useEdgesState: (initialEdges: any) => [initialEdges, vi.fn(), vi.fn()],
-    addEdge: vi.fn(),
+    useEdgesState: (initialEdges: any) => [initialEdges, setEdges, vi.fn()],
+    addEdge: (...args: unknown[]) => addEdge(...args),
     MarkerType: { Arrow: "arrow", ArrowClosed: "arrowclosed" },
     BackgroundVariant: { Dots: "dots", Lines: "lines", Cross: "cross" },
   };
@@ -92,6 +100,8 @@ beforeEach(() => {
   document.documentElement.removeAttribute("data-theme-scheme");
   toPng.mockReset();
   toSvg.mockReset();
+  setEdges.mockReset();
+  addEdge.mockReset();
   toPng.mockResolvedValue("data:image/png;base64,AAA");
   toSvg.mockResolvedValue("data:image/svg+xml;base64,BBB");
 });
@@ -99,6 +109,51 @@ beforeEach(() => {
 afterEach(() => {
   document.body.style.overflow = "";
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
+
+describe("drawing connections", () => {
+  const connection = { source: "2", target: "1", sourceHandle: null, targetHandle: null };
+
+  it("adds the edge when interactive", () => {
+    render(<ReactFlowWrapper nodes={nodes} edges={edges} interactive />);
+    flowHandlers["onConnect"](connection);
+    expect(setEdges).toHaveBeenCalledTimes(1);
+    const current = [{ id: "e1-2" }];
+    setEdges.mock.calls[0]?.[0](current);
+    expect(addEdge).toHaveBeenCalledWith(connection, current);
+  });
+
+  it("ignores it on a static diagram", () => {
+    render(<ReactFlowWrapper nodes={nodes} edges={edges} />);
+    flowHandlers["onConnect"]?.(connection);
+    expect(setEdges).not.toHaveBeenCalled();
+  });
+});
+
+describe("zero-size warning", () => {
+  // The warning is off under the test runner, so pretend to be the dev server.
+  beforeEach(() => {
+    vi.stubEnv("DEV", true);
+    vi.stubEnv("MODE", "development");
+  });
+
+  it("warns in development when the pane has no size", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<ReactFlowWrapper nodes={nodes} edges={edges} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("rendered with zero size (0×0px)"));
+  });
+
+  it("stays quiet once the pane has a size", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const restore = stubOffsets(800, 600);
+    try {
+      render(<ReactFlowWrapper nodes={nodes} edges={edges} />);
+    } finally {
+      restore();
+    }
+    expect(warn).not.toHaveBeenCalled();
+  });
 });
 
 describe("node definition mapping", () => {

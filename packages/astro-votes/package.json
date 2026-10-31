@@ -20,7 +20,7 @@
     }
   },
   "bin": {
-    "astro-votes-sync": "./dist/cli.js"
+    "astro-votes-sync": "./dist/bin.js"
   },
   "files": [
     "dist"

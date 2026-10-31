@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -125,6 +125,31 @@ describe("fetchUmamiValues", () => {
     );
   });
 
+  it("waits between requests, but not before the first", async () => {
+    vi.useFakeTimers();
+    try {
+      const full = Array.from({ length: UMAMI_ROW_LIMIT }, (_, i) => ({ value: `p${i}:up`, total: 1 }));
+      const fetch = vi.fn(async () => response([])).mockResolvedValueOnce(response(full));
+      const done = fetchUmamiValues({ ...base, requestGap: 1000, fetch });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(999);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetch).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1000);
+      await done;
+      expect(fetch).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reports the status when the error body cannot be read", async () => {
+    const broken = { ok: false, status: 503, text: async () => Promise.reject(new Error("gone")) } as Response;
+    await expect(fetchUmamiValues({ ...base, fetch: async () => broken })).rejects.toThrow(/failed with 503: $/);
+  });
+
   it("gives up on a tiny window that is still full", async () => {
     const full = Array.from({ length: UMAMI_ROW_LIMIT }, (_, i) => ({ value: `p${i}:up`, total: 1 }));
     await expect(fetchUmamiValues({ ...base, endAt: 30_000, fetch: async () => response(full) })).rejects.toThrow(
@@ -144,6 +169,13 @@ describe("writeVoteData", () => {
       expect(JSON.parse(text)).toEqual({ updated: SYNC, items: { a: { up: 1, down: 0 } } });
       expect(await readVoteData(path)).toEqual({ updated: SYNC, items: { a: { up: 1, down: 0 } } });
       expect(await readVoteData(join(dir, "missing.json"))).toBeNull();
+
+      await writeFile(path, JSON.stringify({ items: { a: { up: 1, down: 0 } } }));
+      expect(await readVoteData(path)).toEqual({ updated: null, items: { a: { up: 1, down: 0 } } });
+      for (const other of ["null", "[1]", '{"items":null}']) {
+        await writeFile(path, other);
+        expect(await readVoteData(path)).toBeNull();
+      }
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

@@ -70,23 +70,14 @@ if ($LASTEXITCODE -ne 0) {
 
 # Tests
 Write-Host ""
-Write-Host "🧪 Running tests..." -ForegroundColor Yellow
-pnpm test run
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Tests failed" -ForegroundColor Red
-    $failed = $true
-} else {
-    Write-Host "✅ Tests passed" -ForegroundColor Green
-}
-
-# Coverage
-Write-Host ""
-Write-Host "📊 Generating coverage..." -ForegroundColor Yellow
+# One run gives both results; it fails on a failing test or on coverage below the thresholds in vitest.config.ts.
+Write-Host "🧪 Running tests with coverage..." -ForegroundColor Yellow
 pnpm test:coverage
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "⚠️  Coverage generation had issues (non-critical)" -ForegroundColor Yellow
+    Write-Host "❌ Tests failed or coverage fell below the thresholds" -ForegroundColor Red
+    $failed = $true
 } else {
-    Write-Host "✅ Coverage report generated" -ForegroundColor Green
+    Write-Host "✅ Tests passed, coverage report in coverage/index.html" -ForegroundColor Green
 }
 
 # Summary

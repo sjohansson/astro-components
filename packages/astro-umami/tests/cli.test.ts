@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -156,6 +157,13 @@ describe("main", () => {
     expect(stderr).toContain("--max-body");
     expect(await run(["remove"])).toBe(1);
     expect(stderr).toContain('Unknown command "remove"');
+  });
+
+  it("stamps the installed package version when none is given", async () => {
+    const { version } = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+    const argv = ["init", "--website-id", WEBSITE_ID, "--dry-run"];
+    expect(await main(argv, {}, { templateDir: pathToFileURL(`${templateDir}/`) })).toBe(0);
+    expect(stdout).toContain(`@sjohansson/astro-umami ${version})`);
   });
 });
 

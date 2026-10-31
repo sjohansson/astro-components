@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -128,6 +129,13 @@ describe("main", () => {
     expect(await run(["init", "--domain", DOMAIN, "--rule", "bad"])).toBe(1);
     expect(await run(["init", "--domain", DOMAIN, "--max-body", "lots"])).toBe(1);
     expect(await run(["remove"])).toBe(1);
+  });
+
+  it("stamps the installed package version when none is given", async () => {
+    const { version } = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+    const argv = ["init", "--domain", DOMAIN, "--dry-run"];
+    expect(await main(argv, {}, { templateDir: pathToFileURL(`${templateDir}/`) })).toBe(0);
+    expect(stdout).toContain(`@sjohansson/astro-plausible ${version})`);
   });
 });
 

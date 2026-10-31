@@ -68,8 +68,7 @@ All scripts are in the `scripts/` directory. Run them before committing.
 - Build all packages
 - Lint code
 - Type check
-- Run tests
-- Generate coverage
+- Run tests with coverage (fails below the thresholds in `vitest.config.ts`)
 
 **When to use:** Before releases or major PRs; before pushing to main.
 
