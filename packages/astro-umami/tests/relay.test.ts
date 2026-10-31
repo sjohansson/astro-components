@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clientIp, createRelay, DEFAULT_UPSTREAM, swaHandler } from "../src/relay";
+import { clientIp, createRelay, DEFAULT_UPSTREAM, type SwaContext, swaHandler } from "../src/relay";
 
 const WEBSITE_ID = "930ef364-ec51-4ca5-b5af-2b09ca6a0a21";
 const VOTE_VALUE = "^[A-Za-z0-9._/-]{1,200}:(?:up|down)(?:-undo)?$";
@@ -30,6 +30,12 @@ describe("clientIp", () => {
   it("returns undefined without any IP header", () => {
     expect(clientIp({})).toBeUndefined();
     expect(clientIp({ "x-forwarded-for": " " })).toBeUndefined();
+  });
+
+  it("reads only the given headers", () => {
+    const spoofed = { "x-azure-clientip": "198.51.100.1", "cf-connecting-ip": "203.0.113.7" };
+    expect(clientIp(spoofed, ["cf-connecting-ip"])).toBe("203.0.113.7");
+    expect(clientIp({ "x-forwarded-for": "198.51.100.1" }, ["cf-connecting-ip"])).toBeUndefined();
   });
 });
 
@@ -105,6 +111,27 @@ describe("createRelay().forward", () => {
     expect(custom.forward(event({ padding: "x".repeat(200) }), {})).toBeNull();
   });
 
+  it("ignores the g and y flags, which would make RegExp rules stateful", () => {
+    for (const pattern of [/^post:up$/g, /^post:up$/y]) {
+      const flagged = createRelay({ websiteId: WEBSITE_ID, events: { vote: { vote: pattern } } });
+      for (let i = 0; i < 3; i++) {
+        expect(flagged.forward(event({ name: "vote", data: { vote: "post:up" } }), {})).not.toBeNull();
+      }
+    }
+  });
+
+  it("measures the body limit in UTF-8 bytes", () => {
+    const limited = createRelay({ websiteId: WEBSITE_ID, maxBodyLength: 400 });
+    expect(limited.forward(event({ title: "a".repeat(200) }), {})).not.toBeNull();
+    expect(limited.forward(event({ title: "文".repeat(200) }), {})).toBeNull();
+  });
+
+  it("reads the visitor IP only from the configured headers", () => {
+    const relay = createRelay({ websiteId: WEBSITE_ID, ipHeaders: ["CF-Connecting-IP"] });
+    const headers = { "x-azure-clientip": "198.51.100.1", "cf-connecting-ip": "203.0.113.7" };
+    expect(body(relay.forward(event(), headers)).payload.ip).toBe("203.0.113.7");
+  });
+
   it("rejects a missing website id or an empty rule", () => {
     expect(() => createRelay({ websiteId: [] })).toThrow(/websiteId/);
     expect(() => createRelay({ websiteId: "" })).toThrow(/websiteId/);
@@ -160,6 +187,29 @@ describe("createRelay().handle", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("answers 413 for a body over the limit without a content-length, and stops reading", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    let pulled = 0;
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled++;
+        controller.enqueue(new Uint8Array(512).fill(0x20));
+      },
+    });
+    const chunked = new Request("https://example.com/api/send", {
+      method: "POST",
+      body: endless,
+      duplex: "half",
+    } as RequestInit);
+
+    const res = await createRelay({ websiteId: WEBSITE_ID, maxBodyLength: 1024 }).handle(chunked);
+
+    expect(res.status).toBe(413);
+    expect(pulled).toBeLessThan(5);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("answers 502 and reports the error when Umami is unreachable", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
     const onError = vi.fn();
@@ -182,30 +232,28 @@ describe("swaHandler", () => {
       );
     vi.stubGlobal("fetch", fetchMock);
     const handler = swaHandler(createRelay({ websiteId: WEBSITE_ID }));
-    // biome-ignore lint/suspicious/noExplicitAny: partial Functions context
-    const context: Record<string, any> = { log: { warn: vi.fn() } };
+    const context: SwaContext = { log: { warn: vi.fn() } };
 
     await handler(context, { rawBody: event(), headers: { "x-azure-clientip": "203.0.113.5" } });
 
     expect(JSON.parse(fetchMock.mock.calls[0]?.[1].body).payload.ip).toBe("203.0.113.5");
-    expect(context.res.status).toBe(200);
-    expect(context.res.body).toBe('{"cache":"abc"}');
-    expect(context.res.headers["cache-control"]).toBe("no-store");
+    expect(context.res?.status).toBe(200);
+    expect(context.res?.body).toBe('{"cache":"abc"}');
+    expect(context.res?.headers?.["cache-control"]).toBe("no-store");
   });
 
   it("returns 400 for an invalid event and 502 when Umami is unreachable", async () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error("network down"));
     vi.stubGlobal("fetch", fetchMock);
     const handler = swaHandler(createRelay({ websiteId: WEBSITE_ID }));
-    // biome-ignore lint/suspicious/noExplicitAny: partial Functions context
-    const context: Record<string, any> = { log: { warn: vi.fn() } };
+    const context: SwaContext = { log: { warn: vi.fn() } };
 
     await handler(context, { rawBody: "nope", headers: {} });
-    expect(context.res.status).toBe(400);
+    expect(context.res?.status).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
 
     await handler(context, { rawBody: event() });
-    expect(context.res.status).toBe(502);
+    expect(context.res?.status).toBe(502);
     expect(context.log.warn).toHaveBeenCalledWith(expect.stringContaining("network down"));
   });
 });

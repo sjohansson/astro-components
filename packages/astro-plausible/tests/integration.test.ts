@@ -4,8 +4,9 @@ import plausibleIntegration, { clientScript } from "../src/integration";
 function runSetup(integration: ReturnType<typeof plausibleIntegration>, command = "build") {
   const injectScript = vi.fn();
   const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn(), label: "test", fork: vi.fn() };
-  // biome-ignore lint/suspicious/noExplicitAny: partial Astro hook context
-  (integration.hooks["astro:config:setup"] as any)({ command, injectScript, logger });
+  const setup = integration.hooks["astro:config:setup"];
+  if (!setup) throw new Error("setup hook missing");
+  setup({ command, injectScript, logger } as unknown as Parameters<typeof setup>[0]);
   return { injectScript, logger };
 }
 
@@ -40,7 +41,6 @@ describe("plausible integration", () => {
 
   it("rejects bad options at startup", () => {
     expect(() => plausibleIntegration({ domain: "" })).toThrow(/domain/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => plausibleIntegration({ domain: "example.com", enabled: "yes" as any })).toThrow(/enabled/);
+    expect(() => plausibleIntegration({ domain: "example.com", enabled: "yes" as never })).toThrow(/enabled/);
   });
 });

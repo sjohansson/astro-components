@@ -28,6 +28,13 @@ export interface RelayOptions {
   maxBodyLength?: number;
 
   /**
+   * Headers to read the visitor IP from, in order, when `handle` or `forward` is not given one. A client can send
+   * any header, so list only the ones your platform sets: `["cf-connecting-ip"]` on Cloudflare.
+   * @default DEFAULT_IP_HEADERS
+   */
+  ipHeaders?: string[];
+
+  /**
    * Validation for custom events, by event name. An event with a rule is forwarded only if every listed property
    * is a string matching its pattern, and with only those properties. Events without a rule pass through as is.
    */
@@ -64,9 +71,12 @@ export interface Relay {
 export const DEFAULT_UPSTREAM = "https://plausible.io";
 export const DEFAULT_MAX_BODY_LENGTH = 16 * 1024;
 
-// Platform headers that carry the visitor IP, most specific first. x-forwarded-for is last because proxies append
-// to it and some let the client seed it.
-const IP_HEADERS = [
+/**
+ * Platform headers that carry the visitor IP, most specific first. x-forwarded-for is last because proxies append to
+ * it and some let the client seed it. The first header present wins, so on a platform that sets only one of these a
+ * client can spoof the IP by sending one ranked above it; set `ipHeaders` there.
+ */
+export const DEFAULT_IP_HEADERS: readonly string[] = [
   "x-azure-clientip",
   "x-client-ip",
   "cf-connecting-ip",
@@ -81,8 +91,8 @@ function header(headers: RelayHeaders, name: string): string | undefined {
 }
 
 /** Visitor IP from platform headers, without any port. Undefined when no header carries one. */
-export function clientIp(headers: RelayHeaders): string | undefined {
-  for (const name of IP_HEADERS) {
+export function clientIp(headers: RelayHeaders, names: readonly string[] = DEFAULT_IP_HEADERS): string | undefined {
+  for (const name of names) {
     const raw = header(headers, name)?.split(",")[0]?.trim();
     if (!raw) continue;
     const bracketed = raw.match(/^\[(.+)\]:\d+$/);
@@ -98,7 +108,8 @@ function compileRules(events: Record<string, RelayRule> = {}): Map<string, [stri
   for (const [name, rule] of Object.entries(events)) {
     const entries = Object.entries(rule).map(([property, pattern]): [string, RegExp] => [
       property,
-      pattern instanceof RegExp ? pattern : new RegExp(pattern),
+      // Drop g and y: they make test() stateful, and the rules are shared across requests.
+      pattern instanceof RegExp ? new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, "")) : new RegExp(pattern),
     ]);
     if (entries.length === 0) {
       throw new Error(`[@sjohansson/astro-plausible] Rule for event "${name}" lists no properties.`);
@@ -120,6 +131,27 @@ function applyRule(rules: [string, RegExp][], props: unknown): Record<string, st
   return kept;
 }
 
+const encoder = new TextEncoder();
+
+/** Reads a request body as text, or returns null as soon as it grows past `limit` bytes. */
+async function readBody(request: Request, limit: number): Promise<string | null> {
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let text = "";
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return text + decoder.decode();
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel();
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+}
+
 function headersToRecord(headers: Headers): RelayHeaders {
   const record: RelayHeaders = {};
   headers.forEach((value, name) => {
@@ -136,10 +168,13 @@ export function createRelay(options: RelayOptions): Relay {
   const upstream = `${(options.upstream ?? DEFAULT_UPSTREAM).replace(/\/$/, "")}/api/event`;
   const maxBodyLength = options.maxBodyLength ?? DEFAULT_MAX_BODY_LENGTH;
   const rules = compileRules(options.events);
+  const ipHeaders = options.ipHeaders?.map((name) => name.toLowerCase()) ?? DEFAULT_IP_HEADERS;
 
   const relay: Relay = {
     forward(rawBody, headers, ip) {
-      if (typeof rawBody !== "string" || rawBody.length === 0 || rawBody.length > maxBodyLength) return null;
+      if (typeof rawBody !== "string" || rawBody.length === 0) return null;
+      // A UTF-16 code unit is at least one UTF-8 byte, so the length check spares encoding a body that is far too big.
+      if (rawBody.length > maxBodyLength || encoder.encode(rawBody).length > maxBodyLength) return null;
 
       let event: Record<string, unknown>;
       try {
@@ -161,7 +196,7 @@ export function createRelay(options: RelayOptions): Relay {
       const forwardHeaders: Record<string, string> = { "content-type": "application/json" };
       const userAgent = header(headers, "user-agent");
       if (userAgent) forwardHeaders["user-agent"] = userAgent;
-      const visitorIp = ip ?? clientIp(headers);
+      const visitorIp = ip ?? clientIp(headers, ipHeaders);
       if (visitorIp) forwardHeaders["x-forwarded-for"] = visitorIp;
 
       return { url: upstream, body: JSON.stringify(event), headers: forwardHeaders };
@@ -181,7 +216,11 @@ export function createRelay(options: RelayOptions): Relay {
       const length = Number(request.headers.get("content-length"));
       if (length > maxBodyLength) return new Response(null, { status: 413 });
 
-      const forward = relay.forward(await request.text(), headersToRecord(request.headers), context.clientIp);
+      // Content-Length can be missing (chunked) or wrong, so the limit also applies while reading.
+      const body = await readBody(request, maxBodyLength);
+      if (body === null) return new Response(null, { status: 413 });
+
+      const forward = relay.forward(body, headersToRecord(request.headers), context.clientIp);
       if (!forward) return new Response(null, { status: 400 });
 
       try {

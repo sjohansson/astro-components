@@ -78,7 +78,8 @@ export function swaFiles(
   ].join("\n");
   const code = template
     .replace(/^\/\/# sourceMappingURL=.*$/m, "")
-    .replaceAll(CONFIG_PLACEHOLDER, JSON.stringify(config, null, 2))
+    // A replacement function, so `$` sequences in the patterns are inserted as is.
+    .replaceAll(CONFIG_PLACEHOLDER, () => JSON.stringify(config, null, 2))
     .trimEnd();
 
   const functionJson = {

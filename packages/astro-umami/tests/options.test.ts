@@ -35,10 +35,8 @@ describe("umamiConfig", () => {
   it("rejects bad values", () => {
     expect(() => umamiConfig({ websiteId: "" })).toThrow(/websiteId/);
     expect(() => umamiConfig({ websiteId: 'x"; alert(1); "' })).toThrow(/websiteId/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => umamiConfig({ websiteId: WEBSITE_ID, autoTrack: "no" as any })).toThrow(/autoTrack/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => umamiConfig({ websiteId: WEBSITE_ID, domains: "example.com" as any })).toThrow(/domains/);
+    expect(() => umamiConfig({ websiteId: WEBSITE_ID, autoTrack: "no" as never })).toThrow(/autoTrack/);
+    expect(() => umamiConfig({ websiteId: WEBSITE_ID, domains: "example.com" as never })).toThrow(/domains/);
     expect(() => umamiConfig({ websiteId: WEBSITE_ID, hostUrl: "" })).toThrow(/hostUrl/);
     expect(() => umamiConfig({ websiteId: WEBSITE_ID, tag: "has space" })).toThrow(/tag/);
   });

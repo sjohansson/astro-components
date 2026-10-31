@@ -29,12 +29,9 @@ describe("plausibleConfig", () => {
     expect(() => plausibleConfig({ domain: "https://example.com" })).toThrow(/domain/);
     expect(() => plausibleConfig({ domain: 'x"; alert(1); "' })).toThrow(/domain/);
     expect(() => plausibleConfig({ domain: "example.com", endpoint: "" })).toThrow(/endpoint/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => plausibleConfig({ domain: "example.com", outboundLinks: "yes" as any })).toThrow(/outboundLinks/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => plausibleConfig({ domain: "example.com", fileDownloads: ["pdf"] as any })).toThrow(/fileDownloads/);
-    // biome-ignore lint/suspicious/noExplicitAny: deliberately invalid option
-    expect(() => plausibleConfig({ domain: "example.com", customProperties: { nested: {} } as any })).toThrow(
+    expect(() => plausibleConfig({ domain: "example.com", outboundLinks: "yes" as never })).toThrow(/outboundLinks/);
+    expect(() => plausibleConfig({ domain: "example.com", fileDownloads: ["pdf"] as never })).toThrow(/fileDownloads/);
+    expect(() => plausibleConfig({ domain: "example.com", customProperties: { nested: {} } as never })).toThrow(
       /customProperties/,
     );
   });

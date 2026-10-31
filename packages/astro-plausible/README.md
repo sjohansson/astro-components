@@ -92,7 +92,8 @@ CLI options:
 
 The relay works on the web standard `Request` and `Response`. Give it the visitor IP when the platform provides one;
 otherwise it reads the usual headers (`x-azure-clientip`, `cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`, and
-so on).
+so on). A client can send any of those headers, and the first one present wins, so on a platform that sets only
+one of them, name it with `ipHeaders`.
 
 ```ts
 // src/pages/api/event.ts, an Astro server endpoint
@@ -110,7 +111,8 @@ export const POST: APIRoute = ({ request, clientAddress }) => relay.handle(reque
 // functions/api/event.ts, a Cloudflare Pages function
 import { createRelay } from "@sjohansson/astro-plausible/relay";
 
-const relay = createRelay({ domain: "example.com" });
+// Cloudflare sets cf-connecting-ip; any other IP header could come from the client.
+const relay = createRelay({ domain: "example.com", ipHeaders: ["cf-connecting-ip"] });
 
 export const onRequestPost = ({ request }) => relay.handle(request);
 ```
@@ -121,6 +123,7 @@ Relay options:
 | --------------- | ------------------------ | ------------------------------------------------------------------------- |
 | `domain`        |                          | Required. One domain or several. Events for other domains get a 400.      |
 | `upstream`      | `"https://plausible.io"` | Events are posted to `<upstream>/api/event`.                              |
+| `ipHeaders`     |                          | Headers to read the visitor IP from, in order, when none is passed in. |
 | `maxBodyLength` | `16384`                  | Largest request body accepted, in bytes.                                  |
 | `events`        |                          | Validation for custom events, see below.                                  |
 | `onError`       |                          | Called when Plausible cannot be reached. The response is a 502 either way. |

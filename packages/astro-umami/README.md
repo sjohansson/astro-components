@@ -89,7 +89,8 @@ CLI options:
 
 The relay works on the web standard `Request` and `Response`. Give it the visitor IP when the platform provides one;
 otherwise it reads the usual headers (`x-azure-clientip`, `cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`, and
-so on).
+so on). A client can send any of those headers, and the first one present wins, so on a platform that sets only
+one of them, name it with `ipHeaders`.
 
 ```ts
 // src/pages/api/send.ts, an Astro server endpoint
@@ -107,7 +108,8 @@ export const POST: APIRoute = ({ request, clientAddress }) => relay.handle(reque
 // functions/api/send.ts, a Cloudflare Pages function
 import { createRelay } from "@sjohansson/astro-umami/relay";
 
-const relay = createRelay({ websiteId: "930ef364-ec51-4ca5-b5af-2b09ca6a0a21" });
+// Cloudflare sets cf-connecting-ip; any other IP header could come from the client.
+const relay = createRelay({ websiteId: "930ef364-ec51-4ca5-b5af-2b09ca6a0a21", ipHeaders: ["cf-connecting-ip"] });
 
 export const onRequestPost = ({ request }) => relay.handle(request);
 ```
@@ -118,6 +120,7 @@ Relay options:
 | --------------- | ---------------------------- | --------------------------------------------------------------------- |
 | `websiteId`     |                              | Required. One id or several. Events for other ids get a 400.          |
 | `upstream`      | `"https://gateway.umami.is"` | Events are posted to `<upstream>/api/send`.                            |
+| `ipHeaders`     |                              | Headers to read the visitor IP from, in order, when none is passed in. |
 | `maxBodyLength` | `16384`                      | Largest request body accepted, in bytes.                              |
 | `events`        |                              | Validation for custom events, see below.                              |
 | `onError`       |                              | Called when Umami cannot be reached. The response is a 502 either way. |

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clientIp, createRelay, DEFAULT_UPSTREAM, swaHandler } from "../src/relay";
+import { clientIp, createRelay, DEFAULT_UPSTREAM, type SwaContext, swaHandler } from "../src/relay";
 
 const DOMAIN = "example.com";
 const VOTE_VALUE = "^[A-Za-z0-9._/-]{1,200}:(?:up|down)(?:-undo)?$";
@@ -18,6 +18,12 @@ describe("clientIp", () => {
     expect(clientIp({ "x-forwarded-for": "203.0.113.5:51234, 10.0.0.1" })).toBe("203.0.113.5");
     expect(clientIp({ "x-forwarded-for": "[2001:db8::1]:443" })).toBe("2001:db8::1");
     expect(clientIp({})).toBeUndefined();
+  });
+
+  it("reads only the given headers", () => {
+    const spoofed = { "x-azure-clientip": "198.51.100.1", "cf-connecting-ip": "203.0.113.7" };
+    expect(clientIp(spoofed, ["cf-connecting-ip"])).toBe("203.0.113.7");
+    expect(clientIp({ "x-forwarded-for": "198.51.100.1" }, ["cf-connecting-ip"])).toBeUndefined();
   });
 });
 
@@ -86,6 +92,27 @@ describe("createRelay().forward", () => {
     expect(custom.forward(event({ padding: "x".repeat(200) }), {})).toBeNull();
   });
 
+  it("ignores the g and y flags, which would make RegExp rules stateful", () => {
+    for (const pattern of [/^post:up$/g, /^post:up$/y]) {
+      const flagged = createRelay({ domain: DOMAIN, events: { vote: { vote: pattern } } });
+      for (let i = 0; i < 3; i++) {
+        expect(flagged.forward(event({ n: "vote", p: { vote: "post:up" } }), {})).not.toBeNull();
+      }
+    }
+  });
+
+  it("measures the body limit in UTF-8 bytes", () => {
+    const limited = createRelay({ domain: DOMAIN, maxBodyLength: 400 });
+    expect(limited.forward(event({ padding: "a".repeat(200) }), {})).not.toBeNull();
+    expect(limited.forward(event({ padding: "文".repeat(200) }), {})).toBeNull();
+  });
+
+  it("reads the visitor IP only from the configured headers", () => {
+    const relay = createRelay({ domain: DOMAIN, ipHeaders: ["CF-Connecting-IP"] });
+    const headers = { "x-azure-clientip": "198.51.100.1", "cf-connecting-ip": "203.0.113.7" };
+    expect(relay.forward(event(), headers)?.headers["x-forwarded-for"]).toBe("203.0.113.7");
+  });
+
   it("rejects a missing domain or an empty rule", () => {
     expect(() => createRelay({ domain: [] })).toThrow(/domain/);
     expect(() => createRelay({ domain: "" })).toThrow(/domain/);
@@ -145,6 +172,29 @@ describe("createRelay().handle", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("answers 413 for a body over the limit without a content-length, and stops reading", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    let pulled = 0;
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled++;
+        controller.enqueue(new Uint8Array(512).fill(0x20));
+      },
+    });
+    const chunked = new Request("https://example.com/api/event", {
+      method: "POST",
+      body: endless,
+      duplex: "half",
+    } as RequestInit);
+
+    const res = await createRelay({ domain: DOMAIN, maxBodyLength: 1024 }).handle(chunked);
+
+    expect(res.status).toBe(413);
+    expect(pulled).toBeLessThan(5);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("answers 502 and reports the error when Plausible is unreachable", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
     const onError = vi.fn();
@@ -165,30 +215,28 @@ describe("swaHandler", () => {
       .mockResolvedValue(new Response("ok", { status: 202, headers: { "content-type": "text/plain" } }));
     vi.stubGlobal("fetch", fetchMock);
     const handler = swaHandler(createRelay({ domain: DOMAIN }));
-    // biome-ignore lint/suspicious/noExplicitAny: partial Functions context
-    const context: Record<string, any> = { log: { warn: vi.fn() } };
+    const context: SwaContext = { log: { warn: vi.fn() } };
 
     await handler(context, { rawBody: event(), headers: { "x-azure-clientip": "203.0.113.5" } });
 
     expect(fetchMock.mock.calls[0]?.[1].headers["x-forwarded-for"]).toBe("203.0.113.5");
-    expect(context.res.status).toBe(202);
-    expect(context.res.body).toBe("ok");
-    expect(context.res.headers["cache-control"]).toBe("no-store");
+    expect(context.res?.status).toBe(202);
+    expect(context.res?.body).toBe("ok");
+    expect(context.res?.headers?.["cache-control"]).toBe("no-store");
   });
 
   it("returns 400 for an invalid event and 502 when Plausible is unreachable", async () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error("network down"));
     vi.stubGlobal("fetch", fetchMock);
     const handler = swaHandler(createRelay({ domain: DOMAIN }));
-    // biome-ignore lint/suspicious/noExplicitAny: partial Functions context
-    const context: Record<string, any> = { log: { warn: vi.fn() } };
+    const context: SwaContext = { log: { warn: vi.fn() } };
 
     await handler(context, { rawBody: "nope", headers: {} });
-    expect(context.res.status).toBe(400);
+    expect(context.res?.status).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
 
     await handler(context, { rawBody: event() });
-    expect(context.res.status).toBe(502);
+    expect(context.res?.status).toBe(502);
     expect(context.log.warn).toHaveBeenCalledWith(expect.stringContaining("network down"));
   });
 });

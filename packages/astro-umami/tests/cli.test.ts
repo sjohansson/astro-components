@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { main, parseRules, swaFiles } from "../src/cli";
+import type { SwaContext } from "../src/relay";
 
 const WEBSITE_ID = "930ef364-ec51-4ca5-b5af-2b09ca6a0a21";
 const VOTE_VALUE = "^[A-Za-z0-9._/-]{1,200}:(?:up|down)(?:-undo)?$";
@@ -25,6 +26,12 @@ describe("parseRules", () => {
 });
 
 describe("swaFiles", () => {
+  it("inserts patterns containing $ as is", () => {
+    const config = { websiteId: WEBSITE_ID, events: { vote: { vote: "^\\$$|$&|$'" } } };
+    const code = swaFiles(TEMPLATE, config, "api", { version: "x", now: new Date() })[0]?.content ?? "";
+    expect(code).toContain(JSON.stringify(config, null, 2));
+  });
+
   it("bakes the config into the template and adds the function files", () => {
     const files = swaFiles(TEMPLATE, { websiteId: WEBSITE_ID }, "api", {
       version: "1.2.3",
@@ -165,8 +172,7 @@ describe("swa template", () => {
     const template = await import("../src/templates/swa");
 
     expect(template.relay.forward(JSON.stringify({ payload: { website: "other" } }), {})).toBeNull();
-    // biome-ignore lint/suspicious/noExplicitAny: partial Functions context
-    const context: Record<string, any> = { log: { warn: vi.fn() } };
+    const context: SwaContext = { log: { warn: vi.fn() } };
     await template.default(context, {
       rawBody: JSON.stringify({
         type: "event",
@@ -174,7 +180,7 @@ describe("swa template", () => {
       }),
       headers: {},
     });
-    expect(context.res.status).toBe(200);
+    expect(context.res?.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
