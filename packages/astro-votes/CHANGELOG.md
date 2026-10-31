@@ -1,5 +1,11 @@
 # @sjohansson/astro-votes
 
+## 0.1.2
+
+### Patch Changes
+
+- 2fa4788: Add `voteRelayRule()`, the event rule for the `@sjohansson/astro-umami` and `@sjohansson/astro-plausible` relays.
+
 ## 0.1.1
 
 ### Patch Changes

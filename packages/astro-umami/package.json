@@ -1,6 +1,6 @@
 {
   "name": "@sjohansson/astro-umami",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "First-party Umami analytics for Astro sites. The tracker is bundled into your site's own JavaScript and events go through a relay on your domain, so ad blockers do not drop them.",
   "type": "module",
   "main": "./dist/index.js",
