@@ -1,5 +1,11 @@
 # @sjohansson/astro-votes
 
+## 0.1.3
+
+### Patch Changes
+
+- 2dadfdf: Split the `astro-votes-sync` CLI into an importable `cli` module and a `bin` entry, the same layout as astro-umami and astro-plausible. The command and its options are unchanged.
+
 ## 0.1.2
 
 ### Patch Changes
