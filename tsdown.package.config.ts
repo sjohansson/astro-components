@@ -3,7 +3,7 @@ import { defineConfig, type Options } from "tsdown";
 
 type PackageConfigOptions = {
   entry?: string | string[];
-  external?: (string | RegExp)[];
+  neverBundle?: (string | RegExp)[];
 };
 
 const FN_SUFFIX = "?fn";
@@ -38,7 +38,7 @@ export function vendorScriptPlugin() {
   };
 }
 
-export function createPackageConfig({ entry = "src/index.ts", external = [] }: PackageConfigOptions = {}): Options {
+export function createPackageConfig({ entry = "src/index.ts", neverBundle = [] }: PackageConfigOptions = {}): Options {
   const entryArray = Array.isArray(entry) ? entry : [entry];
 
   return defineConfig({
@@ -50,7 +50,7 @@ export function createPackageConfig({ entry = "src/index.ts", external = [] }: P
     clean: true,
     treeshake: true,
     platform: "browser",
-    external: [/^node:/, "astro", ...external],
+    deps: { neverBundle: [/^node:/, "astro", ...neverBundle] },
     loader: { ".css": "copy" },
     plugins: [vendorScriptPlugin()],
   });

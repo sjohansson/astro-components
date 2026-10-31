@@ -4,7 +4,7 @@ import { createPackageConfig } from "../../tsdown.package.config.ts";
 export default [
   createPackageConfig({
     entry: ["src/index.ts", "src/integration.ts", "src/client.ts", "src/relay.ts", "src/bin.ts"],
-    external: ["@plausible-analytics/tracker"],
+    neverBundle: ["@plausible-analytics/tracker"],
   }),
   // The relay function `astro-plausible init` writes. Built on its own so it is one file with no imports: Static
   // Web Apps managed functions cannot reach node_modules, and a dependency-free api/ folder skips the API build.
