@@ -55,6 +55,11 @@
       "matchPackageNames": ["@changesets/cli"],
       "groupName": "Changesets",
       "labels": ["dependencies", "changesets"]
+    },
+    {
+      "description": "Moved daily by the Update Plausible tracker workflow, which also writes the changeset.",
+      "matchPackageNames": ["@plausible-analytics/tracker"],
+      "enabled": false
     }
   ],
   "lockFileMaintenance": {

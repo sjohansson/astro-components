@@ -33,7 +33,8 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "clean": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\"",
-    "test": "vitest"
+    "test": "vitest",
+    "update-tracker": "node scripts/update-tracker.mjs"
   },
   "keywords": [
     "astro",

@@ -1,0 +1,83 @@
+name: Update Plausible tracker
+
+# @sjohansson/astro-plausible depends on the official tracker, @plausible-analytics/tracker, which the consumer's
+# Vite bundles. This checks npm daily for a newer release. When there is one it moves the dependency to it (pnpm
+# rewrites the range floor too, so the package always declares the tracker it was tested with) and opens, or
+# refreshes, a pull request with a patch changeset, so merging releases the update and sites pick it up through
+# Renovate. Renovate itself is disabled for that dependency in renovate.json. Pull requests opened with GITHUB_TOKEN
+# do not start CI, so the package tests, the typecheck and Biome run here and the pull request opens as a draft when
+# one fails. When npm matches main again, the pull request is closed. pnpm's minimumReleaseAge in
+# pnpm-workspace.yaml holds a release back for two days first. The shared steps live in
+# .github/actions/tracker-update-pr.
+on:
+  schedule:
+    - cron: '30 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Compare with npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Move the tracker to the newest release
+        id: refresh
+        run: |
+          node packages/astro-plausible/scripts/update-tracker.mjs | tee "$RUNNER_TEMP/report.txt"
+          if git diff --quiet -- packages/astro-plausible/package.json pnpm-lock.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Describe the change
+        if: steps.refresh.outputs.changed == 'true'
+        env:
+          PREVIOUS: ${{ steps.refresh.outputs.previous }}
+          VERSION: ${{ steps.refresh.outputs.version }}
+        run: |
+          {
+            echo "Plausible released \`@plausible-analytics/tracker\` $VERSION. This moves the dependency from $PREVIOUS to it, range floor included."
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/report.txt"
+            echo '```'
+            echo
+            echo "Review the changelog entries above. The client test starts the new tracker, checks that it posts to the relay, and hands that request to the relay. The changeset releases a patch on merge."
+          } > "$RUNNER_TEMP/body.md"
+
+      - name: Open, refresh or close the pull request
+        uses: ./.github/actions/tracker-update-pr
+        with:
+          changed: ${{ steps.refresh.outputs.changed }}
+          package: "@sjohansson/astro-plausible"
+          package-dir: packages/astro-plausible
+          branch: chore/update-plausible-tracker
+          paths: packages/astro-plausible/package.json pnpm-lock.yaml
+          changeset: .changeset/update-plausible-tracker.md
+          summary: Update the Plausible tracker (`@plausible-analytics/tracker`) to ${{ steps.refresh.outputs.version }}.
+          commit-message: "chore(astro-plausible): update the Plausible tracker to ${{ steps.refresh.outputs.version }}"
+          title: "chore(astro-plausible): update the Plausible tracker"
+          body-file: ${{ runner.temp }}/body.md
+          token: ${{ github.token }}
