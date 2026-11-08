@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getUmami, startUmami } from "../src/client";
+import { createRelay, DEFAULT_UPSTREAM } from "../src/relay";
 
 const WEBSITE_ID = "930ef364-ec51-4ca5-b5af-2b09ca6a0a21";
 
@@ -37,5 +38,19 @@ describe("startUmami", () => {
     expect(sent.type).toBe("event");
     expect(sent.payload).toMatchObject({ website: WEBSITE_ID, name: "signup", data: { plan: "pro" }, tagged: true });
     expect(beforeSend).toHaveBeenCalledWith("event", expect.objectContaining({ name: "signup" }));
+
+    // The request the real tracker makes must be one the relay accepts, with the event data where a rule reads it.
+    // This is what a tracker update can break.
+    const relay = createRelay({ websiteId: WEBSITE_ID, events: { signup: { plan: "^(free|pro)$" } } });
+    const forward = relay.forward(init.body, { "user-agent": "test-agent" }, "203.0.113.9");
+    expect(forward).not.toBeNull();
+    expect(forward?.url).toBe(`${DEFAULT_UPSTREAM}/api/send`);
+    expect(JSON.parse(forward?.body ?? "{}").payload).toMatchObject({
+      website: WEBSITE_ID,
+      name: "signup",
+      data: { plan: "pro" },
+      ip: "203.0.113.9",
+      userAgent: "test-agent",
+    });
   });
 });

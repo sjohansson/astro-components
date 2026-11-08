@@ -3,7 +3,9 @@ name: Update Umami tracker
 # @sjohansson/astro-umami bundles a copy of the Umami Cloud tracker, packages/astro-umami/vendor/umami.js. This
 # compares it with https://cloud.umami.is/script.js daily. When upstream has changed it opens, or refreshes, a pull
 # request with the new copy and a patch changeset, so merging releases the update and sites pick it up through
-# Renovate. Pull requests opened with GITHUB_TOKEN do not start CI: close and reopen the PR, or push to its branch.
+# Renovate. Pull requests opened with GITHUB_TOKEN do not start CI, so the package tests, the typecheck and Biome run
+# here and the pull request opens as a draft when one fails. When upstream matches main again, the pull request is
+# closed. The shared steps live in .github/actions/tracker-update-pr.
 on:
   schedule:
     - cron: '0 18 * * *'
@@ -21,18 +23,23 @@ jobs:
   update:
     name: Compare with upstream
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     env:
-      BRANCH: chore/update-umami-tracker
       TRACKER: packages/astro-umami/vendor/umami.js
-      CHANGESET: .changeset/update-umami-tracker.md
 
     steps:
       - uses: actions/checkout@v6
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Refresh the vendored tracker
         id: refresh
@@ -43,22 +50,11 @@ jobs:
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+          echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
-      - name: Open or update the pull request
+      - name: Describe the change
         if: steps.refresh.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          date=$(date -u +%Y-%m-%d)
-          printf -- '---\n"@sjohansson/astro-umami": patch\n---\n\nUpdate the bundled Umami tracker to upstream as of %s.\n' "$date" > "$CHANGESET"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "$BRANCH"
-          git add "$TRACKER" "$CHANGESET"
-          git commit -m "chore(astro-umami): update the bundled Umami tracker ($date)"
-          git push --force origin "$BRANCH"
-
           {
             echo "The Umami Cloud tracker at https://cloud.umami.is/script.js has changed. This updates the bundled copy."
             echo
@@ -66,17 +62,20 @@ jobs:
             cat "$RUNNER_TEMP/report.txt"
             echo '```'
             echo
-            echo "Review the upstream diff. The client test checks that the tracker still reads \`window.umamiConfig\` and posts to \`<hostUrl>/api/send\`; run the tests on this branch since CI does not start on its own for this PR. The changeset releases a patch on merge."
-            echo
-            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "Review the upstream diff. The client test starts the new tracker, checks that it still reads \`window.umamiConfig\` and posts to \`<hostUrl>/api/send\`, and hands that request to the relay. The changeset releases a patch on merge."
           } > "$RUNNER_TEMP/body.md"
 
-          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --body-file "$RUNNER_TEMP/body.md"
-            gh pr comment "$existing" --body "Refreshed with the upstream script as of $date."
-          else
-            gh pr create --base main --head "$BRANCH" \
-              --title "chore(astro-umami): update the bundled Umami tracker" \
-              --body-file "$RUNNER_TEMP/body.md"
-          fi
+      - name: Open, refresh or close the pull request
+        uses: ./.github/actions/tracker-update-pr
+        with:
+          changed: ${{ steps.refresh.outputs.changed }}
+          package: "@sjohansson/astro-umami"
+          package-dir: packages/astro-umami
+          branch: chore/update-umami-tracker
+          paths: ${{ env.TRACKER }}
+          changeset: .changeset/update-umami-tracker.md
+          summary: Update the bundled Umami tracker to upstream as of ${{ steps.refresh.outputs.date }}.
+          commit-message: "chore(astro-umami): update the bundled Umami tracker (${{ steps.refresh.outputs.date }})"
+          title: "chore(astro-umami): update the bundled Umami tracker"
+          body-file: ${{ runner.temp }}/body.md
+          token: ${{ github.token }}
