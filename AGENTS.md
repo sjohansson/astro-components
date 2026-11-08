@@ -22,6 +22,7 @@ examples/
   theming-showcase/      # Theme toggle showcase
 .changeset/              # Changesets config (versioning & publishing)
 .github/workflows/       # CI/CD (GitHub Actions)
+.github/actions/         # Composite actions shared by the workflows
 .github/social-preview.png # GitHub social preview image (see Repository Metadata)
 tsdown.package.config.ts # Shared tsdown build factory
 vitest.config.ts         # Shared test config
@@ -219,6 +220,12 @@ GitHub Actions (`.github/workflows/`):
   - `build` job: Build all packages, verify `dist/` directories exist (Node 24)
 - **release.yml** — runs on push to `main`:
   - Changesets action: creates release PRs or publishes to npm (Node 24)
+- **update-umami-tracker.yml** — daily: compares `packages/astro-umami/vendor/umami.js` with the Umami Cloud script
+  and, when it changed, opens a PR with the new copy and a patch changeset.
+- The tracker update workflows end in the composite action `.github/actions/tracker-update-pr`: it writes the
+  changeset, runs the package tests, the typecheck and Biome in the workflow (PRs opened with `GITHUB_TOKEN` get no
+  CI run), opens the PR as a draft when a check fails, refreshes it on later runs, and closes it when upstream
+  matches `main` again.
 
 All CI jobs use `pnpm/action-setup@v6` (reads the pnpm version from `packageManager`) + `actions/setup-node@v6` with
 `pnpm install --frozen-lockfile`.

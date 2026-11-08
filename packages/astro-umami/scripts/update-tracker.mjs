@@ -14,7 +14,10 @@ async function fetchUpstream() {
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const res = await fetch(UPSTREAM_URL, { headers: { "user-agent": "astro-umami update-tracker" } });
+      const res = await fetch(UPSTREAM_URL, {
+        headers: { "user-agent": "astro-umami update-tracker" },
+        signal: AbortSignal.timeout(30_000),
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.text();
     } catch (error) {

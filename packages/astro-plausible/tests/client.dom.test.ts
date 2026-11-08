@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { startPlausible, track } from "../src/client";
+import { createRelay, DEFAULT_UPSTREAM } from "../src/relay";
 
 describe("startPlausible", () => {
   afterEach(() => {
@@ -37,5 +38,17 @@ describe("startPlausible", () => {
       changed: true,
     });
     expect(customProperties).toHaveBeenCalledWith("signup");
+
+    // The request the real tracker makes must be one the relay accepts, with the props where a rule reads them.
+    // This is what a tracker update can break.
+    const relay = createRelay({ domain: "example.com", events: { signup: { plan: "^(free|pro)$" } } });
+    const forward = relay.forward(init.body, { "user-agent": "test-agent" }, "203.0.113.9");
+    expect(forward).not.toBeNull();
+    expect(forward?.url).toBe(`${DEFAULT_UPSTREAM}/api/event`);
+    expect(forward?.headers).toMatchObject({ "x-forwarded-for": "203.0.113.9", "user-agent": "test-agent" });
+    const forwarded = JSON.parse(forward?.body ?? "{}");
+    expect(forwarded).toMatchObject({ n: "signup", d: "example.com", p: { plan: "pro" } });
+    // The rule keeps only the listed props.
+    expect(forwarded.p).not.toHaveProperty("tier");
   });
 });

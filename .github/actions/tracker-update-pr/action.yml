@@ -1,0 +1,203 @@
+name: Tracker update pull request
+description: >-
+  Shared tail of the tracker update workflows. When the refresh step changed files, writes a patch changeset, runs
+  the package tests, the typecheck and Biome in the workflow (pull requests opened with GITHUB_TOKEN get no CI run),
+  commits to the update branch and opens or refreshes the pull request, as a draft when a check failed. When nothing
+  changed, closes a pull request left over from an earlier run, since upstream matches main again.
+
+inputs:
+  changed:
+    description: "'true' when the refresh step changed files; anything else when upstream matches."
+    required: true
+  package:
+    description: npm name of the package, for the changeset.
+    required: true
+  package-dir:
+    description: Package directory, for the tests.
+    required: true
+  branch:
+    description: Branch the pull request is opened from. Force pushed on every refresh.
+    required: true
+  base:
+    description: Branch the pull request targets.
+    default: main
+  paths:
+    description: Space separated paths to commit, besides the changeset.
+    required: true
+  changeset:
+    description: Path of the changeset to write.
+    required: true
+  summary:
+    description: Changeset text.
+    required: true
+  commit-message:
+    description: Commit message.
+    required: true
+  title:
+    description: Pull request title.
+    required: true
+  body-file:
+    description: File with the pull request body. The check results and the run link are appended.
+    required: true
+  labels:
+    description: Comma separated labels for the pull request, created when missing.
+    default: dependencies,tracker
+  token:
+    description: Token with contents and pull-requests write access.
+    required: true
+
+outputs:
+  checks:
+    description: pass or fail; empty when nothing changed.
+    value: ${{ steps.checks.outputs.result }}
+  pull-request:
+    description: Number of the pull request opened or refreshed; empty when nothing changed.
+    value: ${{ steps.pr.outputs.number }}
+
+runs:
+  using: composite
+  steps:
+    - name: Close a pull request left over when upstream matches again
+      if: inputs.changed != 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        BRANCH: ${{ inputs.branch }}
+      run: |
+        existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+        if [ -z "$existing" ]; then
+          echo "Nothing changed and no pull request is open."
+          exit 0
+        fi
+        gh pr close "$existing" --delete-branch \
+          --comment "Upstream matches main again, so this update is no longer needed. Closed by the workflow."
+        echo "Closed #$existing."
+
+    - name: Write the changeset
+      if: inputs.changed == 'true'
+      shell: bash
+      env:
+        PACKAGE: ${{ inputs.package }}
+        CHANGESET: ${{ inputs.changeset }}
+        SUMMARY: ${{ inputs.summary }}
+      run: |
+        printf -- '---\n"%s": patch\n---\n\n%s\n' "$PACKAGE" "$SUMMARY" > "$CHANGESET"
+        cat "$CHANGESET"
+
+    - name: Run the checks
+      id: checks
+      if: inputs.changed == 'true'
+      shell: bash
+      env:
+        PACKAGE_DIR: ${{ inputs.package-dir }}
+      run: |
+        result=pass
+        summary="$RUNNER_TEMP/checks.md"
+        {
+          echo "## Checks"
+          echo
+          echo "Pull requests opened by a workflow get no CI run, so these ran in the workflow itself."
+          echo
+        } > "$summary"
+
+        run_check() {
+          local name="$1"
+          shift
+          local log="$RUNNER_TEMP/check-$name.log"
+          if "$@" > "$log" 2>&1; then
+            echo "- :white_check_mark: $name" >> "$summary"
+          else
+            result=fail
+            echo "- :x: $name" >> "$summary"
+          fi
+          {
+            echo
+            echo "<details><summary>$name output</summary>"
+            echo
+            echo '~~~text'
+            tail -n 80 "$log"
+            echo '~~~'
+            echo
+            echo "</details>"
+          } >> "$summary"
+          echo "::group::$name"
+          cat "$log"
+          echo "::endgroup::"
+        }
+
+        run_check tests pnpm vitest run "$PACKAGE_DIR"
+        run_check typecheck pnpm typecheck
+        run_check lint pnpm lint
+        echo "Checks: $result"
+        echo "result=$result" >> "$GITHUB_OUTPUT"
+
+    - name: Push the branch
+      if: inputs.changed == 'true'
+      shell: bash
+      env:
+        BRANCH: ${{ inputs.branch }}
+        PATHS: ${{ inputs.paths }}
+        CHANGESET: ${{ inputs.changeset }}
+        MESSAGE: ${{ inputs.commit-message }}
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+        git checkout -B "$BRANCH"
+        # PATHS is a space separated list by contract, so word splitting is wanted here.
+        # shellcheck disable=SC2086
+        git add $PATHS "$CHANGESET"
+        git commit -m "$MESSAGE"
+        git push --force origin "$BRANCH"
+
+    - name: Open or refresh the pull request
+      id: pr
+      if: inputs.changed == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        BRANCH: ${{ inputs.branch }}
+        BASE: ${{ inputs.base }}
+        TITLE: ${{ inputs.title }}
+        BODY_FILE: ${{ inputs.body-file }}
+        LABELS: ${{ inputs.labels }}
+        RESULT: ${{ steps.checks.outputs.result }}
+      run: |
+        body="$RUNNER_TEMP/pull-request.md"
+        {
+          cat "$BODY_FILE"
+          echo
+          cat "$RUNNER_TEMP/checks.md"
+          echo
+          echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        } > "$body"
+
+        have=$(gh label list --limit 200 --json name --jq '.[].name')
+        IFS=, read -ra labels <<< "$LABELS"
+        for label in "${labels[@]}"; do
+          label=$(echo "$label" | xargs)
+          [ -z "$label" ] && continue
+          if ! grep -qxF "$label" <<< "$have"; then
+            gh label create "$label" --description "Automated tracker update" --color 0e8a16
+          fi
+        done
+
+        existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+        if [ -n "$existing" ]; then
+          gh pr edit "$existing" --title "$TITLE" --body-file "$body" --add-label "$LABELS"
+          is_draft=$(gh pr view "$existing" --json isDraft --jq .isDraft)
+          if [ "$RESULT" = pass ] && [ "$is_draft" = true ]; then
+            gh pr ready "$existing"
+          elif [ "$RESULT" != pass ] && [ "$is_draft" = false ]; then
+            gh pr ready --undo "$existing"
+          fi
+          gh pr comment "$existing" --body "Refreshed with the current upstream. Checks: $RESULT."
+          number=$existing
+        else
+          draft=()
+          [ "$RESULT" = pass ] || draft=(--draft)
+          url=$(gh pr create --base "$BASE" --head "$BRANCH" --title "$TITLE" --body-file "$body" \
+            --label "$LABELS" "${draft[@]}")
+          number=${url##*/}
+        fi
+        echo "Pull request #$number, checks $RESULT."
+        echo "number=$number" >> "$GITHUB_OUTPUT"
