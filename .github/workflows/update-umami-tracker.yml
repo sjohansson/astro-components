@@ -11,25 +11,30 @@ on:
     - cron: '0 18 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
-  update:
+  validate:
     name: Compare with upstream
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.refresh.outputs.changed }}
+      date: ${{ steps.refresh.outputs.date }}
+      checks: ${{ steps.checks.outputs.result }}
 
     env:
       TRACKER: packages/astro-umami/vendor/umami.js
 
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
 
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
 
@@ -43,7 +48,9 @@ jobs:
 
       - name: Refresh the vendored tracker
         id: refresh
+        shell: bash
         run: |
+          set -o pipefail
           node packages/astro-umami/scripts/update-tracker.mjs | tee "$RUNNER_TEMP/report.txt"
           if git diff --quiet -- "$TRACKER"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -65,17 +72,77 @@ jobs:
             echo "Review the upstream diff. The client test starts the new tracker, checks that it still reads \`window.umamiConfig\` and posts to \`<hostUrl>/api/send\`, and hands that request to the relay. The changeset releases a patch on merge."
           } > "$RUNNER_TEMP/body.md"
 
+      - name: Run validation checks
+        id: checks
+        if: steps.refresh.outputs.changed == 'true'
+        uses: ./.github/actions/tracker-update-checks
+        with:
+          package-dir: packages/astro-umami
+
+      - name: Stage update artifact
+        if: steps.refresh.outputs.changed == 'true'
+        shell: bash
+        run: |
+          artifact="$RUNNER_TEMP/tracker-update-artifact"
+          mkdir -p "$artifact"
+          cp --parents "$TRACKER" "$artifact"
+          cp "$RUNNER_TEMP/report.txt" "$artifact/report.txt"
+          cp "$RUNNER_TEMP/body.md" "$artifact/body.md"
+          cp "$RUNNER_TEMP/checks.md" "$artifact/checks.md"
+
+      - name: Upload update artifact
+        if: steps.refresh.outputs.changed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tracker-update
+          path: ${{ runner.temp }}/tracker-update-artifact
+          retention-days: 1
+
+  publish:
+    name: Publish update pull request
+    needs: validate
+    if: always() && needs.validate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      TRACKER: packages/astro-umami/vendor/umami.js
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+
+      - name: Download update artifact
+        if: needs.validate.outputs.changed == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: tracker-update
+          path: ${{ runner.temp }}/tracker-update-artifact
+
+      - name: Apply validated update
+        if: needs.validate.outputs.changed == 'true'
+        shell: bash
+        run: |
+          artifact="$RUNNER_TEMP/tracker-update-artifact"
+          cp "$artifact/$TRACKER" "$TRACKER"
+          cp "$artifact/body.md" "$RUNNER_TEMP/body.md"
+          cp "$artifact/checks.md" "$RUNNER_TEMP/checks.md"
+
       - name: Open, refresh or close the pull request
         uses: ./.github/actions/tracker-update-pr
         with:
-          changed: ${{ steps.refresh.outputs.changed }}
+          changed: ${{ needs.validate.outputs.changed }}
           package: "@sjohansson/astro-umami"
-          package-dir: packages/astro-umami
           branch: chore/update-umami-tracker
           paths: ${{ env.TRACKER }}
           changeset: .changeset/update-umami-tracker.md
-          summary: Update the bundled Umami tracker to upstream as of ${{ steps.refresh.outputs.date }}.
-          commit-message: "chore(astro-umami): update the bundled Umami tracker (${{ steps.refresh.outputs.date }})"
+          summary: Update the bundled Umami tracker to upstream as of ${{ needs.validate.outputs.date }}.
+          commit-message: "chore(astro-umami): update the bundled Umami tracker (${{ needs.validate.outputs.date }})"
           title: "chore(astro-umami): update the bundled Umami tracker"
           body-file: ${{ runner.temp }}/body.md
           token: ${{ github.token }}
+          checks: ${{ needs.validate.outputs.checks }}
+          checks-file: ${{ runner.temp }}/checks.md

@@ -229,10 +229,11 @@ GitHub Actions (`.github/workflows/`):
   and, when it changed, opens a PR with the new copy and a patch changeset.
 - **update-plausible-tracker.yml** — daily: moves `@plausible-analytics/tracker` to the newest npm release and, when
   it moved, opens a PR with a patch changeset. Renovate is disabled for that dependency.
-- Both tracker update workflows end in the composite action `.github/actions/tracker-update-pr`: it writes the
-  changeset, runs the package tests, the typecheck and Biome in the workflow (PRs opened with `GITHUB_TOKEN` get no
-  CI run), opens the PR as a draft when a check fails, refreshes it on later runs, and closes it when upstream
-  matches `main` again.
+- Both tracker update workflows use a read-only `validate` job that checks out `main` without persisted checkout
+  credentials, refreshes the tracker, runs the package tests, typecheck and Biome, and uploads the changed files and
+  check results. A write-enabled `publish` job applies that artifact and uses the composite action
+  `.github/actions/tracker-update-pr` to write the changeset and open or refresh the PR, as a draft when a check fails
+  (PRs opened with `GITHUB_TOKEN` get no CI run). When upstream matches `main` again, the publisher closes the PR.
 
 All CI jobs use `pnpm/action-setup@v6` (reads the pnpm version from `packageManager`) + `actions/setup-node@v6` with
 `pnpm install --frozen-lockfile`.
