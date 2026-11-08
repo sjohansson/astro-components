@@ -198,8 +198,10 @@ serves the relay too, such as the Static Web Apps CLI.
 
 ## Keeping the tracker current
 
-The tracker is a normal dependency, so Renovate or a routine upgrade brings new Plausible releases to your site.
-Nothing is vendored.
+The tracker is a normal dependency on `@plausible-analytics/tracker`, so nothing is vendored. A daily workflow in the
+package repository checks npm for a newer release, moves the dependency to it, runs the tests, and opens a pull
+request; merging releases a patch, so Renovate or a routine upgrade brings the new tracker to your site. A fresh
+install also picks up any newer release within the declared range on its own.
 
 ## License
 

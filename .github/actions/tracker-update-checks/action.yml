@@ -1,0 +1,61 @@
+name: Tracker update checks
+description: Run the tests, typecheck and lint for a tracker update without write permissions.
+
+inputs:
+  package-dir:
+    description: Package directory, for the tests.
+    required: true
+
+outputs:
+  result:
+    description: pass or fail.
+    value: ${{ steps.checks.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Run the checks
+      id: checks
+      shell: bash
+      env:
+        PACKAGE_DIR: ${{ inputs.package-dir }}
+      run: |
+        result=pass
+        summary="$RUNNER_TEMP/checks.md"
+        {
+          echo "## Checks"
+          echo
+          echo "Pull requests opened by a workflow get no CI run, so these ran in the workflow itself."
+          echo
+        } > "$summary"
+
+        run_check() {
+          local name="$1"
+          shift
+          local log="$RUNNER_TEMP/check-$name.log"
+          if "$@" > "$log" 2>&1; then
+            echo "- :white_check_mark: $name" >> "$summary"
+          else
+            result=fail
+            echo "- :x: $name" >> "$summary"
+          fi
+          {
+            echo
+            echo "<details><summary>$name output</summary>"
+            echo
+            echo '~~~text'
+            tail -n 80 "$log"
+            echo '~~~'
+            echo
+            echo "</details>"
+          } >> "$summary"
+          echo "::group::$name"
+          cat "$log"
+          echo "::endgroup::"
+        }
+
+        run_check tests pnpm vitest run "$PACKAGE_DIR"
+        run_check typecheck pnpm typecheck
+        run_check lint pnpm lint
+        echo "Checks: $result"
+        echo "result=$result" >> "$GITHUB_OUTPUT"

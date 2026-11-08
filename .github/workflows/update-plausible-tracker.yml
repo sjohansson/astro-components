@@ -1,0 +1,149 @@
+name: Update Plausible tracker
+
+# @sjohansson/astro-plausible depends on the official tracker, @plausible-analytics/tracker, which the consumer's
+# Vite bundles. This checks npm daily for a newer release. When there is one it moves the dependency to it (pnpm
+# rewrites the range floor too, so the package always declares the tracker it was tested with) and opens, or
+# refreshes, a pull request with a patch changeset, so merging releases the update and sites pick it up through
+# Renovate. Renovate itself is disabled for that dependency in renovate.json. Pull requests opened with GITHUB_TOKEN
+# do not start CI, so the package tests, the typecheck and Biome run here and the pull request opens as a draft when
+# one fails. When npm matches main again, the pull request is closed. pnpm's minimumReleaseAge in
+# pnpm-workspace.yaml holds a release back for two days first. The shared steps live in
+# .github/actions/tracker-update-pr.
+on:
+  schedule:
+    - cron: '30 18 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Compare with npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.refresh.outputs.changed }}
+      version: ${{ steps.refresh.outputs.version }}
+      checks: ${{ steps.checks.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Move the tracker to the newest release
+        id: refresh
+        shell: bash
+        run: |
+          set -o pipefail
+          node packages/astro-plausible/scripts/update-tracker.mjs | tee "$RUNNER_TEMP/report.txt"
+          if git diff --quiet -- packages/astro-plausible/package.json pnpm-lock.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Describe the change
+        if: steps.refresh.outputs.changed == 'true'
+        env:
+          PREVIOUS: ${{ steps.refresh.outputs.previous }}
+          VERSION: ${{ steps.refresh.outputs.version }}
+        run: |
+          {
+            echo "Plausible released \`@plausible-analytics/tracker\` $VERSION. This moves the dependency from $PREVIOUS to it, range floor included."
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/report.txt"
+            echo '```'
+            echo
+            echo "Review the changelog entries above. The client test starts the new tracker, checks that it posts to the relay, and hands that request to the relay. The changeset releases a patch on merge."
+          } > "$RUNNER_TEMP/body.md"
+
+      - name: Run validation checks
+        id: checks
+        if: steps.refresh.outputs.changed == 'true'
+        uses: ./.github/actions/tracker-update-checks
+        with:
+          package-dir: packages/astro-plausible
+
+      - name: Stage update artifact
+        if: steps.refresh.outputs.changed == 'true'
+        shell: bash
+        run: |
+          artifact="$RUNNER_TEMP/tracker-update-artifact"
+          mkdir -p "$artifact"
+          cp --parents packages/astro-plausible/package.json pnpm-lock.yaml "$artifact"
+          cp "$RUNNER_TEMP/report.txt" "$artifact/report.txt"
+          cp "$RUNNER_TEMP/body.md" "$artifact/body.md"
+          cp "$RUNNER_TEMP/checks.md" "$artifact/checks.md"
+
+      - name: Upload update artifact
+        if: steps.refresh.outputs.changed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tracker-update
+          path: ${{ runner.temp }}/tracker-update-artifact
+          retention-days: 1
+
+  publish:
+    name: Publish update pull request
+    needs: validate
+    if: always() && needs.validate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+
+      - name: Download update artifact
+        if: needs.validate.outputs.changed == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: tracker-update
+          path: ${{ runner.temp }}/tracker-update-artifact
+
+      - name: Apply validated update
+        if: needs.validate.outputs.changed == 'true'
+        shell: bash
+        run: |
+          artifact="$RUNNER_TEMP/tracker-update-artifact"
+          cp "$artifact/packages/astro-plausible/package.json" packages/astro-plausible/package.json
+          cp "$artifact/pnpm-lock.yaml" pnpm-lock.yaml
+          cp "$artifact/body.md" "$RUNNER_TEMP/body.md"
+          cp "$artifact/checks.md" "$RUNNER_TEMP/checks.md"
+
+      - name: Open, refresh or close the pull request
+        uses: ./.github/actions/tracker-update-pr
+        with:
+          changed: ${{ needs.validate.outputs.changed }}
+          package: "@sjohansson/astro-plausible"
+          branch: chore/update-plausible-tracker
+          paths: packages/astro-plausible/package.json pnpm-lock.yaml
+          changeset: .changeset/update-plausible-tracker.md
+          summary: Update the Plausible tracker (`@plausible-analytics/tracker`) to ${{ needs.validate.outputs.version }}.
+          commit-message: "chore(astro-plausible): update the Plausible tracker to ${{ needs.validate.outputs.version }}"
+          title: "chore(astro-plausible): update the Plausible tracker"
+          body-file: ${{ runner.temp }}/body.md
+          token: ${{ github.token }}
+          checks: ${{ needs.validate.outputs.checks }}
+          checks-file: ${{ runner.temp }}/checks.md

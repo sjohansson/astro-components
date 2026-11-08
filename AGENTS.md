@@ -115,14 +115,19 @@ go to `<hostUrl>/api/send` on the site, where a relay forwards them to Umami wit
 ### `@sjohansson/astro-plausible`
 
 First-party Plausible analytics with the same shape as astro-umami. The tracker is the official
-`@plausible-analytics/tracker` npm package (a dependency, bundled by the consumer's Vite), so nothing is vendored
-and Renovate keeps it current. Events go to `endpoint` (default `/api/event`), where the relay forwards them to
-Plausible with the visitor IP in `X-Forwarded-For`. Plausible drops events without a real visitor IP.
+`@plausible-analytics/tracker` npm package (a dependency, bundled by the consumer's Vite), so nothing is vendored;
+the `Update Plausible tracker` workflow keeps it current. Events go to `endpoint` (default `/api/event`), where the
+relay forwards them to Plausible with the visitor IP in `X-Forwarded-For`. Plausible drops events without a real
+visitor IP.
 
 - **Component type:** Astro integration (page script) plus a platform-neutral relay and a Node CLI
 - **Deps:** `@plausible-analytics/tracker`; peer `astro ^5 || ^6 || ^7` (optional)
 - **Exports:** `.`, `./integration`, `./client` (`startPlausible`, `track`), `./relay`
 - **Bin:** `astro-plausible init --target swa` writes `api/event/`, same mechanics as astro-umami.
+- **Tracker updates:** `pnpm update-tracker` moves `@plausible-analytics/tracker` to the newest npm release. pnpm
+  rewrites the range floor too, so every tracker release is a patch of this package. The `Update Plausible tracker`
+  workflow does it daily and opens a PR with the changeset; Renovate is disabled for that dependency in
+  `renovate.json`.
 
 ## Build & Test Commands
 
@@ -222,10 +227,13 @@ GitHub Actions (`.github/workflows/`):
   - Changesets action: creates release PRs or publishes to npm (Node 24)
 - **update-umami-tracker.yml** — daily: compares `packages/astro-umami/vendor/umami.js` with the Umami Cloud script
   and, when it changed, opens a PR with the new copy and a patch changeset.
-- The tracker update workflows end in the composite action `.github/actions/tracker-update-pr`: it writes the
-  changeset, runs the package tests, the typecheck and Biome in the workflow (PRs opened with `GITHUB_TOKEN` get no
-  CI run), opens the PR as a draft when a check fails, refreshes it on later runs, and closes it when upstream
-  matches `main` again.
+- **update-plausible-tracker.yml** — daily: moves `@plausible-analytics/tracker` to the newest npm release and, when
+  it moved, opens a PR with a patch changeset. Renovate is disabled for that dependency.
+- Both tracker update workflows use a read-only `validate` job that checks out `main` without persisted checkout
+  credentials, refreshes the tracker, runs the package tests, typecheck and Biome, and uploads the changed files and
+  check results. A write-enabled `publish` job applies that artifact and uses the composite action
+  `.github/actions/tracker-update-pr` to write the changeset and open or refresh the PR, as a draft when a check fails
+  (PRs opened with `GITHUB_TOKEN` get no CI run). When upstream matches `main` again, the publisher closes the PR.
 
 All CI jobs use `pnpm/action-setup@v6` (reads the pnpm version from `packageManager`) + `actions/setup-node@v6` with
 `pnpm install --frozen-lockfile`.
