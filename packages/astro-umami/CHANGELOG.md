@@ -1,5 +1,11 @@
 # @sjohansson/astro-umami
 
+## 0.1.2
+
+### Patch Changes
+
+- d41d681: Update the bundled Umami tracker to upstream as of 2026-11-08.
+
 ## 0.1.1
 
 ### Patch Changes
