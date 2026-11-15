@@ -26,19 +26,19 @@
     "dev": "pnpm --filter \"./packages/*\" --parallel run dev"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@biomejs/biome": "^2.5.14",
+    "@astrojs/check": "^0.9.12",
+    "@biomejs/biome": "^2.6.7",
     "@changesets/cli": "^3.0.3",
-    "@types/node": "^26.6.2",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vitest/ui": "^4.1.11",
-    "astro": "^7.3.4",
-    "happy-dom": "^21.0.0",
-    "markdownlint-cli2": "^0.24.0",
-    "tsdown": "^0.23.0",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/ui": "^4.1.12",
+    "astro": "^7.4.12",
+    "happy-dom": "^21.0.4",
+    "markdownlint-cli2": "^0.24.1",
+    "tsdown": "^0.23.7",
     "typescript": "^6.0.3",
-    "vite": "^8.3.0",
-    "vitest": "^4.1.11"
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12"
   },
   "pnpm": {}
 }
