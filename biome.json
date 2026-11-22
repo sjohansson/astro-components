@@ -18,7 +18,8 @@
       "!**/.astro",
       "!**/*.min.js",
       "!**/pnpm-lock.yaml",
-      "!**/vendor"
+      "!**/vendor",
+      "!.changeset"
     ]
   },
   "formatter": {
