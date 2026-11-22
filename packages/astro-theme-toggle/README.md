@@ -56,20 +56,20 @@ The component starts as a single icon button showing the current theme. On click
 
 #### Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `class` | `string` | Optional CSS classes | `""` |
-| `expandDirection` | `"horizontal" \| "vertical" \| "auto"` | Direction the options panel expands | `"auto"` |
-| `sectionsDirection` | `"horizontal" \| "vertical" \| "auto"` | How the Theme/Scheme/Contrast/Color vision sections are arranged | `"auto"` |
-| `expandSide` | `"auto" \| "start" \| "end"` | Which side of the trigger the panel opens toward | `"auto"` |
-| `showLabels` | `boolean` | Show theme labels next to icons | `false` |
-| `labelPosition` | `"auto" \| "below" \| "above" \| "right" \| "left"` | Where labels sit relative to icons | `"auto"` |
-| `preset` | `"basic" \| "accessible" \| "full" \| ThemeAxis[]` | Which axis controls to offer (scheme/contrast/variation; legacy `ThemeCategory[]` values are mapped) | `"basic"` |
-| `family` | `string` | Restrict to a single family by id (variant-only UI) | — |
-| `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
-| `applyMode` | `"inline" \| "attribute" \| "both"` | How the active theme is reflected on `<html>` | `"inline"` |
-| `attributeName` | `string` | Base data-attribute name (coerced to `data-…`) | `"data-theme"` |
-| `attributeCompanions` | `boolean` | Also set `-family`/`-scheme`/`-contrast`/`-variation` companions | `true` |
+| Prop                  | Type                                                | Description                                                                                          | Default        |
+| --------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------- |
+| `class`               | `string`                                            | Optional CSS classes                                                                                 | `""`           |
+| `expandDirection`     | `"horizontal" \| "vertical" \| "auto"`              | Direction the options panel expands                                                                  | `"auto"`       |
+| `sectionsDirection`   | `"horizontal" \| "vertical" \| "auto"`              | How the Theme/Scheme/Contrast/Color vision sections are arranged                                     | `"auto"`       |
+| `expandSide`          | `"auto" \| "start" \| "end"`                        | Which side of the trigger the panel opens toward                                                     | `"auto"`       |
+| `showLabels`          | `boolean`                                           | Show theme labels next to icons                                                                      | `false`        |
+| `labelPosition`       | `"auto" \| "below" \| "above" \| "right" \| "left"` | Where labels sit relative to icons                                                                   | `"auto"`       |
+| `preset`              | `"basic" \| "accessible" \| "full" \| ThemeAxis[]`  | Which axis controls to offer (scheme/contrast/variation; legacy `ThemeCategory[]` values are mapped) | `"basic"`      |
+| `family`              | `string`                                            | Restrict to a single family by id (variant-only UI)                                                  | —              |
+| `themes`              | `ThemeConfig[]`                                     | Custom theme configurations                                                                          | Default themes |
+| `applyMode`           | `"inline" \| "attribute" \| "both"`                 | How the active theme is reflected on `<html>`                                                        | `"inline"`     |
+| `attributeName`       | `string`                                            | Base data-attribute name (coerced to `data-…`)                                                       | `"data-theme"` |
+| `attributeCompanions` | `boolean`                                           | Also set `-family`/`-scheme`/`-contrast`/`-variation` companions                                     | `true`         |
 
 ### Data-attribute theming
 
@@ -97,16 +97,24 @@ Then style with whatever granularity you need:
 
 ```css
 /* exact theme */
-[data-theme="high-contrast-dark"] { --my-bg: #000; }
+[data-theme="high-contrast-dark"] {
+  --my-bg: #000;
+}
 
 /* any dark scheme */
-[data-theme-scheme="dark"] { color-scheme: dark; }
+[data-theme-scheme="dark"] {
+  color-scheme: dark;
+}
 
 /* any high-contrast theme */
-[data-theme-contrast="more"] { --border-width: 2px; }
+[data-theme-contrast="more"] {
+  --border-width: 2px;
+}
 
 /* a whole family */
-[data-theme-family="kawaii"] { --accent: hotpink; }
+[data-theme-family="kawaii"] {
+  --accent: hotpink;
+}
 ```
 
 #### Three orthogonal axes
@@ -114,11 +122,11 @@ Then style with whatever granularity you need:
 Theme selection is modelled as three independent axes, each its own attribute,
 control, and `ThemeConfig` facet:
 
-| Axis | Attribute | `ThemeConfig` field | Values |
-| --- | --- | --- | --- |
-| scheme | `data-theme-scheme` | `scheme` | `light` / `dark` |
-| contrast | `data-theme-contrast` | `contrast` | `normal` / `more` |
-| color-vision | `data-theme-variation` | `variation` | `normal` + e.g. `protanopia` |
+| Axis         | Attribute              | `ThemeConfig` field | Values                       |
+| ------------ | ---------------------- | ------------------- | ---------------------------- |
+| scheme       | `data-theme-scheme`    | `scheme`            | `light` / `dark`             |
+| contrast     | `data-theme-contrast`  | `contrast`          | `normal` / `more`            |
+| color-vision | `data-theme-variation` | `variation`         | `normal` + e.g. `protanopia` |
 
 Because they're independent, a theme (and the controller) can combine them —
 e.g. **high contrast _and_ protanopia at the same time**, which a single
@@ -130,7 +138,9 @@ in your CSS, so the combination needs no hand-authored palette:
 ```
 
 ```css
-[data-theme-variation="protanopia"] { --accent: #6a5acd; }
+[data-theme-variation="protanopia"] {
+  --accent: #6a5acd;
+}
 [data-theme-contrast="more"][data-theme-variation="protanopia"] {
   /* high-contrast tuning for protanopia, composed from two axes */
 }
@@ -144,16 +154,17 @@ A `ThemeConfig` opts into the non-default end of an axis with the optional
 ```
 
 Presets gate which axis controls appear (`basic` = scheme; `accessible` =
-+ contrast; `full` = + color-vision), and each variation is offered as its own
-option — no collapsing. New color-vision types scale in just by adding themes
-with a new `variation`; no preset changes needed.
+
+- contrast; `full` = + color-vision), and each variation is offered as its own
+  option — no collapsing. New color-vision types scale in just by adding themes
+  with a new `variation`; no preset changes needed.
 
 > **Inline-mode note:** in `inline`/`both` mode the component resolves to the
 > nearest authored palette and falls back (relaxing color-vision, then contrast)
 > when a combination has no concrete theme. Attribute mode has no such limit —
 > the axis attributes always reflect your exact selection.
 
-> **Clean slate:** in `attribute` mode the component sets *only* the attributes —
+> **Clean slate:** in `attribute` mode the component sets _only_ the attributes —
 > it does **not** inject any colors. You author the `[data-theme=…]` rules. (In
 > `both` mode the inline `--theme-*` variables are also set and take precedence.)
 
@@ -179,10 +190,10 @@ of theme configs into `[data-theme="id"] { …vars… }` blocks (it is **not**
 injected automatically):
 
 ```ts
-import { defaultThemes, generateThemeStylesheet } from '@sjohansson/astro-theme-toggle';
+import { defaultThemes, generateThemeStylesheet } from "@sjohansson/astro-theme-toggle";
 
-const css = generateThemeStylesheet(defaultThemes);            // base name 'data-theme'
-const custom = generateThemeStylesheet(defaultThemes, 'data-color-mode');
+const css = generateThemeStylesheet(defaultThemes); // base name 'data-theme'
+const custom = generateThemeStylesheet(defaultThemes, "data-color-mode");
 ```
 
 ### ThemeToggle (Simple)
@@ -202,11 +213,11 @@ the `.dark` class on `<html>`. It supports the same data-attribute opt-in via
 <theme-toggle apply-mode="both" attribute-name="data-mode"></theme-toggle>
 ```
 
-| Attribute | Values | Default |
-|------|------|---------|
-| `apply-mode` | `class` \| `attribute` \| `both` | `class` |
-| `attribute-name` | string (coerced to `data-…`) | `data-theme` |
-| `attribute-companions` | `true` \| `false` (sets `-scheme`) | `true` |
+| Attribute              | Values                             | Default      |
+| ---------------------- | ---------------------------------- | ------------ |
+| `apply-mode`           | `class` \| `attribute` \| `both`   | `class`      |
+| `attribute-name`       | string (coerced to `data-…`)       | `data-theme` |
+| `attribute-companions` | `true` \| `false` (sets `-scheme`) | `true`       |
 
 ### As an Astro Integration (Recommended)
 
@@ -214,8 +225,8 @@ Use the integration for automatic setup and configuration:
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+import { defineConfig } from "astro/config";
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 
 export default defineConfig({
   integrations: [
@@ -225,10 +236,10 @@ export default defineConfig({
       // Optional: when using data-attribute theming, make the injected FOUC
       // script replay the attribute(s) before first paint. Match these to the
       // component's `applyMode` / `attributeName` / `attributeCompanions`.
-      applyMode: 'attribute',
-      attributeName: 'data-theme',
+      applyMode: "attribute",
+      attributeName: "data-theme",
       attributeCompanions: true,
-    })
+    }),
   ],
 });
 ```
@@ -246,6 +257,7 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 ```
 
 **Benefits of using the integration:**
+
 - Automatic theme initialization script (eliminates FOUC)
 - Better SSR handling
 - Configuration validation
@@ -266,9 +278,9 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 
 #### Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `class` | `string` | Optional CSS classes | `""` |
+| Prop    | Type     | Description          | Default |
+| ------- | -------- | -------------------- | ------- |
+| `class` | `string` | Optional CSS classes | `""`    |
 
 ### ThemePreview
 
@@ -288,21 +300,21 @@ import { ThemePreview } from '@sjohansson/astro-theme-toggle';
 
 #### Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `class` | `string` | Optional CSS classes | `""` |
-| `theme` | `"all" \| ThemeMode` | Theme(s) to display | `"all"` |
-| `themes` | `ThemeConfig[]` | Custom theme configurations | Default themes |
+| Prop     | Type                 | Description                 | Default        |
+| -------- | -------------------- | --------------------------- | -------------- |
+| `class`  | `string`             | Optional CSS classes        | `""`           |
+| `theme`  | `"all" \| ThemeMode` | Theme(s) to display         | `"all"`        |
+| `themes` | `ThemeConfig[]`      | Custom theme configurations | Default themes |
 ## API
 
 ### Integration Options
 
-| Option                | Type                                  | Description                                                    | Default       |
-| --------------------- | ------------------------------------- | ------------------------------------------------------------- | ------------- |
-| `injectScript`        | `boolean`                             | Inject theme initialization script in head                    | `false`       |
-| `applyMode`           | `"inline" \| "attribute" \| "both"`   | When `attribute`/`both`, the injected script replays the theme data attribute(s) before paint | `"inline"` |
-| `attributeName`       | `string`                              | Base data-attribute name the script replays (match the component) | `"data-theme"` |
-| `attributeCompanions` | `boolean`                             | Whether the script sets companion attributes on first visit   | `true`        |
+| Option                | Type                                | Description                                                                                   | Default        |
+| --------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------- | -------------- |
+| `injectScript`        | `boolean`                           | Inject theme initialization script in head                                                    | `false`        |
+| `applyMode`           | `"inline" \| "attribute" \| "both"` | When `attribute`/`both`, the injected script replays the theme data attribute(s) before paint | `"inline"`     |
+| `attributeName`       | `string`                            | Base data-attribute name the script replays (match the component)                             | `"data-theme"` |
+| `attributeCompanions` | `boolean`                           | Whether the script sets companion attributes on first visit                                   | `true`         |
 
 ### Preventing FOUC with data attributes
 
@@ -311,7 +323,7 @@ The integration's `injectScript` injects a tiny inline `<head>` script. With
 the page paints. The same script is available directly:
 
 ```ts
-import { generateThemeInitScript, themeInitScript } from '@sjohansson/astro-theme-toggle';
+import { generateThemeInitScript, themeInitScript } from "@sjohansson/astro-theme-toggle";
 
 // scheme-class only (default, backwards compatible)
 const basic = themeInitScript;
@@ -319,7 +331,7 @@ const basic = themeInitScript;
 // also replay data attributes (attribute / both apply modes)
 const withAttrs = generateThemeInitScript({
   applyAttribute: true,
-  attributeName: 'data-theme',
+  attributeName: "data-theme",
   companions: true,
 });
 ```
@@ -345,28 +357,29 @@ script and `<theme-toggle>` interop.
 ## Using CSS Custom Properties
 
 The theme system exposes CSS custom properties that you can use in your styles:
+
 ## Styling
 
 ```css
 .my-component {
   /* Backgrounds */
   background: var(--theme-bg-primary);
-  
+
   /* Text colors */
   color: var(--theme-fg-primary);
-  
+
   /* Borders */
   border: 1px solid var(--theme-border-default);
-  
+
   /* Interactive elements */
   button {
     background: var(--theme-interactive-default);
   }
-  
+
   button:hover {
     background: var(--theme-interactive-hover);
   }
-  
+
   /* Semantic colors */
   .success {
     color: var(--theme-success);
@@ -377,33 +390,39 @@ The theme system exposes CSS custom properties that you can use in your styles:
 ### Available CSS Variables
 
 #### Background Colors
+
 - `--theme-bg-primary` - Primary background
 - `--theme-bg-secondary` - Secondary background
 - `--theme-bg-tertiary` - Tertiary background
 
 #### Foreground Colors
+
 - `--theme-fg-primary` - Primary text
 - `--theme-fg-secondary` - Secondary text
 - `--theme-fg-tertiary` - Tertiary text
 
 #### Border Colors
+
 - `--theme-border-default` - Default border
 - `--theme-border-hover` - Hover state border
 - `--theme-border-focus` - Focus state border
 
 #### Interactive Colors
+
 - `--theme-interactive-default` - Default interactive elements
 - `--theme-interactive-hover` - Hover state
 - `--theme-interactive-active` - Active state
 - `--theme-interactive-disabled` - Disabled state
 
 #### Semantic Colors
+
 - `--theme-success` - Success messages
 - `--theme-warning` - Warning messages
 - `--theme-error` - Error messages
 - `--theme-info` - Info messages
 
 #### Sizing
+
 - `--theme-trigger-size` - Width/height of the trigger button (default `2.5rem`)
 - `--theme-trigger-icon-size` - Trigger icon size (default: half of `--theme-trigger-size`, i.e. `1.25rem`). Set the trigger size alone and the icon scales with it, staying centred; override this to tune the icon independently.
 
@@ -469,12 +488,7 @@ const customThemes: ThemeConfig[] = [
 The package exports TypeScript types for full type safety:
 
 ```typescript
-import type { 
-  ThemeMode,
-  ThemeConfig,
-  ThemeControllerProps,
-  ColorToken 
-} from '@sjohansson/astro-theme-toggle';
+import type { ThemeMode, ThemeConfig, ThemeControllerProps, ColorToken } from "@sjohansson/astro-theme-toggle";
 ```
 
 ## Accessibility

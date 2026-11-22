@@ -234,13 +234,13 @@ Create custom shortcuts in VS Code:
 
 ## Summary
 
-| Task | Command | Time |
-|------|---------|------|
-| Auto-fix code | `.\scripts\fix.ps1` or Ctrl+Shift+B | ~10s |
-| Pre-commit check | `.\scripts\pre-commit.ps1` or Ctrl+Shift+B | ~30-60s |
-| Full verification | `.\scripts\full-check.ps1` or Ctrl+Shift+B | ~2-5min |
-| Quick lint | `pnpm lint` | ~5s |
-| Quick tests | `pnpm test` | ~10s (watch) |
-| Quick type check | `pnpm typecheck` | ~3s |
+| Task              | Command                                    | Time         |
+| ----------------- | ------------------------------------------ | ------------ |
+| Auto-fix code     | `.\scripts\fix.ps1` or Ctrl+Shift+B        | ~10s         |
+| Pre-commit check  | `.\scripts\pre-commit.ps1` or Ctrl+Shift+B | ~30-60s      |
+| Full verification | `.\scripts\full-check.ps1` or Ctrl+Shift+B | ~2-5min      |
+| Quick lint        | `pnpm lint`                                | ~5s          |
+| Quick tests       | `pnpm test`                                | ~10s (watch) |
+| Quick type check  | `pnpm typecheck`                           | ~3s          |
 
 **Remember:** Always run pre-commit checks before committing! ✅

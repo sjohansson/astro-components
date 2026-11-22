@@ -30,8 +30,8 @@ pnpm add @sjohansson/astro-theme-toggle
 
 ```javascript
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+import { defineConfig } from "astro/config";
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 
 export default defineConfig({
   integrations: [themeToggle()],

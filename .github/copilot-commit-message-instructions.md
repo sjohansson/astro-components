@@ -11,8 +11,8 @@ Prefix every commit subject with one of these types, which map directly to
 - `removed:` → **Removed** — now removed features
 - `fix:` → **Fixed** — bug fixes
 - `security:` → **Security** — vulnerability fixes
-- `chore:` → *(omitted from changelog)* — maintenance, tooling, config
-- `docs:` → *(omitted from changelog)* — documentation-only changes
+- `chore:` → _(omitted from changelog)_ — maintenance, tooling, config
+- `docs:` → _(omitted from changelog)_ — documentation-only changes
 
 Append `!` after the type/scope for breaking changes, e.g. `feat!:` or `fix!:`.
 

@@ -16,8 +16,8 @@ pnpm add @sjohansson/astro-reactflow @astrojs/react @xyflow/react react react-do
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import reactFlow from '@sjohansson/astro-reactflow/integration';
+import { defineConfig } from "astro/config";
+import reactFlow from "@sjohansson/astro-reactflow/integration";
 
 export default defineConfig({
   integrations: [reactFlow()],
@@ -27,7 +27,7 @@ export default defineConfig({
 That's it — no need to manually add `react()` to your integrations. The React renderer is auto-registered, and the diagram stylesheets are injected for you.
 
 > [!IMPORTANT]
-> Registering the integration is what gets the CSS onto the page. `<ReactFlowWrapper>` is rendered with `client:only="react"`, so Astro never imports it on the server — and Astro collects each page's CSS from the *server* module graph. The stylesheet the component imports therefore never reaches the build on its own. Without the integration (or the manual import below), the diagram pane collapses to `0px` and the canvas renders empty.
+> Registering the integration is what gets the CSS onto the page. `<ReactFlowWrapper>` is rendered with `client:only="react"`, so Astro never imports it on the server — and Astro collects each page's CSS from the _server_ module graph. The stylesheet the component imports therefore never reaches the build on its own. Without the integration (or the manual import below), the diagram pane collapses to `0px` and the canvas renders empty.
 
 If you'd rather keep the CSS off pages that have no diagrams, set `injectStyles: false` and import it yourself in the relevant page or layout:
 
@@ -69,50 +69,50 @@ import { ReactFlowWrapper } from '@sjohansson/astro-reactflow';
 
 ### Integration options
 
-| Option              | Type      | Default | Description                                                                                       |
-| ------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------- |
-| `configureSsr`      | `boolean` | `true`  | Add `@xyflow/react` to Vite's `ssr.noExternal` so React Flow bundles correctly during SSR builds. |
-| `autoRegisterReact` | `boolean` | `true`  | Auto-add `@astrojs/react` if it isn't in the consumer's `integrations` array.                     |
+| Option              | Type      | Default | Description                                                                                                    |
+| ------------------- | --------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `configureSsr`      | `boolean` | `true`  | Add `@xyflow/react` to Vite's `ssr.noExternal` so React Flow bundles correctly during SSR builds.              |
+| `autoRegisterReact` | `boolean` | `true`  | Auto-add `@astrojs/react` if it isn't in the consumer's `integrations` array.                                  |
 | `injectStyles`      | `boolean` | `true`  | Inject the React Flow and wrapper stylesheets into every page. Required for `client:only` islands — see above. |
 
 If `autoRegisterReact` is disabled and `@astrojs/react` is not present, the integration throws a clear error at config-load time instead of failing later with `NoMatchingRenderer`.
 
 ### Component props
 
-| Prop                 | Type                                       | Default  | Description                                                                 |
-| -------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------------- |
-| `nodes`              | `DiagramNode[]`                            | —        | Nodes to render (see shape below).                                          |
-| `edges`              | `DiagramEdge[]`                            | —        | Edges to render (see shape below).                                          |
-| `title`              | `string`                                   | —        | Title rendered in a header bar above the diagram.                           |
-| `description`        | `string`                                   | —        | Description rendered in a footer bar below the diagram.                     |
-| `width`              | `number \| string`                         | `"100%"` | Container width. Numbers are px; strings pass through.                       |
-| `height`             | `number \| string`                         | `400`    | Container height. Numbers are px; strings pass through.                      |
-| `showMiniMap`        | `boolean`                                  | `false`  | Show the minimap (input/output nodes are color-coded).                       |
-| `miniMapSize`        | `MiniMapSize`                              | `"md"` (200×150) | Minimap dimensions (see [`MiniMapSize`](#minimapsize) below).        |
-| `showControls`       | `boolean`                                  | `true`   | Show the zoom/pan controls.                                                 |
-| `backgroundVariant`  | `"dots" \| "lines" \| "cross"`             | `"dots"` | Background pattern.                                                          |
-| `allowFocusMode`     | `boolean`                                  | `true`   | Show the expand button that opens fullscreen focus mode (Esc to exit).      |
-| `interactive`        | `boolean`                                  | `false`  | Allow dragging, connecting, and selecting nodes/edges.                       |
-| `fitView`            | `boolean`                                  | `true`   | Fit the diagram to the viewport on load.                                    |
-| `defaultMarkerEnd`   | `"arrow" \| "arrowclosed" \| boolean`      | `false`  | Default arrowhead for all edges.                                            |
-| `defaultStrokeWidth` | `number`                                   | `2`      | Default edge stroke width.                                                  |
-| `colorMode`          | `"auto" \| "light" \| "dark"`              | `"auto"` | `"auto"` follows the host page's theme; pass `"light"`/`"dark"` to pin it.   |
-| `className`          | `string`                                   | —        | Extra classes on the outer wrapper.                                        |
-| `style`              | `CSSProperties`                            | —        | Extra inline styles on the outer wrapper.                                  |
-| `enableExport`       | `boolean`                                  | `false`  | Show PNG / SVG export buttons.                                             |
+| Prop                 | Type                                  | Default          | Description                                                                |
+| -------------------- | ------------------------------------- | ---------------- | -------------------------------------------------------------------------- |
+| `nodes`              | `DiagramNode[]`                       | —                | Nodes to render (see shape below).                                         |
+| `edges`              | `DiagramEdge[]`                       | —                | Edges to render (see shape below).                                         |
+| `title`              | `string`                              | —                | Title rendered in a header bar above the diagram.                          |
+| `description`        | `string`                              | —                | Description rendered in a footer bar below the diagram.                    |
+| `width`              | `number \| string`                    | `"100%"`         | Container width. Numbers are px; strings pass through.                     |
+| `height`             | `number \| string`                    | `400`            | Container height. Numbers are px; strings pass through.                    |
+| `showMiniMap`        | `boolean`                             | `false`          | Show the minimap (input/output nodes are color-coded).                     |
+| `miniMapSize`        | `MiniMapSize`                         | `"md"` (200×150) | Minimap dimensions (see [`MiniMapSize`](#minimapsize) below).              |
+| `showControls`       | `boolean`                             | `true`           | Show the zoom/pan controls.                                                |
+| `backgroundVariant`  | `"dots" \| "lines" \| "cross"`        | `"dots"`         | Background pattern.                                                        |
+| `allowFocusMode`     | `boolean`                             | `true`           | Show the expand button that opens fullscreen focus mode (Esc to exit).     |
+| `interactive`        | `boolean`                             | `false`          | Allow dragging, connecting, and selecting nodes/edges.                     |
+| `fitView`            | `boolean`                             | `true`           | Fit the diagram to the viewport on load.                                   |
+| `defaultMarkerEnd`   | `"arrow" \| "arrowclosed" \| boolean` | `false`          | Default arrowhead for all edges.                                           |
+| `defaultStrokeWidth` | `number`                              | `2`              | Default edge stroke width.                                                 |
+| `colorMode`          | `"auto" \| "light" \| "dark"`         | `"auto"`         | `"auto"` follows the host page's theme; pass `"light"`/`"dark"` to pin it. |
+| `className`          | `string`                              | —                | Extra classes on the outer wrapper.                                        |
+| `style`              | `CSSProperties`                       | —                | Extra inline styles on the outer wrapper.                                  |
+| `enableExport`       | `boolean`                             | `false`          | Show PNG / SVG export buttons.                                             |
 
 #### `DiagramNode`
 
 ```ts
 interface DiagramNode {
   id: string;
-  type?: 'default' | 'input' | 'output' | 'group' | string;
-  label: string;                       // hoisted to React Flow's data.label
+  type?: "default" | "input" | "output" | "group" | string;
+  label: string; // hoisted to React Flow's data.label
   position: { x: number; y: number };
   style?: CSSProperties;
   className?: string;
   parentId?: string;
-  extent?: 'parent';
+  extent?: "parent";
 }
 ```
 
@@ -124,20 +124,20 @@ interface DiagramEdge {
   source: string;
   target: string;
   label?: string;
-  type?: 'default' | 'straight' | 'step' | 'smoothstep' | 'bezier';   // default: smoothstep
+  type?: "default" | "straight" | "step" | "smoothstep" | "bezier"; // default: smoothstep
   animated?: boolean;
   style?: CSSProperties;
-  markerEnd?: 'arrow' | 'arrowclosed' | boolean;   // overrides defaultMarkerEnd
-  strokeWidth?: number;                            // overrides defaultStrokeWidth
+  markerEnd?: "arrow" | "arrowclosed" | boolean; // overrides defaultMarkerEnd
+  strokeWidth?: number; // overrides defaultStrokeWidth
 }
 ```
 
 #### `MiniMapSize`
 
 ```ts
-type MiniMapPreset    = 'sm' | 'md' | 'lg';            // 120×90, 200×150, 320×240 (4:3)
-type MiniMapDimension = number | string;               // px number, or a "%" of the pane
-type MiniMapSize      = MiniMapPreset | number | { width: MiniMapDimension; height: MiniMapDimension };
+type MiniMapPreset = "sm" | "md" | "lg"; // 120×90, 200×150, 320×240 (4:3)
+type MiniMapDimension = number | string; // px number, or a "%" of the pane
+type MiniMapSize = MiniMapPreset | number | { width: MiniMapDimension; height: MiniMapDimension };
 ```
 
 Pass `miniMapSize` to resize the minimap. Omitting it keeps React Flow's default 200×150, so existing usage is unchanged.
@@ -158,16 +158,16 @@ Pass `miniMapSize` to resize the minimap. Omitting it keeps React Flow's default
 
 The component ships self-contained light/dark styles via overridable CSS custom properties on `.reactflow-wrapper` (delivered by the integration, or via the `@sjohansson/astro-reactflow/styles.css` export). Override them to match your site:
 
-| Variable                | Purpose                                  |
-| ----------------------- | ---------------------------------------- |
-| `--arf-surface`         | Diagram canvas background                |
-| `--arf-chrome-surface`  | Title/description/control surfaces       |
-| `--arf-text`            | Body text / node text / edge stroke      |
-| `--arf-heading`         | Title text                               |
-| `--arf-border`          | Borders and node outlines                |
-| `--arf-button-hover-bg` | Button hover background                  |
-| `--arf-input-accent`    | `input` node border + connection line    |
-| `--arf-output-accent`   | `output` node border                     |
+| Variable                | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| `--arf-surface`         | Diagram canvas background             |
+| `--arf-chrome-surface`  | Title/description/control surfaces    |
+| `--arf-text`            | Body text / node text / edge stroke   |
+| `--arf-heading`         | Title text                            |
+| `--arf-border`          | Borders and node outlines             |
+| `--arf-button-hover-bg` | Button hover background               |
+| `--arf-input-accent`    | `input` node border + connection line |
+| `--arf-output-accent`   | `output` node border                  |
 
 ```css
 /* Map the wrapper onto your own design tokens */

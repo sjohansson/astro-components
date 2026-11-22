@@ -239,13 +239,13 @@ Rebuilds packages as you change files.
 
 ## Summary
 
-| Task | Command | Time |
-|------|---------|------|
-| Format code | `.\scripts\fix.ps1` | ~10s |
-| Pre-commit | `.\scripts\pre-commit.ps1` | ~30-60s |
-| Full check | `.\scripts\full-check.ps1` | ~30-45s |
-| Watch tests | `pnpm test` | ~10s (starts) |
-| Dev mode | `pnpm dev` | ~5s (starts) |
+| Task        | Command                    | Time          |
+| ----------- | -------------------------- | ------------- |
+| Format code | `.\scripts\fix.ps1`        | ~10s          |
+| Pre-commit  | `.\scripts\pre-commit.ps1` | ~30-60s       |
+| Full check  | `.\scripts\full-check.ps1` | ~30-45s       |
+| Watch tests | `pnpm test`                | ~10s (starts) |
+| Dev mode    | `pnpm dev`                 | ~5s (starts)  |
 
 ---
 

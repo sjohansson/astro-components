@@ -31,20 +31,20 @@ export default defineConfig({
 
 It adds one script to every page that starts the tracker. Options:
 
-| Option                 | Default        | Notes                                                                     |
-| ---------------------- | -------------- | ------------------------------------------------------------------------- |
-| `domain`               |                | Required. The site domain as entered in Plausible.                        |
-| `endpoint`             | `"/api/event"` | Where events go. Set `https://plausible.io/api/event` to skip the relay. |
-| `enabled`              |                | Defaults to on for `astro build` and off for `astro dev`.                 |
-| `autoCapturePageviews` | `true`         | Send a pageview on load and on history navigation.                        |
-| `hashBasedRouting`     | `false`        | Track `#` paths as separate pages.                                        |
-| `outboundLinks`        | `false`        | Track clicks on links to other sites.                                     |
+| Option                 | Default        | Notes                                                                      |
+| ---------------------- | -------------- | -------------------------------------------------------------------------- |
+| `domain`               |                | Required. The site domain as entered in Plausible.                         |
+| `endpoint`             | `"/api/event"` | Where events go. Set `https://plausible.io/api/event` to skip the relay.   |
+| `enabled`              |                | Defaults to on for `astro build` and off for `astro dev`.                  |
+| `autoCapturePageviews` | `true`         | Send a pageview on load and on history navigation.                         |
+| `hashBasedRouting`     | `false`        | Track `#` paths as separate pages.                                         |
+| `outboundLinks`        | `false`        | Track clicks on links to other sites.                                      |
 | `fileDownloads`        | `false`        | `true` for Plausible's default file types, or `{ fileExtensions: [...] }`. |
-| `formSubmissions`      | `false`        | Track form submissions.                                                   |
-| `captureOnLocalhost`   | `false`        | Also track on localhost.                                                  |
-| `logging`              | `true`         | Log ignored events to the console.                                        |
-| `customProperties`     |                | Custom properties added to every event.                                   |
-| `bindToWindow`         | `true`         | Expose `window.plausible`. Plausible's installation check looks for it.   |
+| `formSubmissions`      | `false`        | Track form submissions.                                                    |
+| `captureOnLocalhost`   | `false`        | Also track on localhost.                                                   |
+| `logging`              | `true`         | Log ignored events to the console.                                         |
+| `customProperties`     |                | Custom properties added to every event.                                    |
+| `bindToWindow`         | `true`         | Expose `window.plausible`. Plausible's installation check looks for it.    |
 
 ### 2. Add the relay
 
@@ -119,13 +119,13 @@ export const onRequestPost = ({ request }) => relay.handle(request);
 
 Relay options:
 
-| Option          | Default                  | Notes                                                                     |
-| --------------- | ------------------------ | ------------------------------------------------------------------------- |
-| `domain`        |                          | Required. One domain or several. Events for other domains get a 400.      |
-| `upstream`      | `"https://plausible.io"` | Events are posted to `<upstream>/api/event`.                              |
-| `ipHeaders`     |                          | Headers to read the visitor IP from, in order, when none is passed in. |
-| `maxBodyLength` | `16384`                  | Largest request body accepted, in bytes.                                  |
-| `events`        |                          | Validation for custom events, see below.                                  |
+| Option          | Default                  | Notes                                                                      |
+| --------------- | ------------------------ | -------------------------------------------------------------------------- |
+| `domain`        |                          | Required. One domain or several. Events for other domains get a 400.       |
+| `upstream`      | `"https://plausible.io"` | Events are posted to `<upstream>/api/event`.                               |
+| `ipHeaders`     |                          | Headers to read the visitor IP from, in order, when none is passed in.     |
+| `maxBodyLength` | `16384`                  | Largest request body accepted, in bytes.                                   |
+| `events`        |                          | Validation for custom events, see below.                                   |
 | `onError`       |                          | Called when Plausible cannot be reached. The response is a 502 either way. |
 
 The relay answers 405 for anything but POST, 413 for a body over the limit, 400 for anything it will not forward,

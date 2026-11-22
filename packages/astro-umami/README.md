@@ -116,13 +116,13 @@ export const onRequestPost = ({ request }) => relay.handle(request);
 
 Relay options:
 
-| Option          | Default                      | Notes                                                                 |
-| --------------- | ---------------------------- | --------------------------------------------------------------------- |
-| `websiteId`     |                              | Required. One id or several. Events for other ids get a 400.          |
+| Option          | Default                      | Notes                                                                  |
+| --------------- | ---------------------------- | ---------------------------------------------------------------------- |
+| `websiteId`     |                              | Required. One id or several. Events for other ids get a 400.           |
 | `upstream`      | `"https://gateway.umami.is"` | Events are posted to `<upstream>/api/send`.                            |
 | `ipHeaders`     |                              | Headers to read the visitor IP from, in order, when none is passed in. |
-| `maxBodyLength` | `16384`                      | Largest request body accepted, in bytes.                              |
-| `events`        |                              | Validation for custom events, see below.                              |
+| `maxBodyLength` | `16384`                      | Largest request body accepted, in bytes.                               |
+| `events`        |                              | Validation for custom events, see below.                               |
 | `onError`       |                              | Called when Umami cannot be reached. The response is a 502 either way. |
 
 The relay answers 405 for anything but POST, 413 for a body over the limit, 400 for anything it will not forward,

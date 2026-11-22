@@ -39,15 +39,15 @@ Each package provides both an integration and a component. Using the integration
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+import { defineConfig } from "astro/config";
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 
 export default defineConfig({
   integrations: [
     themeToggle({
       // Optional: inject theme initialization script globally
       injectScript: true, // default: false
-    })
+    }),
   ],
 });
 ```
@@ -72,8 +72,8 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import versionNote from '@sjohansson/astro-version-note/integration';
+import { defineConfig } from "astro/config";
+import versionNote from "@sjohansson/astro-version-note/integration";
 
 export default defineConfig({
   integrations: [versionNote()],
@@ -100,9 +100,9 @@ import { versionNoteHTML } from '@sjohansson/astro-version-note';
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import reactFlow from '@sjohansson/astro-reactflow/integration';
+import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
+import reactFlow from "@sjohansson/astro-reactflow/integration";
 
 export default defineConfig({
   integrations: [
@@ -110,7 +110,7 @@ export default defineConfig({
     reactFlow({
       // Optional: automatically handle React Flow styles
       injectStyles: true, // default: true
-    })
+    }),
   ],
 });
 ```
@@ -206,14 +206,14 @@ All integrations are fully typed. Use TypeScript for the best development experi
 
 ```ts
 // astro.config.mjs (or .ts)
-import { defineConfig } from 'astro/config';
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+import { defineConfig } from "astro/config";
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 
 export default defineConfig({
   integrations: [
     themeToggle({
       injectScript: true, // TypeScript will autocomplete and validate
-    })
+    }),
   ],
 });
 ```
@@ -256,7 +256,7 @@ import { ThemeToggle } from '@sjohansson/astro-theme-toggle';
 
 ```js
 // astro.config.mjs
-import themeToggle from '@sjohansson/astro-theme-toggle/integration';
+import themeToggle from "@sjohansson/astro-theme-toggle/integration";
 
 export default defineConfig({
   integrations: [themeToggle()],

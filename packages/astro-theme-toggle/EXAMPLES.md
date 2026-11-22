@@ -466,39 +466,31 @@ import { ThemeController } from '@sjohansson/astro-theme-toggle';
 
 ```typescript
 // theme-utils.ts
-import type { ThemeMode, ThemeConfig } from '@sjohansson/astro-theme-toggle';
+import type { ThemeMode, ThemeConfig } from "@sjohansson/astro-theme-toggle";
 
 export function getThemePreference(): ThemeMode {
-  if (typeof localStorage === 'undefined') return 'system';
-  
-  const stored = localStorage.getItem('theme-mode');
+  if (typeof localStorage === "undefined") return "system";
+
+  const stored = localStorage.getItem("theme-mode");
   if (stored && isValidThemeMode(stored)) {
     return stored as ThemeMode;
   }
-  
-  return 'system';
+
+  return "system";
 }
 
 export function isValidThemeMode(mode: string): boolean {
-  const validModes: ThemeMode[] = [
-    'system',
-    'light',
-    'dark',
-    'high-contrast-light',
-    'high-contrast-dark',
-  ];
+  const validModes: ThemeMode[] = ["system", "light", "dark", "high-contrast-light", "high-contrast-dark"];
   return validModes.includes(mode as ThemeMode);
 }
 
-export function createCustomTheme(
-  mode: Exclude<ThemeMode, 'system'>,
-  colors: ThemeConfig['colors']
-): ThemeConfig {
+export function createCustomTheme(mode: Exclude<ThemeMode, "system">, colors: ThemeConfig["colors"]): ThemeConfig {
   return {
     mode,
-    label: mode.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' '),
+    label: mode
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
     colors,
   };
 }

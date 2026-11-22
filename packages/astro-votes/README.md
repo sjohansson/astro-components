@@ -32,10 +32,10 @@ export default defineConfig({
 
 It registers `<vote-buttons>` on every page and sets the transport. Options:
 
-| Option      | Default   | Notes                                                              |
-| ----------- | --------- | ------------------------------------------------------------------ |
-| `transport` | `"umami"` | `"umami"` calls `window.umami.track`. `"none"` sends nothing.      |
-| `eventName` | `"vote"`  | Analytics event name. Must match `--event` on the sync.            |
+| Option      | Default   | Notes                                                         |
+| ----------- | --------- | ------------------------------------------------------------- |
+| `transport` | `"umami"` | `"umami"` calls `window.umami.track`. `"none"` sends nothing. |
+| `eventName` | `"vote"`  | Analytics event name. Must match `--event` on the sync.       |
 
 ### 2. Commit an empty data file
 
@@ -62,12 +62,12 @@ const attrs = voteAttributes(votes, post.data.slug);
 
 Attributes:
 
-| Attribute     | Notes                                                          |
-| ------------- | -------------------------------------------------------------- |
-| `item`        | Id of the thing being voted on. `[A-Za-z0-9._/-]`, max 200.    |
-| `up`, `down`  | Counts from the data file.                                     |
-| `synced-at`   | `updated` from the data file. Stops a vote being counted twice. |
-| `event-name`  | Overrides the page-wide event name.                            |
+| Attribute                               | Notes                                                            |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `item`                                  | Id of the thing being voted on. `[A-Za-z0-9._/-]`, max 200.      |
+| `up`, `down`                            | Counts from the data file.                                       |
+| `synced-at`                             | `updated` from the data file. Stops a vote being counted twice.  |
+| `event-name`                            | Overrides the page-wide event name.                              |
 | `label-up`, `label-down`, `group-label` | Accessible labels. Defaults `Like`, `Dislike`, `Rate this page`. |
 
 ### 4. Sync the counts on a schedule

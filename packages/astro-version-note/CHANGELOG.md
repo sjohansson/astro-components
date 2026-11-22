@@ -5,7 +5,6 @@
 ### Minor Changes
 
 - 6cbfbb4: Make the styles easy to override and stop the panel flashing open before the script runs.
-  
   - The integration bundles the styles into every page at build time, so the panel is collapsed with no JavaScript.
     `versionNote({ styles: false })` leaves them out. `registerVersionNote({ injectStyles: false })` does the same without
     the integration.
@@ -24,7 +23,7 @@
   whose `aria-controls` names the note's `id`, closed by its own close button. Adds `versionNoteHTML` and `formatBuildTime`
   for server rendering, an `open` attribute with `show()`, `hide()`, and `toggle()`, a `version-note-toggle` event, and
   `--version-note-*` custom properties for styling.
-  
+
   Breaking: the `type` attribute and its info, warning, success, and error callout styles are gone, and the integration
   takes no options. It now registers the element on every page instead of only logging.
 

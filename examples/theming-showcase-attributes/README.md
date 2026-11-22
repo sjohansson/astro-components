@@ -25,11 +25,11 @@ The scheme, contrast, and color-vision axes are independent, so they compose —
 e.g. `data-theme-contrast="more"` + `data-theme-variation="protanopia"` at once.
 All theming lives in your own stylesheets, which react to those attributes:
 
-| File | Role |
-| --- | --- |
-| [`src/styles/tokens.css`](src/styles/tokens.css) | Baseline `--app-*` palette keyed on `data-theme-scheme` — so **every** theme (including bundled families) gets a sensible palette without enumerating each id. |
+| File                                                 | Role                                                                                                                                                                                                    |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`src/styles/tokens.css`](src/styles/tokens.css)     | Baseline `--app-*` palette keyed on `data-theme-scheme` — so **every** theme (including bundled families) gets a sensible palette without enumerating each id.                                          |
 | [`src/styles/advanced.css`](src/styles/advanced.css) | Cross-cutting overrides via `data-theme-contrast`, `data-theme-variation`, `data-theme-family`, and exact `data-theme` — including the combined contrast×color-vision rule inline styles can't express. |
-| [`src/styles/base.css`](src/styles/base.css) | Page + component styling that consumes only the `--app-*` tokens. |
+| [`src/styles/base.css`](src/styles/base.css)         | Page + component styling that consumes only the `--app-*` tokens.                                                                                                                                       |
 
 ## Two pages, one switcher each
 
@@ -38,10 +38,10 @@ writes to `<html>`. Running two of them on one page makes them fight (each
 overwrites the other's attributes and their button UIs desync), so this example
 gives each its own page:
 
-| Route | Component | Sets |
-| --- | --- | --- |
-| `/` | [`<theme-controller>`](src/pages/index.astro) | `data-theme` + family + scheme + contrast + variation |
-| `/simple` | [`<theme-toggle>`](src/pages/simple.astro) | `data-theme` + scheme (light/dark only) |
+| Route     | Component                                     | Sets                                                  |
+| --------- | --------------------------------------------- | ----------------------------------------------------- |
+| `/`       | [`<theme-controller>`](src/pages/index.astro) | `data-theme` + family + scheme + contrast + variation |
+| `/simple` | [`<theme-toggle>`](src/pages/simple.astro)    | `data-theme` + scheme (light/dark only)               |
 
 The `/simple` page strips any `data-theme-family` / `data-theme-contrast` /
 `data-theme-variation` a prior visit to `/` may have left, so it stays purely
@@ -51,10 +51,10 @@ The component is configured in [`astro.config.mjs`](astro.config.mjs):
 
 ```js
 themeToggle({
-  injectScript: true,        // FOUC: replay attributes before first paint
-  applyMode: "attribute",    // set data-theme*, inject no inline colors
+  injectScript: true, // FOUC: replay attributes before first paint
+  applyMode: "attribute", // set data-theme*, inject no inline colors
   attributeName: "data-theme",
-})
+});
 ```
 
 ## Run

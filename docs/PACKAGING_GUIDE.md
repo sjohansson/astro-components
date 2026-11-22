@@ -146,7 +146,7 @@ Each package must:
 
 ```typescript
 // src/integration.ts
-import type { AstroIntegration } from 'astro';
+import type { AstroIntegration } from "astro";
 
 export interface MyIntegrationOptions {
   // Define configuration options
@@ -154,25 +154,25 @@ export interface MyIntegrationOptions {
   option2?: boolean;
 }
 
-export default function myIntegration(
-  options: MyIntegrationOptions = {}
-): AstroIntegration {
+export default function myIntegration(options: MyIntegrationOptions = {}): AstroIntegration {
   return {
-    name: '@sjohansson/my-integration',
+    name: "@sjohansson/my-integration",
     hooks: {
-      'astro:config:setup': ({ logger, updateConfig, injectScript }) => {
-        logger.info('Setting up integration');
-        
+      "astro:config:setup": ({ logger, updateConfig, injectScript }) => {
+        logger.info("Setting up integration");
+
         // Modify Astro configuration
-        updateConfig({ /* ... */ });
-        
+        updateConfig({
+          /* ... */
+        });
+
         // Inject global scripts
         if (options.option2) {
-          injectScript('head-inline', '/* script code */');
+          injectScript("head-inline", "/* script code */");
         }
       },
-      'astro:config:done': ({ config, logger }) => {
-        logger.info('Integration configured');
+      "astro:config:done": ({ config, logger }) => {
+        logger.info("Integration configured");
         // Validate configuration
         // Log helpful debugging info
       },
@@ -205,23 +205,26 @@ Common hooks and their use cases:
 
 ```typescript
 // tsdown.package.config.ts
-import { defineConfig, type Options } from 'tsdown';
+import { defineConfig, type Options } from "tsdown";
 
 export function createPackageConfig({
-  entry = 'src/index.ts',
-  external = []
-}: { entry?: string | string[]; external?: (string | RegExp)[] } = {}): Options {
+  entry = "src/index.ts",
+  external = [],
+}: {
+  entry?: string | string[];
+  external?: (string | RegExp)[];
+} = {}): Options {
   return defineConfig({
     entry: Array.isArray(entry) ? entry : [entry],
-    format: ['esm'],
-    target: 'es2022',
-    dts: true,              // Generate .d.ts files (Oxc-powered)
-    sourcemap: true,        // Include source maps
-    clean: true,            // Clean output before build
-    treeshake: true,        // Remove unused code
-    platform: 'browser',    // Target browser environment
-    external: [/^node:/, 'astro', ...external],
-    loader: { '.css': 'copy' },
+    format: ["esm"],
+    target: "es2022",
+    dts: true, // Generate .d.ts files (Oxc-powered)
+    sourcemap: true, // Include source maps
+    clean: true, // Clean output before build
+    treeshake: true, // Remove unused code
+    platform: "browser", // Target browser environment
+    external: [/^node:/, "astro", ...external],
+    loader: { ".css": "copy" },
   });
 }
 ```
@@ -230,11 +233,11 @@ export function createPackageConfig({
 
 ```typescript
 // packages/astro-theme-toggle/tsdown.config.ts
-import { createPackageConfig } from '../../tsdown.package.config.ts';
+import { createPackageConfig } from "../../tsdown.package.config.ts";
 
 export default createPackageConfig({
   // Build both component and integration
-  entry: ['src/index.ts', 'src/integration.ts'],
+  entry: ["src/index.ts", "src/integration.ts"],
 });
 ```
 
@@ -307,16 +310,16 @@ Each package builds to `dist/` with:
 
 ```typescript
 // tests/component.test.ts
-import { describe, it, expect } from 'vitest';
-import { render } from './test-utils';
+import { describe, it, expect } from "vitest";
+import { render } from "./test-utils";
 
-describe('MyComponent', () => {
-  it('renders correctly', () => {
-    const result = render('<MyComponent />');
+describe("MyComponent", () => {
+  it("renders correctly", () => {
+    const result = render("<MyComponent />");
     expect(result).toBeTruthy();
   });
-  
-  it('handles props', () => {
+
+  it("handles props", () => {
     // Test component behavior
   });
 });
@@ -407,20 +410,20 @@ When making breaking changes:
 
 ```typescript
 // Export component for direct use
-export { default as MyComponent } from './MyComponent.astro';
+export { default as MyComponent } from "./MyComponent.astro";
 
 // Also export as integration
-export { default as myIntegration } from './integration';
+export { default as myIntegration } from "./integration";
 ```
 
 Users can choose:
 
 ```javascript
 // Option 1: Direct component import
-import { MyComponent } from '@sjohansson/my-package';
+import { MyComponent } from "@sjohansson/my-package";
 
 // Option 2: Use as integration
-import myIntegration from '@sjohansson/my-package/integration';
+import myIntegration from "@sjohansson/my-package/integration";
 ```
 
 ### Pattern: Configuration Passing
@@ -429,13 +432,13 @@ import myIntegration from '@sjohansson/my-package/integration';
 // integration.ts
 export default function myIntegration(options) {
   return {
-    name: '@sjohansson/my-integration',
+    name: "@sjohansson/my-integration",
     hooks: {
-      'astro:config:setup': ({ updateConfig }) => {
+      "astro:config:setup": ({ updateConfig }) => {
         updateConfig({
           vite: {
             define: {
-              '__MY_CONFIG__': JSON.stringify(options),
+              __MY_CONFIG__: JSON.stringify(options),
             },
           },
         });
@@ -451,10 +454,10 @@ export default function myIntegration(options) {
 export default function myIntegration(options = {}) {
   return {
     hooks: {
-      'astro:config:setup': ({ injectScript }) => {
+      "astro:config:setup": ({ injectScript }) => {
         // Only inject if requested
         if (options.autoInit) {
-          injectScript('head-inline', '/* init code */');
+          injectScript("head-inline", "/* init code */");
         }
       },
     },

@@ -32,18 +32,18 @@ biome.json               # Linter & formatter config
 
 ## Tech Stack
 
-| Tool            | Version   | Purpose                               |
-| --------------- | --------- | ------------------------------------- |
-| Node.js         | >=22      | Consumer support (22, 24, 25)         |
-| Node.js (dev)   | 24        | Local development (pinned in `.node-version`) |
-| pnpm            | 11.x      | Package manager (pinned via `packageManager`) |
-| TypeScript      | 6.x       | Type checking & declaration emit      |
-| Astro           | 5, 6, or 7 | Peer dependency for integrations (dev-pinned to 7) |
-| tsdown          | 0.23.x    | Build (ESM bundles + .d.ts, Rolldown) |
-| Vite            | 8.x       | Dev server & test infrastructure      |
-| Vitest          | 4.x       | Test runner (happy-dom environment)   |
-| Biome           | 2.x       | Linting & formatting (no eslint/prettier) |
-| Changesets      | 3.x       | Versioning & npm publishing           |
+| Tool          | Version    | Purpose                                            |
+| ------------- | ---------- | -------------------------------------------------- |
+| Node.js       | >=22       | Consumer support (22, 24, 25)                      |
+| Node.js (dev) | 24         | Local development (pinned in `.node-version`)      |
+| pnpm          | 11.x       | Package manager (pinned via `packageManager`)      |
+| TypeScript    | 6.x        | Type checking & declaration emit                   |
+| Astro         | 5, 6, or 7 | Peer dependency for integrations (dev-pinned to 7) |
+| tsdown        | 0.23.x     | Build (ESM bundles + .d.ts, Rolldown)              |
+| Vite          | 8.x        | Dev server & test infrastructure                   |
+| Vitest        | 4.x        | Test runner (happy-dom environment)                |
+| Biome         | 2.x        | Linting & formatting (no eslint/prettier)          |
+| Changesets    | 3.x        | Versioning & npm publishing                        |
 
 ## Packages
 
